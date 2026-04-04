@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>注册 - AI 数学逻辑诊断系统</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <h1>注册</h1>
+    <p class="muted">先注册账号，再按角色登录</p>
+
+    <form id="registerForm" class="form-stack">
+      <label>
+        用户名
+        <input id="username" name="username" type="text" required maxlength="40" />
+      </label>
+
+      <label>
+        密码
+        <input id="password" name="password" type="password" required minlength="6" maxlength="40" />
+      </label>
+
+      <label>
+        确认密码
+        <input id="confirmPassword" name="confirmPassword" type="password" required minlength="6" maxlength="40" />
+      </label>
+
+      <label>
+        角色
+        <select id="role" name="role" required>
+          <option value="STUDENT">学生</option>
+          <option value="TEACHER">老师</option>
+          <option value="ADMIN">管理员</option>
+        </select>
+      </label>
+
+      <button type="submit" class="primary-btn">注册</button>
+    </form>
+
+    <p id="registerError" class="error-text" aria-live="polite"></p>
+    <p id="registerSuccess" class="success-text" aria-live="polite"></p>
+
+    <p class="muted">
+      已有账号？<a href="/login.html">去登录</a>
+    </p>
+  </main>
+
+  <script type="module" src="/js/register.js"></script>
+</body>
+</html>

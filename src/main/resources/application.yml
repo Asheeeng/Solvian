@@ -1,0 +1,65 @@
+server:
+  # 服务端口
+  port: 8080
+
+spring:
+  application:
+    # 应用名称
+    name: springboot-base
+
+  datasource:
+    # PostgreSQL 数据库连接配置
+    url: jdbc:postgresql://localhost:5432/your_database
+    username: your_username
+    password: your_password
+    driver-class-name: org.postgresql.Driver
+
+  servlet:
+    multipart:
+      # 单个文件上传大小限制
+      max-file-size: 20MB
+      # 单次请求总上传大小限制
+      max-request-size: 50MB
+
+# 业务自定义配置：跨域
+app:
+  cors:
+    # 允许跨域来源
+    allowed-origins:
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+    # 允许的 HTTP 方法
+    allowed-methods:
+      - GET
+      - POST
+      - PUT
+      - DELETE
+      - OPTIONS
+    # 是否允许携带 Cookie
+    allow-credentials: true
+    # 预检请求缓存时间（秒）
+    max-age: 3600
+  ai:
+    # 是否启用真实模型调用（当前阶段默认关闭）
+    enabled: false
+    # 模型提供商标识
+    provider: mock
+    # 模型名称
+    model: mock-model
+    # 从环境变量读取 API Key，严禁硬编码
+    api-key: ${AI_MODEL_API_KEY:}
+    # 从环境变量读取基础地址
+    base-url: ${AI_MODEL_BASE_URL:}
+
+mybatis-plus:
+  # Mapper XML 位置（当前项目为占位结构，可先保留默认路径）
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    # 下划线转驼峰
+    map-underscore-to-camel-case: true
+    # 打印 SQL 到控制台（开发阶段可观察）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 默认主键类型（ASSIGN_ID：雪花算法）
+      id-type: ASSIGN_ID

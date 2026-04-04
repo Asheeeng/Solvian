@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>首页 - AI 数学逻辑诊断系统</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <header class="top-bar">
+    <div>
+      <h1>AI 数学逻辑诊断系统</h1>
+      <p class="muted">当前角色：<strong id="currentRoleLabel"></strong>，用户：<strong id="currentUserLabel"></strong></p>
+    </div>
+
+    <div class="top-actions">
+      <button id="openNotebookBtn" class="secondary-btn" type="button">查看错题本</button>
+      <button id="openStatsBtn" class="secondary-btn" type="button">查看统计面板</button>
+      <button id="logoutBtn" class="danger-btn" type="button">退出登录</button>
+    </div>
+  </header>
+
+  <main class="main-layout">
+    <section class="panel problem-panel">
+      <h2>题目/作业主展示区</h2>
+      <p class="muted">上传题目图片后可点击放大预览，再触发 AI 诊断。</p>
+
+      <div class="upload-row">
+        <input id="problemFileInput" type="file" accept="image/*" />
+      </div>
+
+      <div id="problemImagePlaceholder" class="image-placeholder">请先上传题目图片</div>
+      <img id="problemPreviewImage" class="problem-preview hidden" alt="题目预览" />
+
+      <div class="action-row inline-actions">
+        <label class="checkbox-inline">
+          <input id="socraticModeToggle" type="checkbox" />
+          启发式引导（Socratic Mode）
+        </label>
+        <button id="triggerDiagnosisBtn" class="primary-btn" type="button">启动 AI 诊断</button>
+      </div>
+    </section>
+
+    <section class="panel ai-panel">
+      <h2>AI 诊断结果区</h2>
+
+      <div class="block">
+        <h3>诊断报告</h3>
+        <p id="diagnosisStatusText" class="status-pending">等待诊断</p>
+        <p class="muted" id="currentRecordIdText">记录ID：-</p>
+      </div>
+
+      <div class="block">
+        <h3>步骤重构</h3>
+        <ol id="diagnosisSteps" class="steps-list">
+          <li>尚未生成诊断步骤</li>
+        </ol>
+      </div>
+
+      <div class="block">
+        <h3>错误反馈</h3>
+        <p id="diagnosisFeedback">请先上传题目并启动诊断。</p>
+      </div>
+
+      <div class="block">
+        <h3>AI识别反馈</h3>
+        <form id="aiFeedbackForm" class="feedback-form">
+          <label>
+            反馈结果
+            <select id="aiFeedbackSelect" required>
+              <option value="ACCURATE">识别准确</option>
+              <option value="INACCURATE">识别不准确</option>
+            </select>
+          </label>
+
+          <label id="errorTypeWrap" class="hidden">
+            错误类型
+            <select id="errorTypeSelect">
+              <option value="">请选择</option>
+              <option value="SCALAR_ERROR">标量误差</option>
+              <option value="COPY_ERROR">复制错误</option>
+              <option value="OTHER">其他</option>
+            </select>
+          </label>
+
+          <label>
+            备注（note）
+            <textarea id="feedbackNote" rows="3" maxlength="300" placeholder="可填写补充说明"></textarea>
+          </label>
+
+          <div class="inline-actions">
+            <button type="submit" class="secondary-btn">保存反馈</button>
+            <button id="downloadPdfBtn" type="button" class="secondary-btn">下载 PDF 报告（占位）</button>
+          </div>
+        </form>
+        <p id="aiFeedbackMessage" class="muted" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <div id="imageModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="true"></div>
+    <div class="modal-content">
+      <button id="closeImageModalBtn" class="close-btn" type="button" aria-label="关闭">×</button>
+      <img id="modalImage" alt="放大预览" />
+    </div>
+  </div>
+
+  <aside id="drawer" class="drawer hidden" aria-hidden="true">
+    <div class="drawer-header">
+      <h3 id="drawerTitle">错题本</h3>
+      <button id="closeDrawerBtn" class="close-btn" type="button" aria-label="关闭">×</button>
+    </div>
+    <div id="drawerBody" class="drawer-body"></div>
+  </aside>
+  <div id="drawerMask" class="drawer-mask hidden"></div>
+
+  <script type="module" src="/js/home.js"></script>
+</body>
+</html>

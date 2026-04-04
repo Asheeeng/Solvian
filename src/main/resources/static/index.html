@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 数学逻辑诊断系统</title>
+</head>
+<body>
+<script>
+  const raw = localStorage.getItem('copilot_auth_session');
+  if (raw) {
+    window.location.replace('/home.html');
+  } else {
+    window.location.replace('/login.html');
+  }
+</script>
+</body>
+</html>
