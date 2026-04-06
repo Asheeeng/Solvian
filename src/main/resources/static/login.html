@@ -3,42 +3,225 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>登录 - AI 数学逻辑诊断系统</title>
+  <title>登录 - Solvian</title>
   <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/login.css" />
 </head>
-<body class="auth-page">
-  <main class="auth-card">
-    <h1>登录</h1>
-    <p class="muted">请选择角色并登录系统</p>
+<body class="login-page">
+  <main class="login-layout">
+    <section class="brand-panel" aria-label="品牌展示区">
+      <div class="brand-panel__noise" aria-hidden="true"></div>
+      <div class="brand-panel__halo brand-panel__halo--one" aria-hidden="true"></div>
+      <div class="brand-panel__halo brand-panel__halo--two" aria-hidden="true"></div>
 
-    <form id="loginForm" class="form-stack">
-      <label>
-        用户名
-        <input id="username" name="username" type="text" required maxlength="40" />
-      </label>
+      <header class="brand-header">
+        <div class="brand-badge" aria-hidden="true">S</div>
+        <div>
+          <p class="brand-name">Solvian</p>
+          <p class="brand-tagline">AI 数学诊断系统</p>
+        </div>
+      </header>
 
-      <label>
-        密码
-        <input id="password" name="password" type="password" required minlength="6" maxlength="40" />
-      </label>
+      <div class="brand-copy">
+        <p class="brand-kicker">Explain every step</p>
+        <h1>让每一次推理，都有更清晰的反馈。</h1>
+        <p class="brand-description">
+          面向学生、教师与管理员的 AI 数学诊断平台，用更直观的方式连接题目、过程与诊断结果。
+        </p>
+      </div>
 
-      <label>
-        角色
-        <select id="role" name="role" required>
-          <option value="STUDENT">学生</option>
-          <option value="TEACHER">老师</option>
-          <option value="ADMIN">管理员</option>
-        </select>
-      </label>
+      <div class="scene-shell">
+        <div class="login-scene" id="loginScene" aria-hidden="true">
+          <span class="scene-orb scene-orb--one"></span>
+          <span class="scene-orb scene-orb--two"></span>
+          <span class="scene-symbol scene-symbol--sum">∑</span>
+          <span class="scene-symbol scene-symbol--int">∫</span>
+          <span class="scene-symbol scene-symbol--pi">π</span>
+          <div class="scene-track scene-track--one"></div>
+          <div class="scene-track scene-track--two"></div>
+          <div class="scene-ground"></div>
 
-      <button type="submit" class="primary-btn">登录</button>
-    </form>
+          <div class="scene-character scene-character--violet">
+            <div class="scene-character__core">
+              <div class="scene-character__body"></div>
+              <div class="scene-character__face">
+                <div class="scene-character__eyes">
+                  <span class="scene-eye">
+                    <span class="scene-eye__pupil"></span>
+                  </span>
+                  <span class="scene-eye">
+                    <span class="scene-eye__pupil"></span>
+                  </span>
+                </div>
+              </div>
+              <div class="scene-character__back"></div>
+            </div>
+          </div>
 
-    <p id="loginError" class="error-text" aria-live="polite"></p>
+          <div class="scene-character scene-character--graphite">
+            <div class="scene-character__core">
+              <div class="scene-character__body"></div>
+              <div class="scene-character__face">
+                <div class="scene-character__eyes">
+                  <span class="scene-eye">
+                    <span class="scene-eye__pupil"></span>
+                  </span>
+                  <span class="scene-eye">
+                    <span class="scene-eye__pupil"></span>
+                  </span>
+                </div>
+              </div>
+              <div class="scene-character__back"></div>
+            </div>
+          </div>
 
-    <p class="muted">
-      没有账号？<a href="/register.html">去注册</a>
-    </p>
+          <div class="scene-character scene-character--lemon">
+            <div class="scene-character__core">
+              <div class="scene-character__body"></div>
+              <div class="scene-character__face">
+                <div class="scene-character__eyes">
+                  <span class="scene-eye">
+                    <span class="scene-eye__pupil"></span>
+                  </span>
+                  <span class="scene-eye">
+                    <span class="scene-eye__pupil"></span>
+                  </span>
+                </div>
+                <span class="scene-character__mouth"></span>
+              </div>
+              <div class="scene-character__back"></div>
+            </div>
+          </div>
+
+          <div class="scene-character scene-character--apricot">
+            <div class="scene-character__core">
+              <div class="scene-character__body"></div>
+              <div class="scene-character__face">
+                <div class="scene-character__eyes">
+                  <span class="scene-eye">
+                    <span class="scene-eye__pupil"></span>
+                  </span>
+                  <span class="scene-eye">
+                    <span class="scene-eye__pupil"></span>
+                  </span>
+                </div>
+              </div>
+              <div class="scene-character__back"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="brand-footer">
+        <button type="button" class="brand-footer__link">隐私说明</button>
+        <button type="button" class="brand-footer__link">服务条款</button>
+        <button type="button" class="brand-footer__link">联系我们</button>
+      </footer>
+    </section>
+
+    <section class="form-panel" aria-label="登录表单区">
+      <div class="form-panel__inner">
+        <p class="form-panel__eyebrow">Welcome back</p>
+        <h2>登录你的 Solvian 账户</h2>
+        <p class="form-panel__description">
+          使用当前系统账号、密码和角色信息继续登录，登录成功后仍按现有逻辑进入首页。
+        </p>
+
+        <form id="loginForm" class="login-form">
+          <div class="field-group">
+            <label class="field-label" for="username">账号</label>
+            <div class="field-shell">
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                maxlength="40"
+                autocomplete="username"
+                placeholder="请输入用户名"
+              />
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-head">
+              <label class="field-label" for="password">密码</label>
+              <button type="button" class="inline-link" id="forgotPasswordBtn">忘记密码？</button>
+            </div>
+            <div class="field-shell field-shell--password">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                minlength="6"
+                maxlength="40"
+                autocomplete="current-password"
+                placeholder="请输入密码"
+              />
+              <button
+                type="button"
+                id="passwordToggle"
+                class="password-toggle"
+                aria-label="显示密码"
+                aria-pressed="false"
+              >
+                <span class="password-toggle__icon password-toggle__icon--show" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </span>
+                <span class="password-toggle__icon password-toggle__icon--hide" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3l18 18"></path>
+                    <path d="M10.6 10.7A3 3 0 0 0 13.4 13.5"></path>
+                    <path d="M9.9 5.1A11.4 11.4 0 0 1 12 5c6.4 0 10 7 10 7a18.5 18.5 0 0 1-4 4.9"></path>
+                    <path d="M6.6 6.7A18.7 18.7 0 0 0 2 12s3.6 7 10 7a10.6 10.6 0 0 0 4.4-.9"></path>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <div class="field-head">
+              <span class="field-label">登录身份</span>
+              <span class="field-tip">请与账号真实角色保持一致</span>
+            </div>
+            <input id="role" name="role" type="hidden" value="STUDENT" />
+            <div class="role-switch" id="roleSwitch" role="radiogroup" aria-label="登录身份">
+              <button type="button" class="role-chip is-active" role="radio" aria-checked="true" data-role="STUDENT">
+                <span class="role-chip__title">学生</span>
+                <span class="role-chip__meta">上传题目，查看 AI 诊断结果</span>
+              </button>
+              <button type="button" class="role-chip" role="radio" aria-checked="false" data-role="TEACHER">
+                <span class="role-chip__title">老师</span>
+                <span class="role-chip__meta">查看课堂诊断与反馈信息</span>
+              </button>
+              <button type="button" class="role-chip" role="radio" aria-checked="false" data-role="ADMIN">
+                <span class="role-chip__title">管理员</span>
+                <span class="role-chip__meta">维护系统与全局用户配置</span>
+              </button>
+            </div>
+          </div>
+
+          <p id="loginError" class="error-text login-message" aria-live="polite"></p>
+          <p id="loginNotice" class="login-notice" aria-live="polite"></p>
+
+          <button type="submit" class="submit-btn" id="loginSubmit">登录</button>
+
+          <button type="button" class="secondary-auth-btn" id="thirdPartyLoginBtn">
+            <span class="secondary-auth-btn__badge" aria-hidden="true">企</span>
+            企业微信登录（暂未开放）
+          </button>
+        </form>
+
+        <p class="switch-auth">
+          没有账号？<a href="/register.html">去注册</a>
+        </p>
+      </div>
+    </section>
   </main>
 
   <script type="module" src="/js/login.js"></script>

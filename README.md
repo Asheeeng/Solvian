@@ -15,6 +15,9 @@
 ## 当前已实现能力
 
 - 注册/登录（角色：`STUDENT` / `TEACHER` / `ADMIN`）
+- 品牌化双栏登录页（左侧角色舞台 + 右侧登录表单）
+- 登录页动态交互：角色眼睛跟随鼠标、密码聚焦时前倾偷看、显示密码时统一转身
+- 登录页增强交互：密码显隐、角色卡片切换、第三方登录占位提示
 - 首页两栏布局（左题目主区 2 / 右 AI 诊断区 1）
 - 图片上传与预览，点击放大
 - 启动 AI 诊断（`isSocratic` 开关）
@@ -46,6 +49,16 @@ src/main/java/com/example/springbootbase
 └── vo
 ```
 
+前端登录页相关资源：
+
+```text
+src/main/resources/static
+├── login.html
+├── css/login.css
+├── js/login.js
+└── js/modules/login-scene.js
+```
+
 ## 运行方式
 
 1. 确保本机有 JDK 17。
@@ -61,6 +74,13 @@ src/main/java/com/example/springbootbase
 ```text
 http://localhost:8080
 ```
+
+登录页说明：
+
+- 登录页沿用现有业务接口 `POST /api/auth/login`
+- 登录请求字段保持不变：`username`、`password`、`role`
+- 登录成功后仍跳转到 `/home.html`
+- “企业微信登录（暂未开放）”仅为 UI 占位，不接入真实第三方认证
 
 ## 主要接口
 
