@@ -3,50 +3,273 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>注册 - AI 数学逻辑诊断系统</title>
-  <link rel="stylesheet" href="/css/app.css" />
+  <title>注册 - Solvian</title>
+  <link rel="stylesheet" href="/css/app.css?v=20260407b" />
+  <link rel="stylesheet" href="/css/auth.css?v=20260407b" />
 </head>
-<body class="auth-page">
-  <main class="auth-card">
-    <h1>注册</h1>
-    <p class="muted">先注册账号，再按角色登录</p>
+<body class="auth-screen auth-screen--register" data-theme="light">
+  <main class="auth-layout">
+    <section class="auth-stage" aria-label="品牌展示区">
+      <div class="auth-stage__noise" aria-hidden="true"></div>
+      <div class="auth-stage__halo auth-stage__halo--violet" aria-hidden="true"></div>
+      <div class="auth-stage__halo auth-stage__halo--amber" aria-hidden="true"></div>
 
-    <form id="registerForm" class="form-stack">
-      <label>
-        用户名
-        <input id="username" name="username" type="text" required maxlength="40" />
-      </label>
+      <header class="auth-stage__header">
+        <div class="brand-lockup">
+          <div class="brand-lockup__badge" aria-hidden="true">S</div>
+          <div>
+            <p class="brand-lockup__name">Solvian</p>
+            <p class="brand-lockup__meta">AI 数学诊断系统</p>
+          </div>
+        </div>
+      </header>
 
-      <label>
-        密码
-        <input id="password" name="password" type="password" required minlength="6" maxlength="40" />
-      </label>
+      <div class="auth-stage__copy">
+        <p class="auth-stage__eyebrow">Create your entry</p>
+        <h1 class="auth-stage__title">先建立身份，再把每一步数学推理交给系统分析。</h1>
+        <p class="auth-stage__description">
+          注册页延续与登录页一致的品牌舞台和交互逻辑，同时保留现有注册接口、角色字段和后续跳转流程。
+        </p>
+      </div>
 
-      <label>
-        确认密码
-        <input id="confirmPassword" name="confirmPassword" type="password" required minlength="6" maxlength="40" />
-      </label>
+      <div class="auth-scene-shell">
+        <div class="auth-scene" id="authScene" aria-hidden="true">
+          <span class="auth-scene__orb auth-scene__orb--one"></span>
+          <span class="auth-scene__orb auth-scene__orb--two"></span>
+          <span class="auth-scene__symbol auth-scene__symbol--sum">∑</span>
+          <span class="auth-scene__symbol auth-scene__symbol--int">∫</span>
+          <span class="auth-scene__symbol auth-scene__symbol--pi">π</span>
+          <div class="auth-scene__track auth-scene__track--one"></div>
+          <div class="auth-scene__track auth-scene__track--two"></div>
+          <div class="auth-scene__ground"></div>
 
-      <label>
-        角色
-        <select id="role" name="role" required>
-          <option value="STUDENT">学生</option>
-          <option value="TEACHER">老师</option>
-          <option value="ADMIN">管理员</option>
-        </select>
-      </label>
+          <div class="auth-character auth-character--violet">
+            <div class="auth-character__core">
+              <div class="auth-character__body"></div>
+              <div class="auth-character__face">
+                <div class="auth-character__eyes">
+                  <span class="auth-eye"><span class="auth-eye__pupil"></span></span>
+                  <span class="auth-eye"><span class="auth-eye__pupil"></span></span>
+                </div>
+              </div>
+              <div class="auth-character__back"></div>
+            </div>
+          </div>
 
-      <button type="submit" class="primary-btn">注册</button>
-    </form>
+          <div class="auth-character auth-character--graphite">
+            <div class="auth-character__core">
+              <div class="auth-character__body"></div>
+              <div class="auth-character__face">
+                <div class="auth-character__eyes">
+                  <span class="auth-eye"><span class="auth-eye__pupil"></span></span>
+                  <span class="auth-eye"><span class="auth-eye__pupil"></span></span>
+                </div>
+              </div>
+              <div class="auth-character__back"></div>
+            </div>
+          </div>
 
-    <p id="registerError" class="error-text" aria-live="polite"></p>
-    <p id="registerSuccess" class="success-text" aria-live="polite"></p>
+          <div class="auth-character auth-character--lemon">
+            <div class="auth-character__core">
+              <div class="auth-character__body"></div>
+              <div class="auth-character__face">
+                <div class="auth-character__eyes">
+                  <span class="auth-eye"><span class="auth-eye__pupil"></span></span>
+                  <span class="auth-eye"><span class="auth-eye__pupil"></span></span>
+                </div>
+                <span class="auth-character__mouth"></span>
+              </div>
+              <div class="auth-character__back"></div>
+            </div>
+          </div>
 
-    <p class="muted">
-      已有账号？<a href="/login.html">去登录</a>
-    </p>
+          <div class="auth-character auth-character--apricot">
+            <div class="auth-character__core">
+              <div class="auth-character__body"></div>
+              <div class="auth-character__face">
+                <div class="auth-character__eyes">
+                  <span class="auth-eye"><span class="auth-eye__pupil"></span></span>
+                  <span class="auth-eye"><span class="auth-eye__pupil"></span></span>
+                </div>
+              </div>
+              <div class="auth-character__back"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="auth-stage__footer">
+        <button type="button" class="auth-stage__link">隐私说明</button>
+        <button type="button" class="auth-stage__link">服务条款</button>
+        <button type="button" class="auth-stage__link">联系我们</button>
+      </footer>
+    </section>
+
+    <section class="auth-panel" aria-label="注册表单区">
+      <button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false">
+        <span class="theme-toggle__glyph theme-toggle__glyph--sun" aria-hidden="true">☀</span>
+        <span class="theme-toggle__glyph theme-toggle__glyph--moon" aria-hidden="true">☾</span>
+        <span class="theme-toggle__label" data-theme-label>深色模式</span>
+      </button>
+
+      <div class="auth-panel__inner">
+        <p class="auth-panel__eyebrow">Create account</p>
+        <h2 class="auth-panel__title">创建你的 Solvian 账户</h2>
+        <p class="auth-panel__description">
+          使用当前系统支持的账号、密码和角色完成注册。注册成功后仍按原有逻辑跳转到登录页。
+        </p>
+
+        <form id="registerForm" class="auth-form">
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="username">账号</label>
+            <div class="auth-field-shell">
+              <input
+                id="username"
+                name="username"
+                type="text"
+                required
+                maxlength="40"
+                autocomplete="username"
+                placeholder="请输入用户名"
+              />
+            </div>
+          </div>
+
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="password">密码</label>
+            <div class="auth-field-shell auth-field-shell--password">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                required
+                minlength="6"
+                maxlength="40"
+                autocomplete="new-password"
+                placeholder="请设置登录密码"
+              />
+              <button
+                type="button"
+                id="passwordToggle"
+                class="password-toggle"
+                aria-label="显示密码"
+                aria-pressed="false"
+              >
+                <span class="password-toggle__icon password-toggle__icon--show" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </span>
+                <span class="password-toggle__icon password-toggle__icon--hide" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3l18 18"></path>
+                    <path d="M10.6 10.7A3 3 0 0 0 13.4 13.5"></path>
+                    <path d="M9.9 5.1A11.4 11.4 0 0 1 12 5c6.4 0 10 7 10 7a18.5 18.5 0 0 1-4 4.9"></path>
+                    <path d="M6.6 6.7A18.7 18.7 0 0 0 2 12s3.6 7 10 7a10.6 10.6 0 0 0 4.4-.9"></path>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-field-group">
+            <label class="auth-field-label" for="confirmPassword">确认密码</label>
+            <div class="auth-field-shell auth-field-shell--password">
+              <input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                minlength="6"
+                maxlength="40"
+                autocomplete="new-password"
+                placeholder="请再次输入密码"
+              />
+              <button
+                type="button"
+                id="confirmPasswordToggle"
+                class="password-toggle"
+                aria-label="显示确认密码"
+                aria-pressed="false"
+              >
+                <span class="password-toggle__icon password-toggle__icon--show" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6-10-6-10-6Z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </span>
+                <span class="password-toggle__icon password-toggle__icon--hide" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 3l18 18"></path>
+                    <path d="M10.6 10.7A3 3 0 0 0 13.4 13.5"></path>
+                    <path d="M9.9 5.1A11.4 11.4 0 0 1 12 5c6.4 0 10 7 10 7a18.5 18.5 0 0 1-4 4.9"></path>
+                    <path d="M6.6 6.7A18.7 18.7 0 0 0 2 12s3.6 7 10 7a10.6 10.6 0 0 0 4.4-.9"></path>
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-field-group">
+            <div class="auth-field-head">
+              <span class="auth-field-label">注册身份</span>
+              <span class="auth-field-tip">注册后按同角色登录</span>
+            </div>
+            <input id="role" name="role" type="hidden" value="STUDENT" />
+            <div class="auth-role-switch" role="radiogroup" aria-label="注册身份">
+              <button type="button" class="auth-role-chip is-active" role="radio" aria-checked="true" data-role="STUDENT">
+                <span class="auth-role-chip__title">学生</span>
+                <span class="auth-role-chip__meta">进入题目上传与诊断工作流</span>
+              </button>
+              <button type="button" class="auth-role-chip" role="radio" aria-checked="false" data-role="TEACHER">
+                <span class="auth-role-chip__title">老师</span>
+                <span class="auth-role-chip__meta">关注课堂反馈与纠错效率</span>
+              </button>
+              <button type="button" class="auth-role-chip" role="radio" aria-checked="false" data-role="ADMIN">
+                <span class="auth-role-chip__title">管理员</span>
+                <span class="auth-role-chip__meta">维护用户、权限与运行配置</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="auth-field-group">
+            <div class="auth-field-head">
+              <label class="auth-field-label" for="registerCaptchaInput">图形验证码</label>
+              <span class="auth-field-tip">前端可用版，支持刷新</span>
+            </div>
+            <div class="captcha-row">
+              <div class="auth-field-shell captcha-input-shell">
+                <input
+                  id="registerCaptchaInput"
+                  name="captcha"
+                  type="text"
+                  inputmode="text"
+                  maxlength="4"
+                  autocomplete="off"
+                  placeholder="请输入验证码"
+                />
+              </div>
+              <div class="captcha-card">
+                <canvas id="registerCaptchaCanvas" width="144" height="56" aria-hidden="true"></canvas>
+                <button type="button" class="captcha-refresh" id="registerCaptchaRefresh">换一张</button>
+              </div>
+            </div>
+          </div>
+
+          <p id="registerError" class="auth-message auth-message--error" aria-live="polite"></p>
+          <p id="registerSuccess" class="auth-message auth-message--success" aria-live="polite"></p>
+
+          <button type="submit" class="auth-submit-btn" id="registerSubmit">创建账户</button>
+        </form>
+
+        <p class="auth-switch">
+          已有账号？<a href="/login.html">返回登录</a>
+        </p>
+      </div>
+    </section>
   </main>
 
-  <script type="module" src="/js/register.js"></script>
+  <script type="module" src="/js/register.js?v=20260407b"></script>
 </body>
 </html>

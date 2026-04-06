@@ -5,7 +5,7 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-export function initLoginScene({ scene }) {
+export function initAuthScene({ scene }) {
   if (!scene) {
     return {
       setBehaviorState() {},
@@ -63,7 +63,7 @@ export function initLoginScene({ scene }) {
     );
   }
 
-  function handlePointerLeave() {
+  function resetLook() {
     if (!state.peeking && !state.privacy) {
       applyLook(0, 0);
     }
@@ -73,7 +73,7 @@ export function initLoginScene({ scene }) {
     scene.classList.add('is-reduced-motion');
   } else {
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
-    window.addEventListener('blur', handlePointerLeave);
+    window.addEventListener('blur', resetLook);
   }
 
   applyState();
@@ -87,7 +87,7 @@ export function initLoginScene({ scene }) {
     destroy() {
       if (!prefersReducedMotion) {
         window.removeEventListener('pointermove', handlePointerMove);
-        window.removeEventListener('blur', handlePointerLeave);
+        window.removeEventListener('blur', resetLook);
       }
     }
   };
