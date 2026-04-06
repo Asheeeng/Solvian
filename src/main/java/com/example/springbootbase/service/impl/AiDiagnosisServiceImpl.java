@@ -2,7 +2,8 @@ package com.example.springbootbase.service.impl;
 
 import com.example.springbootbase.auth.Role;
 import com.example.springbootbase.dto.response.EvaluateResponse;
-import com.example.springbootbase.model.DiagnosisRecord;
+import com.example.springbootbase.entity.DiagnosisRecordEntity;
+import com.example.springbootbase.mapper.DiagnosisRecordMapper;
 import com.example.springbootbase.model.DiagnosisResult;
 import com.example.springbootbase.model.DiagnosisStep;
 import com.example.springbootbase.model.ModelChainResult;
@@ -14,13 +15,14 @@ import com.example.springbootbase.service.ImagePreprocessService;
 import com.example.springbootbase.service.ModelClientService;
 import com.example.springbootbase.service.ResponseParserService;
 import com.example.springbootbase.service.TagExtractionService;
-import com.example.springbootbase.store.InMemoryDataStore;
 import com.example.springbootbase.util.IdUtil;
-import com.example.springbootbase.util.TimeUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -38,7 +40,8 @@ public class AiDiagnosisServiceImpl implements AiDiagnosisService {
     private final ResponseParserService responseParserService;
     private final TagExtractionService tagExtractionService;
     private final ErrorAnalysisService errorAnalysisService;
-    private final InMemoryDataStore store;
+    private final DiagnosisRecordMapper diagnosisRecordMapper;
+    private final ObjectMapper objectMapper;
 
     @Override
     public EvaluateResponse evaluate(MultipartFile file, boolean isSocratic, String problemType, SessionInfo sessionInfo) {
@@ -56,24 +59,7 @@ public class AiDiagnosisServiceImpl implements AiDiagnosisService {
         DiagnosisResult finalResult = errorAnalysisService.analyze(parsed, chainResult.getReasoningRaw());
 
         String recordId = IdUtil.newId();
-        DiagnosisRecord record = DiagnosisRecord.builder()
-                .recordId(recordId)
-                .userId(sessionInfo.getUserId())
-                .username(sessionInfo.getUsername())
-                .role(sessionInfo.getRole())
-                .fileName(preprocessedImage.getFileName())
-                .isSocratic(isSocratic)
-                .status(finalResult.getStatus())
-                .steps(toStepSummaries(finalResult.getSteps()))
-                .feedback(finalResult.getFeedback())
-                .errorIndex(finalResult.getErrorIndex())
-                .tags(new ArrayList<>(finalResult.getTags()))
-                .mathData(finalResult.getMathData())
-                .createdAt(TimeUtil.now())
-                .build();
-
-        store.getDiagnosisById().put(recordId, record);
-        store.getDiagnosisOrder().add(0, recordId);
+        persistDiagnosisRecord(recordId, sessionInfo, preprocessedImage, isSocratic, finalResult, subjectScope);
 
         return EvaluateResponse.builder()
                 .recordId(recordId)
@@ -138,5 +124,41 @@ public class AiDiagnosisServiceImpl implements AiDiagnosisService {
             summaries.add(title + ": " + content + latex);
         }
         return summaries;
+    }
+
+    private void persistDiagnosisRecord(String recordId,
+                                        SessionInfo sessionInfo,
+                                        PreprocessedImage preprocessedImage,
+                                        boolean isSocratic,
+                                        DiagnosisResult finalResult,
+                                        String subjectScope) {
+        DiagnosisRecordEntity entity = DiagnosisRecordEntity.builder()
+                .recordId(recordId)
+                .userId(sessionInfo.getUserId())
+                .username(sessionInfo.getUsername())
+                .role(sessionInfo.getRole().name())
+                .status(finalResult.getStatus())
+                .stepsJson(toJson(toStepSummaries(finalResult.getSteps())))
+                .feedback(finalResult.getFeedback())
+                .errorIndex(finalResult.getErrorIndex())
+                .tagsJson(toJson(finalResult.getTags() == null ? List.of() : new ArrayList<>(finalResult.getTags())))
+                .isSocratic(isSocratic)
+                .problemType(subjectScope)
+                .imageName(preprocessedImage.getFileName())
+                .mathDataJson(toJson(finalResult.getMathData()))
+                .createdAt(OffsetDateTime.now())
+                .build();
+        diagnosisRecordMapper.insert(entity);
+    }
+
+    private String toJson(Object value) {
+        try {
+            if (value == null) {
+                return "{}";
+            }
+            return objectMapper.writeValueAsString(value);
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException("序列化诊断记录失败", e);
+        }
     }
 }

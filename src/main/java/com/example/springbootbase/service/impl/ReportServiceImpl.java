@@ -1,10 +1,10 @@
 package com.example.springbootbase.service.impl;
 
 import com.example.springbootbase.auth.Role;
-import com.example.springbootbase.model.DiagnosisRecord;
+import com.example.springbootbase.entity.DiagnosisRecordEntity;
+import com.example.springbootbase.mapper.DiagnosisRecordMapper;
 import com.example.springbootbase.model.SessionInfo;
 import com.example.springbootbase.service.ReportService;
-import com.example.springbootbase.store.InMemoryDataStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,11 +18,11 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
 
-    private final InMemoryDataStore store;
+    private final DiagnosisRecordMapper diagnosisRecordMapper;
 
     @Override
     public byte[] downloadPdf(String recordId, SessionInfo sessionInfo) {
-        DiagnosisRecord record = store.getDiagnosisById().get(recordId);
+        DiagnosisRecordEntity record = diagnosisRecordMapper.selectById(recordId);
         if (record == null) {
             throw new IllegalArgumentException("记录不存在");
         }

@@ -24,7 +24,8 @@
 - 错题本与统计面板（按钮触发抽屉）
 - 前端事件上报
 - PDF 报告下载接口（占位实现）
-- 全链路内存存储实现（便于后续切数据库）
+- PostgreSQL 持久化（认证、会话、诊断记录、AI反馈、事件日志）
+- 对外接口保持稳定，便于后续继续扩展业务字段与权限能力
 - 模型连通性测试接口（`GET /api/model/test`）
 
 ## 目录结构（核心）
@@ -97,6 +98,26 @@ http://localhost:8080
 - `AI_MODEL_BASE_URL`（可选）
 
 安全要求：API Key 仅通过环境变量或配置注入，不允许硬编码。
+
+## PostgreSQL 初始化（本地）
+
+当前项目在 `local` 环境下支持 PostgreSQL 自动初始化：
+
+- 表结构脚本：[schema-postgresql.sql](/Users/suis/Developer/Codex/Copilot/src/main/resources/schema-postgresql.sql)
+- 初始化数据脚本：[data-postgresql.sql](/Users/suis/Developer/Codex/Copilot/src/main/resources/data-postgresql.sql)
+
+默认会创建并预留这些表：
+
+- `app_user`（登录注册）
+- `diagnosis_record`（诊断历史）
+- `ai_feedback_record`（识别反馈）
+- `event_record`（前端事件日志）
+
+默认演示账号（密码统一 `abc123456`）：
+
+- `student_demo` / `STUDENT`
+- `teacher_demo` / `TEACHER`
+- `admin_demo` / `ADMIN`
 
 ## 后续建议
 

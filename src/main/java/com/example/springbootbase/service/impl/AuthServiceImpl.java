@@ -1,19 +1,25 @@
 package com.example.springbootbase.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.springbootbase.auth.Role;
 import com.example.springbootbase.dto.request.LoginRequest;
 import com.example.springbootbase.dto.request.RegisterRequest;
 import com.example.springbootbase.dto.response.LoginResponse;
 import com.example.springbootbase.dto.response.RegisterResponse;
+import com.example.springbootbase.entity.SessionEntity;
+import com.example.springbootbase.entity.UserEntity;
+import com.example.springbootbase.mapper.SessionMapper;
+import com.example.springbootbase.mapper.UserMapper;
 import com.example.springbootbase.model.SessionInfo;
 import com.example.springbootbase.model.UserAccount;
 import com.example.springbootbase.service.AuthService;
-import com.example.springbootbase.store.InMemoryDataStore;
 import com.example.springbootbase.util.IdUtil;
 import com.example.springbootbase.util.TimeUtil;
 import com.example.springbootbase.vo.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
 
 /**
  * 认证服务实现。
@@ -22,7 +28,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final InMemoryDataStore store;
+    private final UserMapper userMapper;
+    private final SessionMapper sessionMapper;
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -30,22 +37,25 @@ public class AuthServiceImpl implements AuthService {
 
         String username = request.getUsername().trim();
         Role role = Role.fromInput(request.getRole());
-        if (store.getUsersByUsername().containsKey(username)) {
+        if (findByUsername(username) != null) {
             return RegisterResponse.builder()
                     .success(false)
                     .message("用户名已存在")
                     .build();
         }
 
-        UserAccount user = UserAccount.builder()
-                .userId(IdUtil.newId())
+        String userId = IdUtil.newId();
+        UserEntity userEntity = UserEntity.builder()
+                .userId(userId)
                 .username(username)
                 .password(request.getPassword())
-                .role(role)
-                .createdAt(TimeUtil.now())
+                .role(role.name())
+                .createdAt(OffsetDateTime.now())
+                .updatedAt(OffsetDateTime.now())
                 .build();
 
-        store.getUsersByUsername().put(username, user);
+        userMapper.insert(userEntity);
+        UserAccount user = toUserAccount(userEntity);
 
         return RegisterResponse.builder()
                 .success(true)
@@ -60,7 +70,8 @@ public class AuthServiceImpl implements AuthService {
 
         String username = request.getUsername().trim();
         Role role = Role.fromInput(request.getRole());
-        UserAccount user = store.getUsersByUsername().get(username);
+        UserEntity userEntity = findByUsername(username);
+        UserAccount user = userEntity == null ? null : toUserAccount(userEntity);
 
         if (user == null || !user.getPassword().equals(request.getPassword()) || user.getRole() != role) {
             return LoginResponse.builder()
@@ -78,7 +89,13 @@ public class AuthServiceImpl implements AuthService {
                 .createdAt(TimeUtil.now())
                 .build();
 
-        store.getSessionsByToken().put(token, sessionInfo);
+        sessionMapper.insert(SessionEntity.builder()
+                .token(token)
+                .userId(sessionInfo.getUserId())
+                .username(sessionInfo.getUsername())
+                .role(sessionInfo.getRole().name())
+                .createdAt(OffsetDateTime.now())
+                .build());
 
         return LoginResponse.builder()
                 .success(true)
@@ -93,13 +110,25 @@ public class AuthServiceImpl implements AuthService {
         if (token == null || token.isBlank()) {
             return null;
         }
-        return store.getSessionsByToken().get(token);
+        SessionEntity sessionEntity = sessionMapper.selectById(token);
+        if (sessionEntity == null) {
+            return null;
+        }
+        return SessionInfo.builder()
+                .token(sessionEntity.getToken())
+                .userId(sessionEntity.getUserId())
+                .username(sessionEntity.getUsername())
+                .role(Role.fromInput(sessionEntity.getRole()))
+                .createdAt(sessionEntity.getCreatedAt() == null
+                        ? TimeUtil.now()
+                        : sessionEntity.getCreatedAt().toInstant())
+                .build();
     }
 
     @Override
     public void logout(String token) {
         if (token != null && !token.isBlank()) {
-            store.getSessionsByToken().remove(token);
+            sessionMapper.deleteById(token);
         }
     }
 
@@ -138,6 +167,24 @@ public class AuthServiceImpl implements AuthService {
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .role(user.getRole())
+                .build();
+    }
+
+    private UserEntity findByUsername(String username) {
+        return userMapper.selectOne(new LambdaQueryWrapper<UserEntity>()
+                .eq(UserEntity::getUsername, username)
+                .last("LIMIT 1"));
+    }
+
+    private UserAccount toUserAccount(UserEntity userEntity) {
+        return UserAccount.builder()
+                .userId(userEntity.getUserId())
+                .username(userEntity.getUsername())
+                .password(userEntity.getPassword())
+                .role(Role.fromInput(userEntity.getRole()))
+                .createdAt(userEntity.getCreatedAt() == null
+                        ? TimeUtil.now()
+                        : userEntity.getCreatedAt().toInstant())
                 .build();
     }
 }

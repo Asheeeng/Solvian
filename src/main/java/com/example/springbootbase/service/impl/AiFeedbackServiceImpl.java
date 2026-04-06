@@ -5,15 +5,17 @@ import com.example.springbootbase.auth.ErrorType;
 import com.example.springbootbase.auth.Role;
 import com.example.springbootbase.dto.request.AiFeedbackRequest;
 import com.example.springbootbase.dto.response.AiFeedbackResponse;
-import com.example.springbootbase.model.AiFeedbackRecord;
-import com.example.springbootbase.model.DiagnosisRecord;
+import com.example.springbootbase.entity.AiFeedbackRecordEntity;
+import com.example.springbootbase.entity.DiagnosisRecordEntity;
+import com.example.springbootbase.mapper.AiFeedbackRecordMapper;
+import com.example.springbootbase.mapper.DiagnosisRecordMapper;
 import com.example.springbootbase.model.SessionInfo;
 import com.example.springbootbase.service.AiFeedbackService;
-import com.example.springbootbase.store.InMemoryDataStore;
 import com.example.springbootbase.util.IdUtil;
-import com.example.springbootbase.util.TimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
 
 /**
  * AI 反馈服务实现。
@@ -22,7 +24,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AiFeedbackServiceImpl implements AiFeedbackService {
 
-    private final InMemoryDataStore store;
+    private final DiagnosisRecordMapper diagnosisRecordMapper;
+    private final AiFeedbackRecordMapper aiFeedbackRecordMapper;
 
     @Override
     public AiFeedbackResponse submit(AiFeedbackRequest request, SessionInfo sessionInfo) {
@@ -30,15 +33,15 @@ public class AiFeedbackServiceImpl implements AiFeedbackService {
             throw new IllegalArgumentException("recordId 不能为空");
         }
 
-        DiagnosisRecord record = store.getDiagnosisById().get(request.getRecordId());
-        if (record == null) {
+        DiagnosisRecordEntity recordEntity = diagnosisRecordMapper.selectById(request.getRecordId());
+        if (recordEntity == null) {
             return AiFeedbackResponse.builder()
                     .success(false)
                     .message("诊断记录不存在")
                     .build();
         }
 
-        if (sessionInfo.getRole() == Role.STUDENT && !sessionInfo.getUserId().equals(record.getUserId())) {
+        if (sessionInfo.getRole() == Role.STUDENT && !sessionInfo.getUserId().equals(recordEntity.getUserId())) {
             return AiFeedbackResponse.builder()
                     .success(false)
                     .message("无权操作该记录")
@@ -55,19 +58,22 @@ public class AiFeedbackServiceImpl implements AiFeedbackService {
             errorType = ErrorType.fromInput(request.getErrorType());
         }
 
-        record.setAiFeedback(aiFeedbackType);
-        record.setErrorType(errorType);
-        record.setNote(request.getNote());
+        recordEntity.setAiFeedback(aiFeedbackType.name());
+        recordEntity.setErrorType(errorType == null ? null : errorType.name());
+        recordEntity.setNote(request.getNote());
+        diagnosisRecordMapper.updateById(recordEntity);
 
         String feedbackId = IdUtil.newId();
-        store.getAiFeedbackRecords().add(AiFeedbackRecord.builder()
+        aiFeedbackRecordMapper.insert(AiFeedbackRecordEntity.builder()
                 .feedbackId(feedbackId)
-                .recordId(record.getRecordId())
+                .recordId(recordEntity.getRecordId())
                 .userId(sessionInfo.getUserId())
-                .aiFeedback(aiFeedbackType)
-                .errorType(errorType)
+                .username(sessionInfo.getUsername())
+                .role(sessionInfo.getRole().name())
+                .aiFeedback(aiFeedbackType.name())
+                .errorType(errorType == null ? null : errorType.name())
                 .note(request.getNote())
-                .createdAt(TimeUtil.now())
+                .createdAt(OffsetDateTime.now())
                 .build());
 
         return AiFeedbackResponse.builder()
