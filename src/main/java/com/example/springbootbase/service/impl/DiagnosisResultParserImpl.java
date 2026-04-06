@@ -1,6 +1,7 @@
 package com.example.springbootbase.service.impl;
 
 import com.example.springbootbase.model.DiagnosisResult;
+import com.example.springbootbase.model.DiagnosisStep;
 import com.example.springbootbase.service.DiagnosisResultParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,13 +39,42 @@ public class DiagnosisResultParserImpl implements DiagnosisResultParser {
                 errorIndex = root.get("error_index").asInt();
             }
 
-            List<String> steps = new ArrayList<>();
+            List<DiagnosisStep> steps = new ArrayList<>();
             JsonNode stepsNode = root.path("steps");
             if (stepsNode.isArray()) {
-                stepsNode.forEach(node -> steps.add(node.asText()));
+                int index = 1;
+                for (JsonNode node : stepsNode) {
+                    if (node.isObject()) {
+                        steps.add(DiagnosisStep.builder()
+                                .stepNo(node.path("stepNo").asInt(index))
+                                .title(node.path("title").asText("步骤 " + index))
+                                .content(node.path("content").asText(""))
+                                .latex(node.path("latex").asText(""))
+                                .isWrong(node.path("isWrong").asBoolean(false))
+                                .explanation(node.path("explanation").asText(""))
+                                .build());
+                    } else {
+                        steps.add(DiagnosisStep.builder()
+                                .stepNo(index)
+                                .title("步骤 " + index)
+                                .content(node.asText())
+                                .latex("")
+                                .isWrong(false)
+                                .explanation("")
+                                .build());
+                    }
+                    index++;
+                }
             }
             if (steps.isEmpty()) {
-                steps.add("未解析到步骤信息");
+                steps.add(DiagnosisStep.builder()
+                        .stepNo(1)
+                        .title("步骤 1")
+                        .content("未解析到步骤信息")
+                        .latex("")
+                        .isWrong(false)
+                        .explanation("")
+                        .build());
             }
 
             Map<String, Object> mathData = new HashMap<>();
@@ -57,6 +87,9 @@ public class DiagnosisResultParserImpl implements DiagnosisResultParser {
                     .steps(steps)
                     .feedback(feedback)
                     .errorIndex(errorIndex)
+                    .tags(new ArrayList<>())
+                    .subjectScope("matrix")
+                    .isMatrixProblem(true)
                     .mathData(mathData)
                     .build();
         } catch (Exception e) {

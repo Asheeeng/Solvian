@@ -1,68 +1,124 @@
 package com.example.springbootbase.service.impl;
 
 import com.example.springbootbase.config.AiModelProperties;
+import com.example.springbootbase.model.ModelChainResult;
 import com.example.springbootbase.model.PreprocessedImage;
+import com.example.springbootbase.model.VisionExtractionResult;
 import com.example.springbootbase.service.ModelClientService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.springbootbase.service.PromptBuilderService;
+import com.example.springbootbase.service.VisionExtractionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
- * 模型调用实现。
- * 当前阶段返回可运行的模拟结果；真实模型调用通过配置开关扩展。
+ * 模型调用编排实现（视觉识别 + 文本推理）。
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ModelClientServiceImpl implements ModelClientService {
 
     private final AiModelProperties aiModelProperties;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final GlmModelClientService glmModelClientService;
+    private final MockModelClientService mockModelClientService;
+    private final PromptBuilderService promptBuilderService;
+    private final VisionExtractionService visionExtractionService;
 
     @Override
-    public String analyze(PreprocessedImage preprocessedImage, boolean isSocratic) {
-        // 当前阶段不强依赖真实模型，但保留配置入口，避免硬编码 Key。
-        boolean errorFound = preprocessedImage.getFileSize() % 2 != 0;
-        String status = errorFound ? "error_found" : "correct";
+    public ModelChainResult analyze(PreprocessedImage preprocessedImage, boolean isSocratic, String subjectScope) {
+        if (!aiModelProperties.isEnabled()) {
+            throw new IllegalArgumentException("AI 调用已关闭，请检查 app.ai.enabled 配置");
+        }
 
-        List<String> steps = isSocratic
-                ? List.of(
-                "请先观察题目中的已知条件与目标结论。",
-                "逐步检查关键计算环节并定位可能的异常步骤。",
-                "给出一条更稳妥的修正思路，供你自行推导验证。")
-                : List.of(
-                "解析题目图像并抽取关键数学结构。",
-                "重构中间步骤并进行一致性校验。",
-                "输出最终诊断结论与修正建议。");
+        if (!"zhipu".equalsIgnoreCase(aiModelProperties.getProvider())) {
+            throw new IllegalArgumentException("当前仅支持 zhipu provider，实际为: " + aiModelProperties.getProvider());
+        }
 
-        String feedback = errorFound
-                ? "检测到疑似错误，建议优先复查第 2 到第 3 步的符号与系数。"
-                : "当前步骤整体一致，未发现明显错误。";
+        if (aiModelProperties.isMockEnabled()) {
+            log.warn("[model-chain] mockEnabled=true，当前走 mock 实现（仅用于本地调试）");
+            String raw = mockModelClientService.analyze(preprocessedImage, isSocratic, subjectScope, "mock-enabled=true");
+            VisionExtractionResult fallbackVision = VisionExtractionResult.builder()
+                    .problemText("mock mode")
+                    .isMatrixProblem(true)
+                    .confidence(1.0d)
+                    .build();
+            return ModelChainResult.builder()
+                    .visionModel("mock-vision")
+                    .reasoningModel("mock-reasoning")
+                    .visionRaw("{\"problemText\":\"mock mode\"}")
+                    .reasoningRaw(raw)
+                    .visionExtractionResult(fallbackVision)
+                    .build();
+        }
 
-        Integer errorIndex = errorFound ? 2 : null;
+        log.info(
+                "[model-chain] provider={}, visionModel={}, reasoningModel={}, baseUrlHost={}, apiKeyMasked={}",
+                aiModelProperties.getProvider(),
+                aiModelProperties.getVisionModel(),
+                aiModelProperties.getModel(),
+                extractHost(aiModelProperties.getBaseUrl()),
+                aiModelProperties.maskedApiKey()
+        );
 
-        Map<String, Object> mathData = new LinkedHashMap<>();
-        mathData.put("matrixDetected", true);
-        mathData.put("fileSize", preprocessedImage.getFileSize());
-        mathData.put("provider", aiModelProperties.getProvider());
-        mathData.put("model", aiModelProperties.getModel());
-
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("status", status);
-        payload.put("steps", steps);
-        payload.put("feedback", feedback);
-        payload.put("errorIndex", errorIndex);
-        payload.put("mathData", mathData);
-
+        String visionPrompt = promptBuilderService.buildVisionPrompt(preprocessedImage, subjectScope);
+        String visionRaw;
         try {
-            return objectMapper.writeValueAsString(payload);
-        } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException("模型响应生成失败");
+            visionRaw = glmModelClientService.callVisionModel(
+                    aiModelProperties.getVisionModel(),
+                    preprocessedImage,
+                    visionPrompt
+            );
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("视觉模型调用失败: " + ex.getMessage());
+        }
+
+        VisionExtractionResult visionExtractionResult = visionExtractionService.parse(visionRaw);
+        String reasoningPrompt = promptBuilderService.buildReasoningPrompt(
+                visionExtractionResult,
+                isSocratic,
+                subjectScope
+        );
+
+        String reasoningRaw;
+        try {
+            reasoningRaw = glmModelClientService.callTextModel(
+                    aiModelProperties.getModel(),
+                    reasoningPrompt
+            );
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("推理模型调用失败: " + ex.getMessage());
+        }
+
+        return ModelChainResult.builder()
+                .visionModel(aiModelProperties.getVisionModel())
+                .reasoningModel(aiModelProperties.getModel())
+                .visionRaw(visionRaw)
+                .reasoningRaw(reasoningRaw)
+                .visionExtractionResult(visionExtractionResult)
+                .build();
+    }
+
+    @Override
+    public Map<String, Object> testTextModel() {
+        return glmModelClientService.testTextModel(
+                aiModelProperties.getModel(),
+                "请仅返回字符串: model_test_ok"
+        );
+    }
+
+    private String extractHost(String baseUrl) {
+        if (baseUrl == null || baseUrl.isBlank()) {
+            return "<empty>";
+        }
+        try {
+            java.net.URI uri = java.net.URI.create(baseUrl);
+            return uri.getHost() == null ? baseUrl : uri.getHost();
+        } catch (Exception ex) {
+            return "<invalid>";
         }
     }
 }
+

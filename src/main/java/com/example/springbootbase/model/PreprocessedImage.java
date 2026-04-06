@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PreprocessedImage {
     private String fileName;
+    private String contentType;
     private byte[] bytes;
     private long fileSize;
 }

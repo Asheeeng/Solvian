@@ -32,6 +32,7 @@ public class DiagnosisRecord {
     private List<String> steps;
     private String feedback;
     private Integer errorIndex;
+    private List<String> tags;
     private Map<String, Object> mathData;
 
     private AiFeedbackType aiFeedback;

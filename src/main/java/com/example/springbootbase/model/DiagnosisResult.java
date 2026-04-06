@@ -17,8 +17,11 @@ import java.util.Map;
 @AllArgsConstructor
 public class DiagnosisResult {
     private String status;
-    private List<String> steps;
+    private List<DiagnosisStep> steps;
     private String feedback;
     private Integer errorIndex;
+    private List<String> tags;
+    private String subjectScope;
+    private Boolean isMatrixProblem;
     private Map<String, Object> mathData;
 }

@@ -27,9 +27,14 @@ public class EvaluateController {
     public EvaluateResponse evaluate(@RequestParam("file") MultipartFile file,
                                      @RequestParam(value = "isSocratic", required = false) Boolean isSocratic,
                                      @RequestParam(value = "is_socratic", required = false) Boolean isSocraticSnake,
+                                     @RequestParam(value = "problemType", required = false) String problemType,
+                                     @RequestParam(value = "subjectScope", required = false) String subjectScope,
                                      HttpServletRequest request) {
         SessionInfo sessionInfo = (SessionInfo) request.getAttribute(AuthInterceptor.CURRENT_SESSION_KEY);
         boolean finalSocratic = Boolean.TRUE.equals(isSocratic) || Boolean.TRUE.equals(isSocraticSnake);
-        return aiDiagnosisService.evaluate(file, finalSocratic, sessionInfo);
+        String finalProblemType = (problemType != null && !problemType.isBlank())
+                ? problemType
+                : ((subjectScope != null && !subjectScope.isBlank()) ? subjectScope : "matrix");
+        return aiDiagnosisService.evaluate(file, finalSocratic, finalProblemType, sessionInfo);
     }
 }

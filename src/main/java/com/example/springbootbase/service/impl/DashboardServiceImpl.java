@@ -53,6 +53,7 @@ public class DashboardServiceImpl implements DashboardService {
                         .status(record.getStatus())
                         .errorIndex(record.getErrorIndex())
                         .steps(record.getSteps())
+                        .tags(record.getTags())
                         .feedback(record.getFeedback())
                         .isSocratic(record.getIsSocratic())
                         .aiFeedback(record.getAiFeedback())

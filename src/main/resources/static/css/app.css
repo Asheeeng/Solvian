@@ -230,6 +230,45 @@ button {
   padding: 0;
 }
 
+.step-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  margin: 8px 0;
+  background: #fff;
+}
+
+.step-card p {
+  margin: 6px 0;
+}
+
+.step-wrong {
+  border-color: #ef4444;
+  background: #fff5f5;
+}
+
+.latex-line {
+  font-family: "Times New Roman", "Cambria Math", serif;
+  overflow-x: auto;
+}
+
+.tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #1d4ed8;
+  border: 1px solid #c7d2fe;
+  font-size: 13px;
+}
+
 .modal {
   position: fixed;
   inset: 0;

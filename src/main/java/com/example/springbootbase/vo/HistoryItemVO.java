@@ -26,6 +26,7 @@ public class HistoryItemVO {
     private String status;
     private Integer errorIndex;
     private List<String> steps;
+    private List<String> tags;
     private String feedback;
     private Boolean isSocratic;
     private AiFeedbackType aiFeedback;

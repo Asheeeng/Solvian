@@ -128,10 +128,11 @@ export async function logoutUser() {
   }
 }
 
-export async function evaluateProblem({ file, isSocratic }) {
+export async function evaluateProblem({ file, isSocratic, problemType = 'matrix' }) {
   const formData = new FormData();
   formData.append('file', file);
   formData.append('isSocratic', String(Boolean(isSocratic)));
+  formData.append('problemType', problemType);
 
   return requestJson('/api/evaluate', {
     method: 'POST',

@@ -18,12 +18,14 @@
 - 首页两栏布局（左题目主区 2 / 右 AI 诊断区 1）
 - 图片上传与预览，点击放大
 - 启动 AI 诊断（`isSocratic` 开关）
-- 结果展示：`status`、`steps`、`feedback`、`errorIndex`
+- 两阶段模型链路：视觉提取（`glm-4.6v`）+ 推理分析（`glm-4.7`）
+- 结果展示：`status`、`steps`、`feedback`、`errorIndex`、`tags`
 - AI 识别反馈保存（准确/不准确 + 错误类型 + note）
 - 错题本与统计面板（按钮触发抽屉）
 - 前端事件上报
 - PDF 报告下载接口（占位实现）
 - 全链路内存存储实现（便于后续切数据库）
+- 模型连通性测试接口（`GET /api/model/test`）
 
 ## 目录结构（核心）
 
@@ -69,6 +71,7 @@ http://localhost:8080
 - `GET /api/history`
 - `GET /api/dashboard-summary`
 - `GET /api/report/{recordId}/pdf`
+- `GET /api/model/test`
 
 ## 配置说明
 
@@ -79,6 +82,20 @@ http://localhost:8080
 - CORS 配置
 - AI 模型配置（`app.ai.*`）
 
+默认配置为：
+
+- `spring.profiles.active=local`（可被环境变量覆盖）
+- `app.ai.vision-model=glm-4.6v`
+- `app.ai.model=glm-4.7`
+- `app.ai.base-url=https://open.bigmodel.cn/api/paas/v4`
+- `app.ai.mock-enabled=false`
+- `app.ai.fallback-to-mock=false`
+
+本地密钥建议放在 `application-local.yml` 或环境变量：
+
+- `AI_MODEL_API_KEY`
+- `AI_MODEL_BASE_URL`（可选）
+
 安全要求：API Key 仅通过环境变量或配置注入，不允许硬编码。
 
 ## 后续建议
@@ -87,4 +104,3 @@ http://localhost:8080
 - 接入数据库（用户、记录、反馈、统计）
 - 增加权限控制与会话过期策略
 - 补充自动化测试与接口文档
-

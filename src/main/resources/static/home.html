@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>首页 - AI 数学逻辑诊断系统</title>
   <link rel="stylesheet" href="/css/app.css" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
   <header class="top-bar">
@@ -43,11 +53,13 @@
 
     <section class="panel ai-panel">
       <h2>AI 诊断结果区</h2>
+      <p id="teacherOnlyHint" class="muted hidden">当前阶段检测能力仅对老师端开放。</p>
 
       <div class="block">
         <h3>诊断报告</h3>
         <p id="diagnosisStatusText" class="status-pending">等待诊断</p>
         <p class="muted" id="currentRecordIdText">记录ID：-</p>
+        <p class="muted" id="subjectScopeText">题型范围：matrix</p>
       </div>
 
       <div class="block">
@@ -60,6 +72,15 @@
       <div class="block">
         <h3>错误反馈</h3>
         <p id="diagnosisFeedback">请先上传题目并启动诊断。</p>
+        <p id="diagnosisErrorIndexText" class="muted">错误定位：-</p>
+        <p id="diagnosisErrorReasonText" class="muted">错误说明：-</p>
+      </div>
+
+      <div class="block">
+        <h3>标签列表</h3>
+        <div id="diagnosisTags" class="tags-wrap">
+          <span class="tag-chip">#待检测</span>
+        </div>
       </div>
 
       <div class="block">

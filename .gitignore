@@ -14,3 +14,5 @@ target/
 # Logs
 *.log
 
+# Local secret config
+src/main/resources/application-local.yml

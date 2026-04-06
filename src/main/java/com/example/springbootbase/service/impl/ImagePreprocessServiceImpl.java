@@ -23,6 +23,7 @@ public class ImagePreprocessServiceImpl implements ImagePreprocessService {
         try {
             return PreprocessedImage.builder()
                     .fileName(file.getOriginalFilename())
+                    .contentType(file.getContentType())
                     .bytes(file.getBytes())
                     .fileSize(file.getSize())
                     .build();

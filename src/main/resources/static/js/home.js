@@ -33,6 +33,10 @@ if (currentSession) {
     statusText: document.getElementById('diagnosisStatusText'),
     stepsContainer: document.getElementById('diagnosisSteps'),
     feedbackText: document.getElementById('diagnosisFeedback'),
+    errorIndexText: document.getElementById('diagnosisErrorIndexText'),
+    errorReasonText: document.getElementById('diagnosisErrorReasonText'),
+    tagsContainer: document.getElementById('diagnosisTags'),
+    subjectScopeText: document.getElementById('subjectScopeText'),
     recordIdText: document.getElementById('currentRecordIdText')
   });
 
@@ -53,6 +57,14 @@ if (currentSession) {
   const feedbackNote = document.getElementById('feedbackNote');
   const aiFeedbackMessage = document.getElementById('aiFeedbackMessage');
   const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+  const teacherOnlyHint = document.getElementById('teacherOnlyHint');
+
+  if (currentUser.role !== 'TEACHER') {
+    teacherOnlyHint.classList.remove('hidden');
+    triggerDiagnosisBtn.disabled = true;
+    triggerDiagnosisBtn.title = '当前阶段仅老师角色可用';
+    diagnosisPanel.setError('当前阶段仅支持老师端发起 AI 检测。');
+  }
 
   let currentRecordId = '';
 
@@ -79,6 +91,11 @@ if (currentSession) {
   });
 
   triggerDiagnosisBtn.addEventListener('click', async () => {
+    if (currentUser.role !== 'TEACHER') {
+      window.alert('当前阶段仅支持老师端发起 AI 检测。');
+      return;
+    }
+
     if (!problemViewer.hasImage()) {
       window.alert('请先上传题目图片。');
       return;
@@ -101,7 +118,8 @@ if (currentSession) {
     try {
       const result = await evaluateProblem({
         file: selectedFile,
-        isSocratic
+        isSocratic,
+        problemType: 'matrix'
       });
 
       diagnosisPanel.renderResult(result);
