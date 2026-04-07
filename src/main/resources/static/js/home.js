@@ -1,8 +1,9 @@
 import { requireAuth, roleToLabel } from './common/auth-guard.js?v=20260407e';
 import {
+  createDiagnosisTask,
   downloadPdfReport,
-  evaluateProblem,
   fetchDashboardSummary,
+  fetchDiagnosisTask,
   fetchHistory,
   logEvent,
   logoutUser,
@@ -10,6 +11,7 @@ import {
 } from './common/storage.js?v=20260407e';
 import { ProblemViewer } from './modules/problem-viewer.js?v=20260407e';
 import { DiagnosisPanel } from './modules/diagnosis-panel.js?v=20260407e';
+import { DiagnosisProgressPanel } from './modules/diagnosis-progress-panel.js?v=20260407e';
 import { NotebookDrawer } from './modules/notebook-drawer.js?v=20260407e';
 import { initWorkspaceTheme } from './modules/theme-controller.js?v=20260407e';
 
@@ -64,6 +66,10 @@ function setFeedbackMessage(element, message, type = '') {
   }
 }
 
+function logEventInBackground(payload) {
+  logEvent(payload);
+}
+
 const currentSession = requireAuth();
 if (currentSession) {
   const currentUser = currentSession.user;
@@ -101,6 +107,10 @@ if (currentSession) {
     subjectScopeText: document.getElementById('subjectScopeText'),
     recordIdText: document.getElementById('currentRecordIdText')
   });
+  const diagnosisProgressPanel = new DiagnosisProgressPanel({
+    container: document.getElementById('diagnosisProgressPanel')
+  });
+  diagnosisProgressPanel.reset();
 
   const drawer = new NotebookDrawer({
     drawer: document.getElementById('drawer'),
@@ -134,10 +144,109 @@ if (currentSession) {
   }
 
   let currentRecordId = '';
+  let currentTaskId = '';
+  let diagnosisPollTimer = 0;
+  let diagnosisPollToken = 0;
+
+  function stopDiagnosisPolling() {
+    if (diagnosisPollTimer) {
+      window.clearTimeout(diagnosisPollTimer);
+      diagnosisPollTimer = 0;
+    }
+  }
+
+  function resetFeedbackForm() {
+    aiFeedbackForm.reset();
+    errorTypeWrap.classList.add('hidden');
+    setFeedbackMessage(aiFeedbackMessage, '');
+  }
+
+  async function handleDiagnosisTaskSnapshot(task) {
+    if (!task) {
+      return false;
+    }
+
+    currentTaskId = task.taskId || currentTaskId;
+    diagnosisProgressPanel.renderTask(task);
+
+    const partialResult = task.partialResult || {};
+    const partialHighlights = Array.isArray(partialResult.imageHighlights) ? partialResult.imageHighlights : [];
+    if (partialHighlights.length) {
+      problemViewer.setHighlights(partialHighlights);
+    }
+
+    if (task.status === 'done' && task.finalResult) {
+      diagnosisPanel.renderResult(task.finalResult);
+      problemViewer.setHighlights(task.finalResult.imageHighlights || partialHighlights);
+      currentRecordId = task.finalResult.recordId || task.recordId || '';
+      resetFeedbackForm();
+
+      logEventInBackground({
+        eventType: 'DIAGNOSIS',
+        page: 'HOME',
+        action: 'DIAGNOSIS_FINISHED',
+        payload: {
+          recordId: currentRecordId,
+          status: task.finalResult.status,
+          errorIndex: task.finalResult.errorIndex ?? task.finalResult.error_index ?? null
+        },
+        recordId: currentRecordId,
+        ts: Date.now()
+      });
+      return true;
+    }
+
+    if (task.status === 'failed') {
+      diagnosisPanel.setError(task.errorMessage || '诊断失败，请稍后重试。');
+      if (!partialHighlights.length) {
+        problemViewer.clearHighlights();
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  async function pollDiagnosisTask(taskId, pollToken) {
+    try {
+      const task = await fetchDiagnosisTask(taskId);
+      if (pollToken !== diagnosisPollToken) {
+        return;
+      }
+
+      const finished = await handleDiagnosisTaskSnapshot(task);
+      if (finished) {
+        stopDiagnosisPolling();
+        setButtonBusy(triggerDiagnosisBtn, false);
+        return;
+      }
+
+      diagnosisPollTimer = window.setTimeout(() => pollDiagnosisTask(taskId, pollToken), 1100);
+    } catch (error) {
+      if (pollToken !== diagnosisPollToken) {
+        return;
+      }
+      stopDiagnosisPolling();
+      diagnosisProgressPanel.setFailed(error.message || '诊断进度获取失败');
+      diagnosisPanel.setError(error.message || '诊断进度获取失败');
+      setButtonBusy(triggerDiagnosisBtn, false);
+    }
+  }
+
+  function startDiagnosisPolling(taskId) {
+    stopDiagnosisPolling();
+    diagnosisPollToken += 1;
+    const pollToken = diagnosisPollToken;
+    diagnosisPollTimer = window.setTimeout(() => pollDiagnosisTask(taskId, pollToken), 800);
+  }
 
   document.getElementById('problemFileInput').addEventListener('change', () => {
     const meta = problemViewer.getImageMeta();
-    logEvent({
+    currentTaskId = '';
+    currentRecordId = '';
+    stopDiagnosisPolling();
+    diagnosisProgressPanel.reset();
+    logEventInBackground({
       eventType: 'UPLOAD',
       page: 'HOME',
       action: 'UPLOAD_IMAGE',
@@ -148,7 +257,7 @@ if (currentSession) {
 
   document.getElementById('problemPreviewImage').addEventListener('click', () => {
     const meta = problemViewer.getImageMeta();
-    logEvent({
+    logEventInBackground({
       eventType: 'PREVIEW',
       page: 'HOME',
       action: 'OPEN_IMAGE_MODAL',
@@ -174,11 +283,19 @@ if (currentSession) {
     const isSocratic = socraticModeToggle.checked;
 
     diagnosisPanel.setRunning();
+    diagnosisProgressPanel.renderTask({
+      status: 'queued',
+      progress: 2,
+      stageMessage: '正在创建诊断任务',
+      partialResult: {}
+    });
     problemViewer.clearHighlights();
     setFeedbackMessage(aiFeedbackMessage, '');
     setButtonBusy(triggerDiagnosisBtn, true, '正在诊断');
+    currentRecordId = '';
+    currentTaskId = '';
 
-    await logEvent({
+    logEventInBackground({
       eventType: 'DIAGNOSIS',
       page: 'HOME',
       action: 'START_DIAGNOSIS',
@@ -187,36 +304,23 @@ if (currentSession) {
     });
 
     try {
-      const result = await evaluateProblem({
+      const task = await createDiagnosisTask({
         file: selectedFile,
         isSocratic,
         problemType: 'matrix'
       });
 
-      diagnosisPanel.renderResult(result);
-      problemViewer.setHighlights(result.imageHighlights || []);
-      currentRecordId = result.recordId || '';
+      const finished = await handleDiagnosisTaskSnapshot(task);
+      if (finished) {
+        setButtonBusy(triggerDiagnosisBtn, false);
+        return;
+      }
 
-      aiFeedbackForm.reset();
-      errorTypeWrap.classList.add('hidden');
-      setFeedbackMessage(aiFeedbackMessage, '');
-
-      await logEvent({
-        eventType: 'DIAGNOSIS',
-        page: 'HOME',
-        action: 'DIAGNOSIS_FINISHED',
-        payload: {
-          recordId: currentRecordId,
-          status: result.status,
-          errorIndex: result.errorIndex ?? result.error_index ?? null
-        },
-        recordId: currentRecordId,
-        ts: Date.now()
-      });
+      startDiagnosisPolling(task.taskId);
     } catch (error) {
       problemViewer.clearHighlights();
+      diagnosisProgressPanel.setFailed(error.message || '诊断失败，请稍后重试。');
       diagnosisPanel.setError(error.message || '诊断失败，请稍后重试。');
-    } finally {
       setButtonBusy(triggerDiagnosisBtn, false);
     }
   });

@@ -4,6 +4,7 @@ import com.example.springbootbase.config.AiModelProperties;
 import com.example.springbootbase.model.PreprocessedImage;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,18 +27,31 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GlmModelClientService {
 
+    private static final String TEXT_SYSTEM_PROMPT = "你是严谨的数学推理助手，请严格返回用户要求的JSON。";
+    private static final String VISION_SYSTEM_PROMPT = "你是数学题图像理解助手，请只返回结构化结果。";
+
     private final AiModelProperties aiModelProperties;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private HttpClient httpClient;
+
+    @PostConstruct
+    public void init() {
+        this.httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .connectTimeout(Duration.ofMillis(Math.max(aiModelProperties.getTimeoutMs(), 3000)))
+                .build();
+    }
 
     public String callTextModel(String model, String prompt) {
         requireConfig();
         Map<String, Object> requestBody = new LinkedHashMap<>();
         requestBody.put("model", model);
         requestBody.put("messages", List.of(
-                Map.of("role", "system", "content", "你是严谨的数学推理助手，请严格返回用户要求的JSON。"),
+                Map.of("role", "system", "content", TEXT_SYSTEM_PROMPT),
                 Map.of("role", "user", "content", prompt)
         ));
         requestBody.put("temperature", 0.2);
+        requestBody.put("max_tokens", Math.max(aiModelProperties.getReasoningMaxTokens(), 512));
 
         String responseBody = postChatCompletion(requestBody);
         return extractAssistantContent(responseBody);
@@ -57,10 +71,11 @@ public class GlmModelClientService {
         Map<String, Object> requestBody = new LinkedHashMap<>();
         requestBody.put("model", model);
         requestBody.put("messages", List.of(
-                Map.of("role", "system", "content", "你是数学题图像理解助手，请只返回结构化结果。"),
+                Map.of("role", "system", "content", VISION_SYSTEM_PROMPT),
                 userContent
         ));
         requestBody.put("temperature", 0.1);
+        requestBody.put("max_tokens", Math.max(aiModelProperties.getVisionMaxTokens(), 256));
 
         String responseBody = postChatCompletion(requestBody);
         return extractAssistantContent(responseBody);
@@ -140,12 +155,7 @@ public class GlmModelClientService {
                 .POST(HttpRequest.BodyPublishers.ofString(body))
                 .build();
 
-        HttpClient client = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .connectTimeout(Duration.ofMillis(Math.max(aiModelProperties.getTimeoutMs(), 3000)))
-                .build();
-
-        return client.send(request, HttpResponse.BodyHandlers.ofString());
+        return httpClient.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
     private String extractAssistantContent(String rawResponse) {
@@ -254,4 +264,3 @@ public class GlmModelClientService {
         return raw.length() <= max ? raw : raw.substring(0, max);
     }
 }
-

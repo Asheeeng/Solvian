@@ -61,6 +61,16 @@ app:
     fallback-to-mock: false
     # 网络超时（毫秒）
     timeout-ms: 120000
+    # 视觉阶段返回上限
+    vision-max-tokens: 1400
+    # 推理阶段返回上限
+    reasoning-max-tokens: 2600
+    # 上传图片进入模型前的最大边长
+    image-max-width: 1024
+    # 异步诊断 worker 并发数
+    task-worker-threads: 2
+    # 诊断任务文件暂存目录，留空时使用系统临时目录
+    task-storage-dir: ""
 
 mybatis-plus:
   # Mapper XML 位置（当前项目为占位结构，可先保留默认路径）

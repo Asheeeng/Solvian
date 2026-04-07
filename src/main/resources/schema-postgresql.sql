@@ -46,6 +46,40 @@ CREATE TABLE IF NOT EXISTS diagnosis_record (
 CREATE INDEX IF NOT EXISTS idx_diagnosis_user_id ON diagnosis_record(user_id);
 CREATE INDEX IF NOT EXISTS idx_diagnosis_created_at ON diagnosis_record(created_at DESC);
 
+-- 异步诊断任务表（新链路：创建任务后后台执行视觉/推理）
+CREATE TABLE IF NOT EXISTS diagnosis_task (
+    task_id VARCHAR(64) PRIMARY KEY,
+    record_id VARCHAR(64),
+    user_id VARCHAR(64) NOT NULL,
+    username VARCHAR(64) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    progress INTEGER NOT NULL DEFAULT 0,
+    stage_message VARCHAR(255),
+    input_image_name VARCHAR(255),
+    input_image_path VARCHAR(512),
+    input_image_hash VARCHAR(128),
+    input_content_type VARCHAR(128),
+    input_file_size BIGINT,
+    subject_scope VARCHAR(64) DEFAULT 'matrix',
+    is_socratic BOOLEAN DEFAULT TRUE,
+    vision_model VARCHAR(64),
+    reasoning_model VARCHAR(64),
+    vision_result_json TEXT,
+    partial_result_json TEXT,
+    final_result_json TEXT,
+    error_message TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    started_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    finished_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_diagnosis_task_user_id ON diagnosis_task(user_id);
+CREATE INDEX IF NOT EXISTS idx_diagnosis_task_status ON diagnosis_task(status);
+CREATE INDEX IF NOT EXISTS idx_diagnosis_task_hash ON diagnosis_task(input_image_hash);
+CREATE INDEX IF NOT EXISTS idx_diagnosis_task_created_at ON diagnosis_task(created_at DESC);
+
 -- 兼容历史 JSONB 列，统一转为 TEXT 以便轻量存储与后续迁移。
 ALTER TABLE diagnosis_record
     ALTER COLUMN steps_json TYPE TEXT USING steps_json::text;

@@ -27,6 +27,11 @@ public class AiModelProperties {
     private boolean mockEnabled = true;
     private boolean fallbackToMock = false;
     private int timeoutMs = 30000;
+    private int visionMaxTokens = 1400;
+    private int reasoningMaxTokens = 2600;
+    private int imageMaxWidth = 1024;
+    private int taskWorkerThreads = 2;
+    private String taskStorageDir = "";
 
     public String maskedApiKey() {
         if (apiKey == null || apiKey.isBlank()) {

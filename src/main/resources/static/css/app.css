@@ -346,6 +346,153 @@
   gap: 12px;
 }
 
+.diagnosis-progress {
+  display: grid;
+  gap: 14px;
+  margin-top: 6px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.diagnosis-progress__empty {
+  display: grid;
+  gap: 8px;
+}
+
+.diagnosis-progress__empty-title,
+.diagnosis-progress__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-inverse);
+}
+
+.diagnosis-progress__empty-copy,
+.diagnosis-progress__message,
+.diagnosis-progress__step-desc,
+.diagnosis-progress__preview-copy {
+  color: var(--text-inverse-muted);
+  line-height: 1.65;
+}
+
+.diagnosis-progress__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.diagnosis-progress__eyebrow,
+.diagnosis-progress__preview-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.diagnosis-progress__bar {
+  position: relative;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.diagnosis-progress__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(110, 231, 183, 0.92), rgba(96, 165, 250, 0.92));
+  box-shadow: 0 0 24px rgba(96, 165, 250, 0.32);
+  transition: width 220ms ease;
+}
+
+.diagnosis-progress__timeline {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.diagnosis-progress__step {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.diagnosis-progress__step:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.diagnosis-progress__step:last-child {
+  padding-bottom: 0;
+}
+
+.diagnosis-progress__dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.diagnosis-progress__step--active .diagnosis-progress__dot {
+  color: #04131a;
+  background: linear-gradient(135deg, #6ee7b7, #60a5fa);
+  box-shadow: 0 0 18px rgba(96, 165, 250, 0.24);
+}
+
+.diagnosis-progress__step--done .diagnosis-progress__dot {
+  color: #052e1d;
+  background: rgba(110, 231, 183, 0.92);
+}
+
+.diagnosis-progress__step--failed .diagnosis-progress__dot {
+  color: #fff5f5;
+  background: rgba(248, 113, 113, 0.94);
+}
+
+.diagnosis-progress__step-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-inverse);
+}
+
+.diagnosis-progress__copy {
+  display: grid;
+  gap: 4px;
+}
+
+.diagnosis-progress__insights {
+  display: grid;
+  gap: 12px;
+  padding-top: 6px;
+}
+
+.diagnosis-progress__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.diagnosis-progress__preview {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .result-metric {
   padding: 16px;
   border-radius: 18px;

@@ -141,6 +141,26 @@ export async function evaluateProblem({ file, isSocratic, problemType = 'matrix'
   });
 }
 
+export async function createDiagnosisTask({ file, isSocratic, problemType = 'matrix' }) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('isSocratic', String(Boolean(isSocratic)));
+  formData.append('problemType', problemType);
+
+  return requestJson('/api/diagnose', {
+    method: 'POST',
+    auth: true,
+    body: formData
+  });
+}
+
+export async function fetchDiagnosisTask(taskId) {
+  return requestJson(`/api/diagnose/${encodeURIComponent(taskId)}`, {
+    method: 'GET',
+    auth: true
+  });
+}
+
 export async function logEvent(payload) {
   try {
     return await requestJson('/api/log-event', {

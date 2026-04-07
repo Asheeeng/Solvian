@@ -17,4 +17,8 @@ public class PreprocessedImage {
     private String contentType;
     private byte[] bytes;
     private long fileSize;
+    private long originalFileSize;
+    private String imageHash;
+    private Integer width;
+    private Integer height;
 }

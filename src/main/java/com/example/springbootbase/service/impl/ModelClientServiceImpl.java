@@ -4,6 +4,7 @@ import com.example.springbootbase.config.AiModelProperties;
 import com.example.springbootbase.model.ModelChainResult;
 import com.example.springbootbase.model.PreprocessedImage;
 import com.example.springbootbase.model.VisionExtractionResult;
+import com.example.springbootbase.model.VisionStageResult;
 import com.example.springbootbase.service.ModelClientService;
 import com.example.springbootbase.service.PromptBuilderService;
 import com.example.springbootbase.service.VisionExtractionService;
@@ -28,29 +29,25 @@ public class ModelClientServiceImpl implements ModelClientService {
     private final VisionExtractionService visionExtractionService;
 
     @Override
-    public ModelChainResult analyze(PreprocessedImage preprocessedImage, boolean isSocratic, String subjectScope) {
-        if (!aiModelProperties.isEnabled()) {
-            throw new IllegalArgumentException("AI 调用已关闭，请检查 app.ai.enabled 配置");
-        }
-
-        if (!"zhipu".equalsIgnoreCase(aiModelProperties.getProvider())) {
-            throw new IllegalArgumentException("当前仅支持 zhipu provider，实际为: " + aiModelProperties.getProvider());
-        }
+    public VisionStageResult analyzeVision(PreprocessedImage preprocessedImage, String subjectScope) {
+        validateProvider();
 
         if (aiModelProperties.isMockEnabled()) {
-            log.warn("[model-chain] mockEnabled=true，当前走 mock 实现（仅用于本地调试）");
-            String raw = mockModelClientService.analyze(preprocessedImage, isSocratic, subjectScope, "mock-enabled=true");
+            log.warn("[vision-stage] mockEnabled=true，当前走 mock 视觉结果（仅用于本地调试）");
             VisionExtractionResult fallbackVision = VisionExtractionResult.builder()
                     .problemText("mock mode")
+                    .studentSteps(java.util.List.of("识别到矩阵题题干", "识别到中间演算步骤"))
+                    .matrixExpressions(java.util.List.of("A+B", "c_{12}=a_{12}-b_{12}"))
+                    .imageHighlights(java.util.List.of())
                     .isMatrixProblem(true)
                     .confidence(1.0d)
+                    .rawSummary("mock vision result")
                     .build();
-            return ModelChainResult.builder()
+            return VisionStageResult.builder()
                     .visionModel("mock-vision")
-                    .reasoningModel("mock-reasoning")
                     .visionRaw("{\"problemText\":\"mock mode\"}")
-                    .reasoningRaw(raw)
                     .visionExtractionResult(fallbackVision)
+                    .cacheHit(false)
                     .build();
         }
 
@@ -75,9 +72,40 @@ public class ModelClientServiceImpl implements ModelClientService {
             throw new IllegalArgumentException("视觉模型调用失败: " + ex.getMessage());
         }
 
-        VisionExtractionResult visionExtractionResult = visionExtractionService.parse(visionRaw);
+        return VisionStageResult.builder()
+                .visionModel(aiModelProperties.getVisionModel())
+                .visionRaw(visionRaw)
+                .visionExtractionResult(visionExtractionService.parse(visionRaw))
+                .cacheHit(false)
+                .build();
+    }
+
+    @Override
+    public ModelChainResult analyzeReasoning(VisionStageResult visionStageResult, boolean isSocratic, String subjectScope) {
+        validateProvider();
+
+        if (visionStageResult == null || visionStageResult.getVisionExtractionResult() == null) {
+            throw new IllegalArgumentException("视觉阶段结果为空，无法继续推理");
+        }
+
+        if (aiModelProperties.isMockEnabled()) {
+            String raw = mockModelClientService.analyze(
+                    PreprocessedImage.builder().fileSize(1).build(),
+                    isSocratic,
+                    subjectScope,
+                    "mock-enabled=true"
+            );
+            return ModelChainResult.builder()
+                    .visionModel(visionStageResult.getVisionModel())
+                    .reasoningModel("mock-reasoning")
+                    .visionRaw(visionStageResult.getVisionRaw())
+                    .reasoningRaw(raw)
+                    .visionExtractionResult(visionStageResult.getVisionExtractionResult())
+                    .build();
+        }
+
         String reasoningPrompt = promptBuilderService.buildReasoningPrompt(
-                visionExtractionResult,
+                visionStageResult.getVisionExtractionResult(),
                 isSocratic,
                 subjectScope
         );
@@ -93,12 +121,18 @@ public class ModelClientServiceImpl implements ModelClientService {
         }
 
         return ModelChainResult.builder()
-                .visionModel(aiModelProperties.getVisionModel())
+                .visionModel(visionStageResult.getVisionModel())
                 .reasoningModel(aiModelProperties.getModel())
-                .visionRaw(visionRaw)
+                .visionRaw(visionStageResult.getVisionRaw())
                 .reasoningRaw(reasoningRaw)
-                .visionExtractionResult(visionExtractionResult)
+                .visionExtractionResult(visionStageResult.getVisionExtractionResult())
                 .build();
+    }
+
+    @Override
+    public ModelChainResult analyze(PreprocessedImage preprocessedImage, boolean isSocratic, String subjectScope) {
+        VisionStageResult visionStageResult = analyzeVision(preprocessedImage, subjectScope);
+        return analyzeReasoning(visionStageResult, isSocratic, subjectScope);
     }
 
     @Override
@@ -107,6 +141,16 @@ public class ModelClientServiceImpl implements ModelClientService {
                 aiModelProperties.getModel(),
                 "请仅返回字符串: model_test_ok"
         );
+    }
+
+    private void validateProvider() {
+        if (!aiModelProperties.isEnabled()) {
+            throw new IllegalArgumentException("AI 调用已关闭，请检查 app.ai.enabled 配置");
+        }
+
+        if (!"zhipu".equalsIgnoreCase(aiModelProperties.getProvider())) {
+            throw new IllegalArgumentException("当前仅支持 zhipu provider，实际为: " + aiModelProperties.getProvider());
+        }
     }
 
     private String extractHost(String baseUrl) {
@@ -121,4 +165,3 @@ public class ModelClientServiceImpl implements ModelClientService {
         }
     }
 }
-
