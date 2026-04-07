@@ -1,4 +1,4 @@
-import { requireAuth, roleToLabel } from './common/auth-guard.js';
+import { requireAuth, roleToLabel } from './common/auth-guard.js?v=20260407d';
 import {
   downloadPdfReport,
   evaluateProblem,
@@ -7,10 +7,62 @@ import {
   logEvent,
   logoutUser,
   submitAiFeedback
-} from './common/storage.js';
-import { ProblemViewer } from './modules/problem-viewer.js';
-import { DiagnosisPanel } from './modules/diagnosis-panel.js';
-import { NotebookDrawer } from './modules/notebook-drawer.js';
+} from './common/storage.js?v=20260407d';
+import { ProblemViewer } from './modules/problem-viewer.js?v=20260407d';
+import { DiagnosisPanel } from './modules/diagnosis-panel.js?v=20260407d';
+import { NotebookDrawer } from './modules/notebook-drawer.js?v=20260407d';
+import { initWorkspaceTheme } from './modules/theme-controller.js?v=20260407d';
+
+function setButtonBusy(button, busy, busyLabel) {
+  if (!button) {
+    return;
+  }
+
+  const label = button.querySelector('.action-button__label');
+  if (label && !button.dataset.idleLabel) {
+    button.dataset.idleLabel = label.textContent;
+  }
+
+  if (busy) {
+    button.classList.add('is-loading');
+    button.setAttribute('aria-busy', 'true');
+    if (label && busyLabel) {
+      label.textContent = busyLabel;
+    }
+    button.disabled = true;
+    return;
+  }
+
+  button.classList.remove('is-loading');
+  button.setAttribute('aria-busy', 'false');
+  if (label && button.dataset.idleLabel) {
+    label.textContent = button.dataset.idleLabel;
+  }
+  button.disabled = button.dataset.locked === 'true';
+}
+
+function setButtonLocked(button, locked, title = '') {
+  if (!button) {
+    return;
+  }
+  button.dataset.locked = locked ? 'true' : 'false';
+  button.disabled = locked;
+  button.title = title;
+}
+
+function setFeedbackMessage(element, message, type = '') {
+  if (!element) {
+    return;
+  }
+  element.textContent = message || '';
+  element.classList.remove('is-error', 'is-success');
+  if (type === 'error') {
+    element.classList.add('is-error');
+  }
+  if (type === 'success') {
+    element.classList.add('is-success');
+  }
+}
 
 const currentSession = requireAuth();
 if (currentSession) {
@@ -19,17 +71,24 @@ if (currentSession) {
   document.getElementById('currentRoleLabel').textContent = roleToLabel(currentUser.role);
   document.getElementById('currentUserLabel').textContent = currentUser.username;
 
+  initWorkspaceTheme({
+    root: document.body,
+    toggle: document.getElementById('themeToggle')
+  });
+
   const problemViewer = new ProblemViewer({
     fileInput: document.getElementById('problemFileInput'),
     previewImage: document.getElementById('problemPreviewImage'),
     placeholder: document.getElementById('problemImagePlaceholder'),
     modal: document.getElementById('imageModal'),
     modalImage: document.getElementById('modalImage'),
-    closeModalBtn: document.getElementById('closeImageModalBtn')
+    closeModalBtn: document.getElementById('closeImageModalBtn'),
+    fileMetaText: document.getElementById('problemFileMeta')
   });
   problemViewer.init();
 
   const diagnosisPanel = new DiagnosisPanel({
+    statusBadge: document.getElementById('diagnosisStatusBadge'),
     statusText: document.getElementById('diagnosisStatusText'),
     stepsContainer: document.getElementById('diagnosisSteps'),
     feedbackText: document.getElementById('diagnosisFeedback'),
@@ -44,13 +103,19 @@ if (currentSession) {
     drawer: document.getElementById('drawer'),
     drawerMask: document.getElementById('drawerMask'),
     drawerTitle: document.getElementById('drawerTitle'),
+    drawerSubtitle: document.getElementById('drawerSubtitle'),
+    drawerEyebrow: document.getElementById('drawerEyebrow'),
     drawerBody: document.getElementById('drawerBody'),
     closeBtn: document.getElementById('closeDrawerBtn')
   });
 
   const socraticModeToggle = document.getElementById('socraticModeToggle');
   const triggerDiagnosisBtn = document.getElementById('triggerDiagnosisBtn');
+  const openNotebookBtn = document.getElementById('openNotebookBtn');
+  const openStatsBtn = document.getElementById('openStatsBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
   const aiFeedbackForm = document.getElementById('aiFeedbackForm');
+  const saveFeedbackBtn = document.getElementById('saveFeedbackBtn');
   const aiFeedbackSelect = document.getElementById('aiFeedbackSelect');
   const errorTypeWrap = document.getElementById('errorTypeWrap');
   const errorTypeSelect = document.getElementById('errorTypeSelect');
@@ -61,8 +126,7 @@ if (currentSession) {
 
   if (currentUser.role !== 'TEACHER') {
     teacherOnlyHint.classList.remove('hidden');
-    triggerDiagnosisBtn.disabled = true;
-    triggerDiagnosisBtn.title = '当前阶段仅老师角色可用';
+    setButtonLocked(triggerDiagnosisBtn, true, '当前阶段仅老师角色可用');
     diagnosisPanel.setError('当前阶段仅支持老师端发起 AI 检测。');
   }
 
@@ -92,12 +156,14 @@ if (currentSession) {
 
   triggerDiagnosisBtn.addEventListener('click', async () => {
     if (currentUser.role !== 'TEACHER') {
-      window.alert('当前阶段仅支持老师端发起 AI 检测。');
+      teacherOnlyHint.classList.remove('hidden');
+      diagnosisPanel.setError('当前阶段仅支持老师端发起 AI 检测。');
       return;
     }
 
     if (!problemViewer.hasImage()) {
-      window.alert('请先上传题目图片。');
+      diagnosisPanel.setError('请先上传题目图片，再启动 AI 诊断。');
+      document.getElementById('problemFileMeta').textContent = '请先选择题目图片，然后再发起本次诊断。';
       return;
     }
 
@@ -105,7 +171,8 @@ if (currentSession) {
     const isSocratic = socraticModeToggle.checked;
 
     diagnosisPanel.setRunning();
-    aiFeedbackMessage.textContent = '';
+    setFeedbackMessage(aiFeedbackMessage, '');
+    setButtonBusy(triggerDiagnosisBtn, true, '正在诊断');
 
     await logEvent({
       eventType: 'DIAGNOSIS',
@@ -127,6 +194,7 @@ if (currentSession) {
 
       aiFeedbackForm.reset();
       errorTypeWrap.classList.add('hidden');
+      setFeedbackMessage(aiFeedbackMessage, '');
 
       await logEvent({
         eventType: 'DIAGNOSIS',
@@ -142,6 +210,8 @@ if (currentSession) {
       });
     } catch (error) {
       diagnosisPanel.setError(error.message || '诊断失败，请稍后重试。');
+    } finally {
+      setButtonBusy(triggerDiagnosisBtn, false);
     }
   });
 
@@ -158,7 +228,7 @@ if (currentSession) {
     event.preventDefault();
 
     if (!currentRecordId) {
-      aiFeedbackMessage.textContent = '请先完成一次诊断，再提交反馈。';
+      setFeedbackMessage(aiFeedbackMessage, '请先完成一次诊断，再提交反馈。', 'error');
       return;
     }
 
@@ -167,11 +237,12 @@ if (currentSession) {
     const note = feedbackNote.value.trim();
 
     if (aiFeedback === 'INACCURATE' && !errorType) {
-      aiFeedbackMessage.textContent = '识别不准确时请先选择错误类型。';
+      setFeedbackMessage(aiFeedbackMessage, '识别不准确时请先选择错误类型。', 'error');
       return;
     }
 
     try {
+      setButtonBusy(saveFeedbackBtn, true, '正在保存');
       const response = await submitAiFeedback({
         recordId: currentRecordId,
         aiFeedback,
@@ -179,7 +250,7 @@ if (currentSession) {
         note
       });
 
-      aiFeedbackMessage.textContent = response.message || '反馈已保存';
+      setFeedbackMessage(aiFeedbackMessage, response.message || '反馈已保存', 'success');
       await logEvent({
         eventType: 'FEEDBACK',
         page: 'HOME',
@@ -189,25 +260,32 @@ if (currentSession) {
         ts: Date.now()
       });
     } catch (error) {
-      aiFeedbackMessage.textContent = error.message || '反馈保存失败';
+      setFeedbackMessage(aiFeedbackMessage, error.message || '反馈保存失败', 'error');
+    } finally {
+      setButtonBusy(saveFeedbackBtn, false);
     }
   });
 
   downloadPdfBtn.addEventListener('click', async () => {
     if (!currentRecordId) {
-      aiFeedbackMessage.textContent = '暂无可下载报告，请先完成诊断。';
+      setFeedbackMessage(aiFeedbackMessage, '暂无可下载报告，请先完成诊断。', 'error');
       return;
     }
 
     try {
+      setButtonBusy(downloadPdfBtn, true, '正在下载');
       await downloadPdfReport(currentRecordId);
+      setFeedbackMessage(aiFeedbackMessage, 'PDF 报告已开始下载。', 'success');
     } catch (error) {
-      aiFeedbackMessage.textContent = error.message || '下载失败';
+      setFeedbackMessage(aiFeedbackMessage, error.message || '下载失败', 'error');
+    } finally {
+      setButtonBusy(downloadPdfBtn, false);
     }
   });
 
-  document.getElementById('openNotebookBtn').addEventListener('click', async () => {
+  openNotebookBtn.addEventListener('click', async () => {
     try {
+      setButtonBusy(openNotebookBtn, true, '正在加载');
       const historyResponse = await fetchHistory();
       drawer.openNotebook(historyResponse);
       await logEvent({
@@ -218,12 +296,15 @@ if (currentSession) {
         ts: Date.now()
       });
     } catch (error) {
-      window.alert(error.message || '加载错题本失败');
+      diagnosisPanel.setError(error.message || '加载错题本失败');
+    } finally {
+      setButtonBusy(openNotebookBtn, false);
     }
   });
 
-  document.getElementById('openStatsBtn').addEventListener('click', async () => {
+  openStatsBtn.addEventListener('click', async () => {
     try {
+      setButtonBusy(openStatsBtn, true, '正在加载');
       const summaryResponse = await fetchDashboardSummary();
       drawer.openStats(summaryResponse);
       await logEvent({
@@ -234,12 +315,19 @@ if (currentSession) {
         ts: Date.now()
       });
     } catch (error) {
-      window.alert(error.message || '加载统计失败');
+      diagnosisPanel.setError(error.message || '加载统计失败');
+    } finally {
+      setButtonBusy(openStatsBtn, false);
     }
   });
 
-  document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await logoutUser();
-    window.location.href = '/login.html';
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      setButtonBusy(logoutBtn, true, '正在退出');
+      await logoutUser();
+      window.location.href = '/login.html';
+    } finally {
+      setButtonBusy(logoutBtn, false);
+    }
   });
 }

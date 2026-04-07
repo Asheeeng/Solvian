@@ -19,13 +19,14 @@
 - 认证页动态交互：角色眼睛跟随鼠标、密码聚焦时前倾偷看、显示密码时统一转身
 - 认证页增强交互：密码显隐、角色卡片切换、前端图形验证码、深色模式切换
 - 忘记密码入口占位与企业微信登录占位提示
-- 首页两栏布局（左题目主区 2 / 右 AI 诊断区 1）
+- 教师端工作台设计系统（按钮、卡片、面板、状态、暗色模式统一）
+- 首页两栏工作台布局（左题目主区 / 右 AI 诊断区）
 - 图片上传与预览，点击放大
 - 启动 AI 诊断（`isSocratic` 开关）
 - 两阶段模型链路：视觉提取（`glm-4.6v`）+ 推理分析（`glm-4.7`）
 - 结果展示：`status`、`steps`、`feedback`、`errorIndex`、`tags`
 - AI 识别反馈保存（准确/不准确 + 错误类型 + note）
-- 错题本与统计面板（按钮触发抽屉）
+- 错题本与统计面板（统一品牌化抽屉工作区、归档卡片、统计概览）
 - 前端事件上报
 - PDF 报告下载接口（占位实现）
 - PostgreSQL 持久化（认证、会话、诊断记录、AI反馈、事件日志）
@@ -63,6 +64,20 @@ src/main/resources/static
 └── js/modules/auth-scene.js
 ```
 
+前端工作台相关资源：
+
+```text
+src/main/resources/static
+├── home.html
+├── css/design-system.css
+├── css/app.css
+├── js/home.js
+├── js/modules/theme-controller.js
+├── js/modules/problem-viewer.js
+├── js/modules/diagnosis-panel.js
+└── js/modules/notebook-drawer.js
+```
+
 ## 运行方式
 
 1. 确保本机有 JDK 17。
@@ -88,6 +103,7 @@ http://localhost:8080
 - 注册请求字段保持不变：`username`、`password`、`role`
 - 图形验证码为前端可用版，不改变现有后端接口语义
 - 深色模式使用本地存储记忆当前主题
+- 教师端工作台与认证页共用主题记忆键，支持全站浅色/深色切换
 - “企业微信登录（暂未开放）”仅为 UI 占位，不接入真实第三方认证
 
 ## 主要接口

@@ -5,7 +5,8 @@ export class ProblemViewer {
     placeholder,
     modal,
     modalImage,
-    closeModalBtn
+    closeModalBtn,
+    fileMetaText
   }) {
     this.fileInput = fileInput;
     this.previewImage = previewImage;
@@ -13,6 +14,7 @@ export class ProblemViewer {
     this.modal = modal;
     this.modalImage = modalImage;
     this.closeModalBtn = closeModalBtn;
+    this.fileMetaText = fileMetaText;
 
     this.imageDataUrl = '';
     this.imageName = '';
@@ -54,6 +56,10 @@ export class ProblemViewer {
 
     this.selectedFile = file;
     this.imageName = file.name;
+    if (this.fileMetaText) {
+      const sizeInMb = (file.size / (1024 * 1024)).toFixed(2);
+      this.fileMetaText.textContent = `${file.name} · ${sizeInMb} MB · 可点击预览查看细节`;
+    }
 
     const reader = new FileReader();
     reader.onload = () => {
