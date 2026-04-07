@@ -2,6 +2,9 @@ package com.example.springbootbase.service.impl;
 
 import com.example.springbootbase.model.DiagnosisResult;
 import com.example.springbootbase.model.DiagnosisStep;
+import com.example.springbootbase.model.ImageHighlight;
+import com.example.springbootbase.model.LatexHighlight;
+import com.example.springbootbase.model.MatrixCellDiff;
 import com.example.springbootbase.service.ResponseParserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -76,6 +79,7 @@ public class ResponseParserServiceImpl implements ResponseParserService {
 
         List<DiagnosisStep> steps = parseSteps(root.path("steps"));
         List<String> tags = parseTags(root.path("tags"));
+        List<ImageHighlight> imageHighlights = parseImageHighlights(root.path("imageHighlights"));
 
         String subjectScope = root.path("subjectScope").asText(
                 root.path("problemType").asText("matrix")
@@ -89,14 +93,21 @@ public class ResponseParserServiceImpl implements ResponseParserService {
             mathData = objectMapper.convertValue(root.get("mathData"), Map.class);
         }
 
+        Map<String, Object> diffInfo = new HashMap<>();
+        if (root.has("diffInfo") && root.get("diffInfo").isObject()) {
+            diffInfo = objectMapper.convertValue(root.get("diffInfo"), Map.class);
+        }
+
         return DiagnosisResult.builder()
                 .status(status)
                 .steps(steps)
                 .feedback(feedback)
                 .errorIndex(errorIndex)
                 .tags(tags)
+                .imageHighlights(imageHighlights)
                 .subjectScope(subjectScope)
                 .isMatrixProblem(isMatrixProblem)
+                .diffInfo(diffInfo)
                 .mathData(mathData)
                 .build();
     }
@@ -115,8 +126,11 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                         .title(item.path("title").asText("步骤 " + index))
                         .content(item.path("content").asText(""))
                         .latex(item.path("latex").asText(""))
+                        .highlightedLatex(item.path("highlightedLatex").asText(""))
                         .isWrong(item.path("isWrong").asBoolean(false))
                         .explanation(item.path("explanation").asText(""))
+                        .latexHighlights(parseLatexHighlights(item.path("latexHighlights")))
+                        .matrixCellDiffs(parseMatrixCellDiffs(item.path("matrixCellDiffs")))
                         .build();
                 steps.add(step);
             } else if (item.isTextual()) {
@@ -125,8 +139,11 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                         .title("步骤 " + index)
                         .content(item.asText())
                         .latex("")
+                        .highlightedLatex("")
                         .isWrong(false)
                         .explanation("")
+                        .latexHighlights(new ArrayList<>())
+                        .matrixCellDiffs(new ArrayList<>())
                         .build());
             }
             index++;
@@ -144,6 +161,74 @@ public class ResponseParserServiceImpl implements ResponseParserService {
             }
         }
         return tags;
+    }
+
+    private List<ImageHighlight> parseImageHighlights(JsonNode node) {
+        List<ImageHighlight> values = new ArrayList<>();
+        if (node == null || !node.isArray()) {
+            return values;
+        }
+
+        for (JsonNode item : node) {
+            if (!item.isObject()) {
+                continue;
+            }
+            values.add(ImageHighlight.builder()
+                    .x(item.has("x") && !item.get("x").isNull() ? item.path("x").asDouble() : null)
+                    .y(item.has("y") && !item.get("y").isNull() ? item.path("y").asDouble() : null)
+                    .width(item.has("width") && !item.get("width").isNull() ? item.path("width").asDouble() : null)
+                    .height(item.has("height") && !item.get("height").isNull() ? item.path("height").asDouble() : null)
+                    .label(item.path("label").asText(""))
+                    .stepNo(item.has("stepNo") && !item.get("stepNo").isNull() ? item.path("stepNo").asInt() : null)
+                    .severity(item.path("severity").asText("medium"))
+                    .coordinateType(item.path("coordinateType").asText("ratio"))
+                    .mock(item.has("mock") ? item.path("mock").asBoolean(false) : false)
+                    .build());
+        }
+        return values;
+    }
+
+    private List<LatexHighlight> parseLatexHighlights(JsonNode node) {
+        List<LatexHighlight> values = new ArrayList<>();
+        if (node == null || !node.isArray()) {
+            return values;
+        }
+
+        for (JsonNode item : node) {
+            if (!item.isObject()) {
+                continue;
+            }
+            values.add(LatexHighlight.builder()
+                    .target(item.path("target").asText(""))
+                    .label(item.path("label").asText(""))
+                    .severity(item.path("severity").asText("medium"))
+                    .start(item.has("start") && !item.get("start").isNull() ? item.path("start").asInt() : null)
+                    .end(item.has("end") && !item.get("end").isNull() ? item.path("end").asInt() : null)
+                    .build());
+        }
+        return values;
+    }
+
+    private List<MatrixCellDiff> parseMatrixCellDiffs(JsonNode node) {
+        List<MatrixCellDiff> values = new ArrayList<>();
+        if (node == null || !node.isArray()) {
+            return values;
+        }
+
+        for (JsonNode item : node) {
+            if (!item.isObject()) {
+                continue;
+            }
+            values.add(MatrixCellDiff.builder()
+                    .row(item.has("row") && !item.get("row").isNull() ? item.path("row").asInt() : null)
+                    .col(item.has("col") && !item.get("col").isNull() ? item.path("col").asInt() : null)
+                    .expected(item.path("expected").asText(""))
+                    .actual(item.path("actual").asText(""))
+                    .reason(item.path("reason").asText(""))
+                    .severity(item.path("severity").asText("medium"))
+                    .build());
+        }
+        return values;
     }
 
     private DiagnosisResult parseFromText(String raw) {
@@ -183,8 +268,11 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                         .title("步骤 " + stepNo)
                         .content(matcher.group(2))
                         .latex("")
+                        .highlightedLatex("")
                         .isWrong(false)
                         .explanation("")
+                        .latexHighlights(new ArrayList<>())
+                        .matrixCellDiffs(new ArrayList<>())
                         .build());
                 fallbackStepNo = Math.max(fallbackStepNo, stepNo + 1);
             }
@@ -200,8 +288,11 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                     .title("模型原文")
                     .content(raw.length() > 600 ? raw.substring(0, 600) : raw)
                     .latex("")
+                    .highlightedLatex("")
                     .isWrong(false)
                     .explanation("")
+                    .latexHighlights(new ArrayList<>())
+                    .matrixCellDiffs(new ArrayList<>())
                     .build());
         }
 
@@ -211,8 +302,10 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                 .feedback(feedback)
                 .errorIndex(errorIndex)
                 .tags(tags)
+                .imageHighlights(new ArrayList<>())
                 .subjectScope("matrix")
                 .isMatrixProblem(true)
+                .diffInfo(new HashMap<>())
                 .mathData(new HashMap<>())
                 .build();
     }
@@ -224,8 +317,11 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                         .title("结果不可用")
                         .content("当前没有可解析的模型结果。")
                         .latex("")
+                        .highlightedLatex("")
                         .isWrong(false)
                         .explanation("")
+                        .latexHighlights(new ArrayList<>())
+                        .matrixCellDiffs(new ArrayList<>())
                         .build()
         );
 
@@ -235,8 +331,10 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                 .feedback(feedback)
                 .errorIndex(null)
                 .tags(new ArrayList<>())
+                .imageHighlights(new ArrayList<>())
                 .subjectScope("matrix")
                 .isMatrixProblem(true)
+                .diffInfo(new HashMap<>())
                 .mathData(new HashMap<>())
                 .build();
     }
@@ -253,4 +351,3 @@ public class ResponseParserServiceImpl implements ResponseParserService {
         };
     }
 }
-

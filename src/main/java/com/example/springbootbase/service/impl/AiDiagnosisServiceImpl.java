@@ -6,6 +6,7 @@ import com.example.springbootbase.entity.DiagnosisRecordEntity;
 import com.example.springbootbase.mapper.DiagnosisRecordMapper;
 import com.example.springbootbase.model.DiagnosisResult;
 import com.example.springbootbase.model.DiagnosisStep;
+import com.example.springbootbase.model.ImageHighlight;
 import com.example.springbootbase.model.ModelChainResult;
 import com.example.springbootbase.model.PreprocessedImage;
 import com.example.springbootbase.model.SessionInfo;
@@ -57,6 +58,7 @@ public class AiDiagnosisServiceImpl implements AiDiagnosisService {
         parsed.setMathData(mergeMathData(parsed.getMathData(), chainResult));
 
         DiagnosisResult finalResult = errorAnalysisService.analyze(parsed, chainResult.getReasoningRaw());
+        finalResult.setImageHighlights(resolveImageHighlights(finalResult.getImageHighlights(), chainResult.getVisionExtractionResult()));
 
         String recordId = IdUtil.newId();
         persistDiagnosisRecord(recordId, sessionInfo, preprocessedImage, isSocratic, finalResult, subjectScope);
@@ -68,8 +70,10 @@ public class AiDiagnosisServiceImpl implements AiDiagnosisService {
                 .feedback(finalResult.getFeedback())
                 .errorIndex(finalResult.getErrorIndex())
                 .tags(finalResult.getTags())
+                .imageHighlights(finalResult.getImageHighlights())
                 .subjectScope(finalResult.getSubjectScope())
                 .isMatrixProblem(finalResult.getIsMatrixProblem())
+                .diffInfo(finalResult.getDiffInfo())
                 .mathData(finalResult.getMathData())
                 .isSocratic(isSocratic)
                 .build();
@@ -103,6 +107,33 @@ public class AiDiagnosisServiceImpl implements AiDiagnosisService {
         merged.put("visionRawSnippet", shorten(chainResult.getVisionRaw(), 200));
         merged.put("reasoningRawSnippet", shorten(chainResult.getReasoningRaw(), 200));
         return merged;
+    }
+
+    private List<ImageHighlight> resolveImageHighlights(List<ImageHighlight> current, com.example.springbootbase.model.VisionExtractionResult visionExtractionResult) {
+        if (current != null && !current.isEmpty()) {
+            return current;
+        }
+        if (visionExtractionResult == null || visionExtractionResult.getImageHighlights() == null) {
+            return List.of();
+        }
+        List<ImageHighlight> resolved = new ArrayList<>();
+        for (ImageHighlight item : visionExtractionResult.getImageHighlights()) {
+            if (item == null) {
+                continue;
+            }
+            resolved.add(ImageHighlight.builder()
+                    .x(item.getX())
+                    .y(item.getY())
+                    .width(item.getWidth())
+                    .height(item.getHeight())
+                    .label(item.getLabel())
+                    .stepNo(item.getStepNo())
+                    .severity(item.getSeverity())
+                    .coordinateType(item.getCoordinateType())
+                    .mock(item.getMock())
+                    .build());
+        }
+        return resolved;
     }
 
     private String shorten(String raw, int max) {

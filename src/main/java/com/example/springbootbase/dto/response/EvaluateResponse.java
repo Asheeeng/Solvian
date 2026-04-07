@@ -1,6 +1,7 @@
 package com.example.springbootbase.dto.response;
 
 import com.example.springbootbase.model.DiagnosisStep;
+import com.example.springbootbase.model.ImageHighlight;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,8 +25,10 @@ public class EvaluateResponse {
     private String feedback;
     private Integer errorIndex;
     private List<String> tags;
+    private List<ImageHighlight> imageHighlights;
     private String subjectScope;
     private Boolean isMatrixProblem;
+    private Map<String, Object> diffInfo;
     private Map<String, Object> mathData;
     private Boolean isSocratic;
 

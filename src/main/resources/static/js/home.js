@@ -1,4 +1,4 @@
-import { requireAuth, roleToLabel } from './common/auth-guard.js?v=20260407d';
+import { requireAuth, roleToLabel } from './common/auth-guard.js?v=20260407e';
 import {
   downloadPdfReport,
   evaluateProblem,
@@ -7,11 +7,11 @@ import {
   logEvent,
   logoutUser,
   submitAiFeedback
-} from './common/storage.js?v=20260407d';
-import { ProblemViewer } from './modules/problem-viewer.js?v=20260407d';
-import { DiagnosisPanel } from './modules/diagnosis-panel.js?v=20260407d';
-import { NotebookDrawer } from './modules/notebook-drawer.js?v=20260407d';
-import { initWorkspaceTheme } from './modules/theme-controller.js?v=20260407d';
+} from './common/storage.js?v=20260407e';
+import { ProblemViewer } from './modules/problem-viewer.js?v=20260407e';
+import { DiagnosisPanel } from './modules/diagnosis-panel.js?v=20260407e';
+import { NotebookDrawer } from './modules/notebook-drawer.js?v=20260407e';
+import { initWorkspaceTheme } from './modules/theme-controller.js?v=20260407e';
 
 function setButtonBusy(button, busy, busyLabel) {
   if (!button) {
@@ -79,9 +79,12 @@ if (currentSession) {
   const problemViewer = new ProblemViewer({
     fileInput: document.getElementById('problemFileInput'),
     previewImage: document.getElementById('problemPreviewImage'),
+    imageCanvas: document.getElementById('problemImageCanvas'),
+    previewOverlay: document.getElementById('problemImageOverlay'),
     placeholder: document.getElementById('problemImagePlaceholder'),
     modal: document.getElementById('imageModal'),
     modalImage: document.getElementById('modalImage'),
+    modalOverlay: document.getElementById('modalImageOverlay'),
     closeModalBtn: document.getElementById('closeImageModalBtn'),
     fileMetaText: document.getElementById('problemFileMeta')
   });
@@ -171,6 +174,7 @@ if (currentSession) {
     const isSocratic = socraticModeToggle.checked;
 
     diagnosisPanel.setRunning();
+    problemViewer.clearHighlights();
     setFeedbackMessage(aiFeedbackMessage, '');
     setButtonBusy(triggerDiagnosisBtn, true, '正在诊断');
 
@@ -190,6 +194,7 @@ if (currentSession) {
       });
 
       diagnosisPanel.renderResult(result);
+      problemViewer.setHighlights(result.imageHighlights || []);
       currentRecordId = result.recordId || '';
 
       aiFeedbackForm.reset();
@@ -209,6 +214,7 @@ if (currentSession) {
         ts: Date.now()
       });
     } catch (error) {
+      problemViewer.clearHighlights();
       diagnosisPanel.setError(error.message || '诊断失败，请稍后重试。');
     } finally {
       setButtonBusy(triggerDiagnosisBtn, false);

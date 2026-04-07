@@ -19,6 +19,7 @@ public class VisionExtractionResult {
     private String problemText;
     private List<String> studentSteps;
     private List<String> matrixExpressions;
+    private List<ImageHighlight> imageHighlights;
     private Boolean isMatrixProblem;
     private Double confidence;
     private String rawSummary;
@@ -28,10 +29,10 @@ public class VisionExtractionResult {
                 .problemText(raw == null ? "" : raw)
                 .studentSteps(new ArrayList<>())
                 .matrixExpressions(new ArrayList<>())
+                .imageHighlights(new ArrayList<>())
                 .isMatrixProblem(true)
                 .confidence(0.3d)
                 .rawSummary(raw == null ? "" : raw)
                 .build();
     }
 }
-

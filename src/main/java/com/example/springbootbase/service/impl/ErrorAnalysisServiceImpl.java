@@ -6,6 +6,7 @@ import com.example.springbootbase.service.ErrorAnalysisService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -59,11 +60,20 @@ public class ErrorAnalysisServiceImpl implements ErrorAnalysisService {
             if (step.getLatex() == null) {
                 step.setLatex("");
             }
+            if (step.getHighlightedLatex() == null) {
+                step.setHighlightedLatex("");
+            }
             if (step.getIsWrong() == null) {
                 step.setIsWrong(false);
             }
             if (step.getExplanation() == null) {
                 step.setExplanation("");
+            }
+            if (step.getLatexHighlights() == null) {
+                step.setLatexHighlights(new ArrayList<>());
+            }
+            if (step.getMatrixCellDiffs() == null) {
+                step.setMatrixCellDiffs(new ArrayList<>());
             }
         }
 
@@ -75,6 +85,9 @@ public class ErrorAnalysisServiceImpl implements ErrorAnalysisService {
                 if (step.getExplanation() == null) {
                     step.setExplanation("");
                 }
+                step.setHighlightedLatex("");
+                step.setLatexHighlights(new ArrayList<>());
+                step.setMatrixCellDiffs(new ArrayList<>());
             }
             errorIndex = null;
         } else if ("error_found".equals(status)) {
@@ -93,6 +106,10 @@ public class ErrorAnalysisServiceImpl implements ErrorAnalysisService {
                     if (step.getExplanation() == null || step.getExplanation().isBlank()) {
                         step.setExplanation("该步骤存在逻辑或计算错误，请重点复核。");
                     }
+                    if ((step.getHighlightedLatex() == null || step.getHighlightedLatex().isBlank())
+                            && step.getLatex() != null && !step.getLatex().isBlank()) {
+                        step.setHighlightedLatex(step.getLatex());
+                    }
                 }
             }
         } else {
@@ -104,6 +121,12 @@ public class ErrorAnalysisServiceImpl implements ErrorAnalysisService {
 
         if (diagnosisResult.getFeedback() == null || diagnosisResult.getFeedback().isBlank()) {
             diagnosisResult.setFeedback(defaultFeedback(status));
+        }
+        if (diagnosisResult.getImageHighlights() == null) {
+            diagnosisResult.setImageHighlights(new ArrayList<>());
+        }
+        if (diagnosisResult.getDiffInfo() == null) {
+            diagnosisResult.setDiffInfo(new LinkedHashMap<>());
         }
 
         return diagnosisResult;
@@ -144,8 +167,11 @@ public class ErrorAnalysisServiceImpl implements ErrorAnalysisService {
                         .title("结果不可用")
                         .content("暂时无法从模型响应中提取有效步骤。")
                         .latex("")
+                        .highlightedLatex("")
                         .isWrong(false)
                         .explanation("")
+                        .latexHighlights(new ArrayList<>())
+                        .matrixCellDiffs(new ArrayList<>())
                         .build()
         );
 
@@ -157,7 +183,8 @@ public class ErrorAnalysisServiceImpl implements ErrorAnalysisService {
                 .subjectScope("matrix")
                 .isMatrixProblem(true)
                 .tags(new ArrayList<>())
+                .imageHighlights(new ArrayList<>())
+                .diffInfo(new LinkedHashMap<>())
                 .build();
     }
 }
-

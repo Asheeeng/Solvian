@@ -21,7 +21,9 @@ public class DiagnosisResult {
     private String feedback;
     private Integer errorIndex;
     private List<String> tags;
+    private List<ImageHighlight> imageHighlights;
     private String subjectScope;
     private Boolean isMatrixProblem;
+    private Map<String, Object> diffInfo;
     private Map<String, Object> mathData;
 }
