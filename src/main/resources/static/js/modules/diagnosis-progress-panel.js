@@ -144,7 +144,7 @@ export class DiagnosisProgressPanel {
             ${partialResult.cacheHit ? '<span class="tag-chip tag-chip--brand">复用视觉缓存</span>' : ''}
             ${expressions.length ? `<span class="tag-chip tag-chip--accent">公式片段 ${expressions.length}</span>` : ''}
             ${studentSteps.length ? `<span class="tag-chip">步骤草稿 ${studentSteps.length}</span>` : ''}
-            ${highlightCount ? `<span class="tag-chip tag-chip--danger">原图高亮 ${highlightCount}</span>` : ''}
+            ${highlightCount ? `<span class="tag-chip tag-chip--danger">识别线索 ${highlightCount}</span>` : ''}
           </div>
           ${partialResult.problemText ? `
             <div class="diagnosis-progress__preview">

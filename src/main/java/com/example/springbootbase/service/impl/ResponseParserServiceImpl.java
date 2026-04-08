@@ -35,16 +35,21 @@ public class ResponseParserServiceImpl implements ResponseParserService {
         }
 
         JsonNode root = tryParseAsJson(rawModelOutput);
-        if (root != null) {
+        if (root != null && root.isObject()) {
             return parseFromJson(root);
         }
 
         String jsonBlock = extractJsonBlock(rawModelOutput);
         if (jsonBlock != null) {
             JsonNode blockNode = tryParseAsJson(jsonBlock);
-            if (blockNode != null) {
+            if (blockNode != null && blockNode.isObject()) {
                 return parseFromJson(blockNode);
             }
+        }
+
+        JsonNode embeddedNode = extractEmbeddedObject(rawModelOutput);
+        if (embeddedNode != null && embeddedNode.isObject()) {
+            return parseFromJson(embeddedNode);
         }
 
         return parseFromText(rawModelOutput);
@@ -52,9 +57,29 @@ public class ResponseParserServiceImpl implements ResponseParserService {
 
     private JsonNode tryParseAsJson(String text) {
         try {
-            return objectMapper.readTree(text);
+            JsonNode parsed = objectMapper.readTree(text);
+            return unwrapTextualJsonNode(parsed, 0);
         } catch (Exception ignored) {
             return null;
+        }
+    }
+
+    private JsonNode unwrapTextualJsonNode(JsonNode node, int depth) {
+        if (node == null || depth > 3) {
+            return node;
+        }
+        if (!node.isTextual()) {
+            return node;
+        }
+        String value = node.asText();
+        if (value == null || value.isBlank()) {
+            return node;
+        }
+        try {
+            JsonNode reparsed = objectMapper.readTree(value);
+            return unwrapTextualJsonNode(reparsed, depth + 1);
+        } catch (Exception ignored) {
+            return node;
         }
     }
 
@@ -66,9 +91,21 @@ public class ResponseParserServiceImpl implements ResponseParserService {
         return null;
     }
 
+    private JsonNode extractEmbeddedObject(String raw) {
+        if (raw == null) {
+            return null;
+        }
+        int start = raw.indexOf('{');
+        int end = raw.lastIndexOf('}');
+        if (start < 0 || end <= start) {
+            return null;
+        }
+        return tryParseAsJson(raw.substring(start, end + 1));
+    }
+
     private DiagnosisResult parseFromJson(JsonNode root) {
-        String status = normalizeStatus(root.path("status").asText(null));
-        String feedback = root.path("feedback").asText("诊断完成，但未返回反馈说明。");
+        String status = normalizeStatus(readText(root, null, "status", "resultStatus"));
+        String feedback = readText(root, "诊断完成，但未返回反馈说明。", "feedback", "summary", "message");
 
         Integer errorIndex = null;
         if (root.has("errorIndex") && !root.get("errorIndex").isNull()) {
@@ -77,15 +114,22 @@ public class ResponseParserServiceImpl implements ResponseParserService {
             errorIndex = root.get("error_index").asInt();
         }
 
-        List<DiagnosisStep> steps = parseSteps(root.path("steps"));
+        JsonNode stepsNode = root.has("steps")
+                ? root.get("steps")
+                : (root.has("step_list") ? root.get("step_list") : root.path("steps"));
+        if (stepsNode != null && stepsNode.isTextual()) {
+            JsonNode reparsedSteps = tryParseAsJson(stepsNode.asText());
+            if (reparsedSteps != null) {
+                stepsNode = reparsedSteps;
+            }
+        }
+        List<DiagnosisStep> steps = parseSteps(stepsNode);
         List<String> tags = parseTags(root.path("tags"));
-        List<ImageHighlight> imageHighlights = parseImageHighlights(root.path("imageHighlights"));
+        List<ImageHighlight> imageHighlights = parseImageHighlights(resolveArrayNode(root, "imageHighlights", "image_highlights", "boxes", "boundingBoxes"));
 
-        String subjectScope = root.path("subjectScope").asText(
-                root.path("problemType").asText("matrix")
-        );
-        Boolean isMatrixProblem = root.has("isMatrixProblem")
-                ? root.path("isMatrixProblem").asBoolean(true)
+        String subjectScope = readText(root, readText(root, "matrix", "problemType", "problem_type"), "subjectScope", "subject_scope");
+        Boolean isMatrixProblem = root.has("isMatrixProblem") || root.has("is_matrix_problem")
+                ? readBoolean(root, true, "isMatrixProblem", "is_matrix_problem")
                 : "matrix".equalsIgnoreCase(subjectScope);
 
         Map<String, Object> mathData = new HashMap<>();
@@ -114,6 +158,15 @@ public class ResponseParserServiceImpl implements ResponseParserService {
 
     private List<DiagnosisStep> parseSteps(JsonNode stepsNode) {
         List<DiagnosisStep> steps = new ArrayList<>();
+        if (stepsNode == null) {
+            return steps;
+        }
+        if (stepsNode.isTextual()) {
+            JsonNode reparsed = tryParseAsJson(stepsNode.asText());
+            if (reparsed != null) {
+                stepsNode = reparsed;
+            }
+        }
         if (!stepsNode.isArray()) {
             return steps;
         }
@@ -122,29 +175,36 @@ public class ResponseParserServiceImpl implements ResponseParserService {
         for (JsonNode item : stepsNode) {
             if (item.isObject()) {
                 DiagnosisStep step = DiagnosisStep.builder()
-                        .stepNo(item.has("stepNo") ? item.path("stepNo").asInt(index) : index)
-                        .title(item.path("title").asText("步骤 " + index))
-                        .content(item.path("content").asText(""))
-                        .latex(item.path("latex").asText(""))
-                        .highlightedLatex(item.path("highlightedLatex").asText(""))
-                        .isWrong(item.path("isWrong").asBoolean(false))
-                        .explanation(item.path("explanation").asText(""))
-                        .latexHighlights(parseLatexHighlights(item.path("latexHighlights")))
-                        .matrixCellDiffs(parseMatrixCellDiffs(item.path("matrixCellDiffs")))
+                        .stepNo(readInteger(item, index, "stepNo", "step_no", "step"))
+                        .title(readText(item, "步骤 " + index, "title", "name"))
+                        .content(readText(item, "", "content", "description", "detail"))
+                        .latex(readText(item, "", "latex", "tex", "formula"))
+                        .highlightedLatex(readText(item, "", "highlightedLatex", "highlighted_latex", "highlightLatex"))
+                        .isWrong(readBoolean(item, false, "isWrong", "is_wrong", "wrong"))
+                        .explanation(readText(item, "", "explanation", "errorMessage", "error_message", "reason"))
+                        .latexHighlights(parseLatexHighlights(resolveArrayNode(item, "latexHighlights", "latex_highlights")))
+                        .matrixCellDiffs(parseMatrixCellDiffs(resolveArrayNode(item, "matrixCellDiffs", "matrix_cell_diffs")))
                         .build();
                 steps.add(step);
             } else if (item.isTextual()) {
-                steps.add(DiagnosisStep.builder()
-                        .stepNo(index)
-                        .title("步骤 " + index)
-                        .content(item.asText())
-                        .latex("")
-                        .highlightedLatex("")
-                        .isWrong(false)
-                        .explanation("")
-                        .latexHighlights(new ArrayList<>())
-                        .matrixCellDiffs(new ArrayList<>())
-                        .build());
+                JsonNode nestedNode = tryParseAsJson(item.asText());
+                if (nestedNode != null && nestedNode.isObject()) {
+                    steps.addAll(parseSteps(objectNodeToSingleItemArray(nestedNode)));
+                } else if (nestedNode != null && nestedNode.isArray()) {
+                    steps.addAll(parseSteps(nestedNode));
+                } else {
+                    steps.add(DiagnosisStep.builder()
+                            .stepNo(index)
+                            .title("步骤 " + index)
+                            .content(item.asText())
+                            .latex("")
+                            .highlightedLatex("")
+                            .isWrong(false)
+                            .explanation("")
+                            .latexHighlights(new ArrayList<>())
+                            .matrixCellDiffs(new ArrayList<>())
+                            .build());
+                }
             }
             index++;
         }
@@ -174,15 +234,15 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                 continue;
             }
             values.add(ImageHighlight.builder()
-                    .x(item.has("x") && !item.get("x").isNull() ? item.path("x").asDouble() : null)
-                    .y(item.has("y") && !item.get("y").isNull() ? item.path("y").asDouble() : null)
-                    .width(item.has("width") && !item.get("width").isNull() ? item.path("width").asDouble() : null)
-                    .height(item.has("height") && !item.get("height").isNull() ? item.path("height").asDouble() : null)
-                    .label(item.path("label").asText(""))
-                    .stepNo(item.has("stepNo") && !item.get("stepNo").isNull() ? item.path("stepNo").asInt() : null)
-                    .severity(item.path("severity").asText("medium"))
-                    .coordinateType(item.path("coordinateType").asText("ratio"))
-                    .mock(item.has("mock") ? item.path("mock").asBoolean(false) : false)
+                    .x(readDouble(item, "x", "left"))
+                    .y(readDouble(item, "y", "top"))
+                    .width(readDouble(item, "width", "w"))
+                    .height(readDouble(item, "height", "h"))
+                    .label(readText(item, "", "label", "title"))
+                    .stepNo(readNullableInteger(item, "stepNo", "step_no"))
+                    .severity(readText(item, "medium", "severity", "level"))
+                    .coordinateType(readText(item, "ratio", "coordinateType", "coordinate_type"))
+                    .mock(readBoolean(item, false, "mock"))
                     .build());
         }
         return values;
@@ -199,11 +259,11 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                 continue;
             }
             values.add(LatexHighlight.builder()
-                    .target(item.path("target").asText(""))
-                    .label(item.path("label").asText(""))
-                    .severity(item.path("severity").asText("medium"))
-                    .start(item.has("start") && !item.get("start").isNull() ? item.path("start").asInt() : null)
-                    .end(item.has("end") && !item.get("end").isNull() ? item.path("end").asInt() : null)
+                    .target(readText(item, "", "target", "text", "actual"))
+                    .label(readText(item, "", "label", "reason"))
+                    .severity(readText(item, "medium", "severity", "level"))
+                    .start(readNullableInteger(item, "start", "startIndex", "start_index"))
+                    .end(readNullableInteger(item, "end", "endIndex", "end_index"))
                     .build());
         }
         return values;
@@ -220,12 +280,12 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                 continue;
             }
             values.add(MatrixCellDiff.builder()
-                    .row(item.has("row") && !item.get("row").isNull() ? item.path("row").asInt() : null)
-                    .col(item.has("col") && !item.get("col").isNull() ? item.path("col").asInt() : null)
-                    .expected(item.path("expected").asText(""))
-                    .actual(item.path("actual").asText(""))
-                    .reason(item.path("reason").asText(""))
-                    .severity(item.path("severity").asText("medium"))
+                    .row(readNullableInteger(item, "row", "rowIndex", "row_index"))
+                    .col(readNullableInteger(item, "col", "column", "colIndex", "col_index"))
+                    .expected(readText(item, "", "expected", "correct"))
+                    .actual(readText(item, "", "actual", "student"))
+                    .reason(readText(item, "", "reason", "label"))
+                    .severity(readText(item, "medium", "severity", "level"))
                     .build());
         }
         return values;
@@ -283,11 +343,12 @@ public class ResponseParserServiceImpl implements ResponseParserService {
         }
 
         if (steps.isEmpty()) {
+            String extractedLatex = extractLatexFromText(raw);
             steps.add(DiagnosisStep.builder()
                     .stepNo(fallbackStepNo)
                     .title("模型原文")
-                    .content(raw.length() > 600 ? raw.substring(0, 600) : raw)
-                    .latex("")
+                    .content(extractedLatex.isBlank() ? (raw.length() > 600 ? raw.substring(0, 600) : raw) : "")
+                    .latex(extractedLatex)
                     .highlightedLatex("")
                     .isWrong(false)
                     .explanation("")
@@ -308,6 +369,106 @@ public class ResponseParserServiceImpl implements ResponseParserService {
                 .diffInfo(new HashMap<>())
                 .mathData(new HashMap<>())
                 .build();
+    }
+
+    private JsonNode resolveArrayNode(JsonNode node, String... fieldNames) {
+        if (node == null) {
+            return null;
+        }
+        for (String fieldName : fieldNames) {
+            if (node.has(fieldName)) {
+                JsonNode resolved = node.get(fieldName);
+                if (resolved != null && !resolved.isNull()) {
+                    if (resolved.isTextual()) {
+                        JsonNode reparsed = tryParseAsJson(resolved.asText());
+                        if (reparsed != null) {
+                            return reparsed;
+                        }
+                    }
+                    return resolved;
+                }
+            }
+        }
+        return null;
+    }
+
+    private JsonNode objectNodeToSingleItemArray(JsonNode node) {
+        return objectMapper.createArrayNode().add(node);
+    }
+
+    private String readText(JsonNode node, String fallback, String... fieldNames) {
+        if (node == null) {
+            return fallback;
+        }
+        for (String fieldName : fieldNames) {
+            if (node.has(fieldName) && !node.get(fieldName).isNull()) {
+                String value = node.get(fieldName).asText("");
+                if (!value.isBlank()) {
+                    return value;
+                }
+            }
+        }
+        return fallback;
+    }
+
+    private Integer readInteger(JsonNode node, Integer fallback, String... fieldNames) {
+        Integer resolved = readNullableInteger(node, fieldNames);
+        return resolved == null ? fallback : resolved;
+    }
+
+    private Integer readNullableInteger(JsonNode node, String... fieldNames) {
+        if (node == null) {
+            return null;
+        }
+        for (String fieldName : fieldNames) {
+            if (node.has(fieldName) && !node.get(fieldName).isNull()) {
+                return node.get(fieldName).asInt();
+            }
+        }
+        return null;
+    }
+
+    private Double readDouble(JsonNode node, String... fieldNames) {
+        if (node == null) {
+            return null;
+        }
+        for (String fieldName : fieldNames) {
+            if (node.has(fieldName) && !node.get(fieldName).isNull()) {
+                return node.get(fieldName).asDouble();
+            }
+        }
+        return null;
+    }
+
+    private boolean readBoolean(JsonNode node, boolean fallback, String... fieldNames) {
+        if (node == null) {
+            return fallback;
+        }
+        for (String fieldName : fieldNames) {
+            if (node.has(fieldName) && !node.get(fieldName).isNull()) {
+                return node.get(fieldName).asBoolean();
+            }
+        }
+        return fallback;
+    }
+
+    private String extractLatexFromText(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return "";
+        }
+        Matcher blockMatcher = Pattern.compile("(\\\\begin\\{[a-zA-Z*]+\\}[\\s\\S]+?\\\\end\\{[a-zA-Z*]+\\})").matcher(raw);
+        if (blockMatcher.find()) {
+            return blockMatcher.group(1).trim();
+        }
+        Matcher displayMatcher = Pattern.compile("\\\\\\[([\\s\\S]+?)\\\\\\]").matcher(raw);
+        if (displayMatcher.find()) {
+            return displayMatcher.group(1).trim();
+        }
+        Matcher dollarsMatcher = Pattern.compile("\\$\\$([\\s\\S]+?)\\$\\$").matcher(raw);
+        if (dollarsMatcher.find()) {
+            return dollarsMatcher.group(1).trim();
+        }
+        return "";
     }
 
     private DiagnosisResult fallbackResult(String status, String feedback) {

@@ -8,10 +8,11 @@ import {
   logEvent,
   logoutUser,
   submitAiFeedback
-} from './common/storage.js?v=20260407e';
-import { ProblemViewer } from './modules/problem-viewer.js?v=20260407e';
-import { DiagnosisPanel } from './modules/diagnosis-panel.js?v=20260407e';
-import { DiagnosisProgressPanel } from './modules/diagnosis-progress-panel.js?v=20260407e';
+} from './common/storage.js?v=20260407g';
+import { normalizeDiagnosisPreview, normalizeDiagnosisResult } from './common/diagnosis-normalizer.js?v=20260408a';
+import { ProblemViewer } from './modules/problem-viewer.js?v=20260408b';
+import { DiagnosisPanel } from './modules/diagnosis-panel.js?v=20260408b';
+import { DiagnosisProgressPanel } from './modules/diagnosis-progress-panel.js?v=20260408b';
 import { NotebookDrawer } from './modules/notebook-drawer.js?v=20260407e';
 import { initWorkspaceTheme } from './modules/theme-controller.js?v=20260407e';
 
@@ -86,11 +87,9 @@ if (currentSession) {
     fileInput: document.getElementById('problemFileInput'),
     previewImage: document.getElementById('problemPreviewImage'),
     imageCanvas: document.getElementById('problemImageCanvas'),
-    previewOverlay: document.getElementById('problemImageOverlay'),
     placeholder: document.getElementById('problemImagePlaceholder'),
     modal: document.getElementById('imageModal'),
     modalImage: document.getElementById('modalImage'),
-    modalOverlay: document.getElementById('modalImageOverlay'),
     closeModalBtn: document.getElementById('closeImageModalBtn'),
     fileMetaText: document.getElementById('problemFileMeta')
   });
@@ -167,18 +166,29 @@ if (currentSession) {
     }
 
     currentTaskId = task.taskId || currentTaskId;
-    diagnosisProgressPanel.renderTask(task);
-
-    const partialResult = task.partialResult || {};
+    const partialResult = normalizeDiagnosisPreview(task.partialResult || {}, task);
+    diagnosisProgressPanel.renderTask({
+      ...task,
+      partialResult
+    });
     const partialHighlights = Array.isArray(partialResult.imageHighlights) ? partialResult.imageHighlights : [];
+    const partialSteps = Array.isArray(partialResult.steps) ? partialResult.steps : [];
     if (partialHighlights.length) {
       problemViewer.setHighlights(partialHighlights);
     }
+    if (partialSteps.length && task.status !== 'done') {
+      diagnosisPanel.renderStreamingResult({
+        ...partialResult,
+        stageMessage: task.stageMessage
+      });
+    }
 
     if (task.status === 'done' && task.finalResult) {
-      diagnosisPanel.renderResult(task.finalResult);
-      problemViewer.setHighlights(task.finalResult.imageHighlights || partialHighlights);
-      currentRecordId = task.finalResult.recordId || task.recordId || '';
+      const finalResult = normalizeDiagnosisResult(task.finalResult);
+      diagnosisPanel.renderResult(finalResult);
+      const finalHighlights = Array.isArray(finalResult.imageHighlights) ? finalResult.imageHighlights : [];
+      problemViewer.setHighlights(finalHighlights.length ? finalHighlights : partialHighlights);
+      currentRecordId = finalResult.recordId || task.recordId || '';
       resetFeedbackForm();
 
       logEventInBackground({
@@ -187,8 +197,8 @@ if (currentSession) {
         action: 'DIAGNOSIS_FINISHED',
         payload: {
           recordId: currentRecordId,
-          status: task.finalResult.status,
-          errorIndex: task.finalResult.errorIndex ?? task.finalResult.error_index ?? null
+          status: finalResult.status,
+          errorIndex: finalResult.errorIndex ?? finalResult.error_index ?? null
         },
         recordId: currentRecordId,
         ts: Date.now()

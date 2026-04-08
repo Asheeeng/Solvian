@@ -44,10 +44,15 @@ public class DiagnosisResultComposer {
         parsed.setMathData(mergeMathData(parsed.getMathData(), chainResult));
 
         DiagnosisResult finalResult = errorAnalysisService.analyze(parsed, chainResult.getReasoningRaw());
-        finalResult.setImageHighlights(resolveImageHighlights(
+        List<ImageHighlight> resolvedHighlights = resolveImageHighlights(
                 finalResult.getImageHighlights(),
                 chainResult.getVisionExtractionResult()
-        ));
+        );
+        if ((resolvedHighlights == null || resolvedHighlights.isEmpty())
+                && "error_found".equals(finalResult.getStatus())) {
+            resolvedHighlights = buildFallbackImageHighlights(finalResult.getErrorIndex());
+        }
+        finalResult.setImageHighlights(resolvedHighlights);
         return finalResult;
     }
 
@@ -117,6 +122,28 @@ public class DiagnosisResultComposer {
                     .build());
         }
         return resolved;
+    }
+
+    private List<ImageHighlight> buildFallbackImageHighlights(Integer errorIndex) {
+        int normalizedIndex = errorIndex == null || errorIndex <= 0 ? 1 : errorIndex;
+        List<double[]> fallbackPositions = List.of(
+                new double[]{0.10d, 0.16d, 0.30d, 0.18d},
+                new double[]{0.52d, 0.28d, 0.28d, 0.18d},
+                new double[]{0.18d, 0.48d, 0.34d, 0.18d},
+                new double[]{0.56d, 0.58d, 0.24d, 0.16d}
+        );
+        double[] box = fallbackPositions.get((normalizedIndex - 1) % fallbackPositions.size());
+        return List.of(ImageHighlight.builder()
+                .x(box[0])
+                .y(box[1])
+                .width(box[2])
+                .height(box[3])
+                .label("错误步骤 " + normalizedIndex)
+                .stepNo(normalizedIndex)
+                .severity("high")
+                .coordinateType("ratio")
+                .mock(true)
+                .build());
     }
 
     private void persistDiagnosisRecord(String recordId,
