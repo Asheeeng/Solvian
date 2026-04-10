@@ -46,6 +46,15 @@ CREATE TABLE IF NOT EXISTS diagnosis_record (
 CREATE INDEX IF NOT EXISTS idx_diagnosis_user_id ON diagnosis_record(user_id);
 CREATE INDEX IF NOT EXISTS idx_diagnosis_created_at ON diagnosis_record(created_at DESC);
 
+-- 兼容旧版本数据库：历史记录查询会读取这些字段，缺失时需要补齐。
+ALTER TABLE diagnosis_record ADD COLUMN IF NOT EXISTS is_socratic BOOLEAN DEFAULT TRUE;
+ALTER TABLE diagnosis_record ADD COLUMN IF NOT EXISTS problem_type VARCHAR(64) DEFAULT 'matrix';
+ALTER TABLE diagnosis_record ADD COLUMN IF NOT EXISTS image_name VARCHAR(255);
+ALTER TABLE diagnosis_record ADD COLUMN IF NOT EXISTS ai_feedback VARCHAR(32);
+ALTER TABLE diagnosis_record ADD COLUMN IF NOT EXISTS error_type VARCHAR(32);
+ALTER TABLE diagnosis_record ADD COLUMN IF NOT EXISTS note TEXT;
+ALTER TABLE diagnosis_record ADD COLUMN IF NOT EXISTS math_data_json TEXT;
+
 -- 异步诊断任务表（新链路：创建任务后后台执行视觉/推理）
 CREATE TABLE IF NOT EXISTS diagnosis_task (
     task_id VARCHAR(64) PRIMARY KEY,
