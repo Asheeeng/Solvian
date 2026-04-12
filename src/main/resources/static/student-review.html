@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>作业诊断 - Solvian</title>
+  <link rel="stylesheet" href="/css/design-system.css?v=20260412a" />
+  <link rel="stylesheet" href="/css/student-review.css?v=20260412a" />
+</head>
+<body class="workspace-shell" data-theme="dark">
+  <div class="review-shell">
+    <header class="review-header">
+      <div class="review-brand">
+        <div class="app-brand__badge">S</div>
+        <div class="review-brand__copy">
+          <p class="review-brand__eyebrow">Student Review</p>
+          <h1 class="review-brand__title">Solvian 学生作业诊断台</h1>
+          <p class="review-brand__desc">按学生快速筛选最近提交的作业，查看图片、运行 AI 诊断，并把错误定位、步骤追踪和讲解建议集中在同一个工作区中。</p>
+        </div>
+      </div>
+
+      <div class="review-header__actions">
+        <a class="action-button action-button--ghost" href="/home.html">
+          <span class="action-button__icon">↖</span>
+          <span class="action-button__label">返回工作台</span>
+        </a>
+        <a class="action-button action-button--secondary" href="/student-review.html">
+          <span class="action-button__icon">◎</span>
+          <span class="action-button__label">作业诊断</span>
+        </a>
+      </div>
+    </header>
+
+    <main class="review-main">
+      <aside class="surface-card review-sidebar">
+        <div class="sidebar-head">
+          <div class="sidebar-head__copy">
+            <p class="eyebrow">Students</p>
+            <h2 class="title">学生列表</h2>
+            <p class="desc">按姓名或学号筛选，优先处理有待批作业的同学。</p>
+          </div>
+          <div class="count-pill"><span id="stuTotal">0</span> 人</div>
+        </div>
+
+        <div class="search-wrap">
+          <input id="searchInput" class="search-input" type="text" placeholder="搜索学生姓名或学号" />
+        </div>
+
+        <ul id="stuList" class="student-list"></ul>
+      </aside>
+
+      <section class="review-content">
+        <article id="emptyState" class="surface-card empty-panel">
+          <div class="empty-panel__inner">
+            <div class="empty-panel__icon">🧠</div>
+            <h2 class="empty-panel__title">先选择左侧的一位学生</h2>
+            <p class="desc">进入后可以浏览该学生的作业图片，选择一张作业执行诊断，并查看 OCR、步骤追踪与错误讲解。</p>
+          </div>
+        </article>
+
+        <div id="homeworkView" class="workspace-stack hidden">
+          <article class="surface-card workspace-bar">
+            <div class="workspace-head">
+              <div class="workspace-head__copy">
+                <p class="eyebrow">Workspace</p>
+                <h2 id="viewStuName" class="title">-</h2>
+                <p id="viewMeta" class="meta-text">-</p>
+              </div>
+              <div class="action-group">
+                <button class="action-button action-button--ghost" type="button" onclick="App.goBack()">
+                  <span class="action-button__icon">←</span>
+                  <span class="action-button__label">返回学生列表</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="workspace-bar__actions">
+              <div id="actionTip" class="action-tip">请先选择一张作业图片</div>
+              <div class="action-group">
+                <button id="btnDetect" class="action-button action-button--primary action-button--large" type="button" onclick="App.runDetection()" disabled>
+                  <span class="action-button__icon">▶</span>
+                  <span class="action-button__label">启动 AI 诊断</span>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <div class="workspace-grid">
+            <article class="surface-card review-panel">
+              <div class="section-head">
+                <div class="section-head__copy">
+                  <p class="eyebrow">Homework Gallery</p>
+                  <h3 class="block-title">作业图片</h3>
+                  <p class="block-desc">点击缩略图选择作业，右上角可直接放大原图。</p>
+                </div>
+              </div>
+              <div id="imgGrid" class="img-grid"></div>
+            </article>
+
+            <article id="resultArea" class="surface-card result-area hidden">
+              <div class="result-head">
+                <div class="result-head__copy">
+                  <p class="eyebrow">Diagnosis Result</p>
+                  <h3 class="block-title">AI 诊断结果</h3>
+                  <p class="block-desc">诊断过程会依次展示预览图、流程状态、OCR 识别、步骤追踪和错误讲解。</p>
+                </div>
+              </div>
+
+              <div class="result-stack">
+                <div class="preview-wrap">
+                  <div class="preview-frame" onclick="App.openLightbox()">
+                    <img id="previewImg" src="" alt="作业预览" />
+                    <div id="errorBoxes" class="error-boxes"></div>
+                  </div>
+
+                  <div class="pipeline-head">
+                    <div class="pipeline-head__title">诊断流水线</div>
+                    <div id="pipeTag" class="pipe-tag">等待</div>
+                  </div>
+
+                  <div class="pipeline">
+                    <div class="pipe-step" data-n="1">
+                      <div class="pipe-step__num">1</div>
+                      <div class="pipe-step__title">载入题图</div>
+                      <div class="pipe-step__sub">准备图片与上下文</div>
+                    </div>
+                    <div class="pipe-step" data-n="2">
+                      <div class="pipe-step__num">2</div>
+                      <div class="pipe-step__title">OCR 提取</div>
+                      <div class="pipe-step__sub">抽取矩阵与关键文本</div>
+                    </div>
+                    <div class="pipe-step" data-n="3">
+                      <div class="pipe-step__num">3</div>
+                      <div class="pipe-step__title">步骤追踪</div>
+                      <div class="pipe-step__sub">校验每一步是否正确</div>
+                    </div>
+                    <div class="pipe-step" data-n="4">
+                      <div class="pipe-step__num">4</div>
+                      <div class="pipe-step__title">错误讲解</div>
+                      <div class="pipe-step__sub">生成可读反馈建议</div>
+                    </div>
+                  </div>
+                </div>
+
+                <section id="ocrBlock" class="detail-block hidden">
+                  <p class="eyebrow">OCR Result</p>
+                  <h3 class="block-title">OCR 识别内容</h3>
+                  <p class="block-desc">按块展示题目与学生书写内容，便于快速对照。</p>
+                  <div id="ocrContent" class="ocr-content"></div>
+                </section>
+
+                <section id="traceBlock" class="detail-block hidden">
+                  <p class="eyebrow">Step Trace</p>
+                  <h3 class="block-title">步骤追踪</h3>
+                  <p class="block-desc">错误步骤默认展开，便于直接定位问题。</p>
+                  <div id="traceCards" class="trace-cards"></div>
+                </section>
+
+                <section id="explainBlock" class="detail-block hidden">
+                  <p class="eyebrow">Error Review</p>
+                  <h3 class="block-title">错误详解</h3>
+                  <p class="block-desc">聚焦错误位置、正确答案、原因和教学建议。</p>
+                  <div id="explainCards" class="explain-cards"></div>
+                </section>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="lightbox" class="lightbox" onclick="App.closeLightbox(event)">
+    <button class="action-button action-button--ghost lightbox__close" type="button" onclick="App.closeLightbox(event)">
+      <span class="action-button__icon">×</span>
+      <span class="action-button__label">关闭</span>
+    </button>
+    <img id="lbImg" src="" alt="作业放大预览" />
+  </div>
+
+  <script defer src="/js/student-review.js?v=20260412a"></script>
+</body>
+</html>
