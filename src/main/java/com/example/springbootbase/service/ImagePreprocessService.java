@@ -8,4 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ImagePreprocessService {
     PreprocessedImage preprocess(MultipartFile file);
+
+    PreprocessedImage preprocess(String fileName, String contentType, byte[] bytes);
 }

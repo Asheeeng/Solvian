@@ -35,7 +35,8 @@ public class AiDiagnosisServiceImpl implements AiDiagnosisService {
                 preprocessedImage,
                 isSocratic,
                 diagnosisResultComposer.compose(chainResult, subjectScope),
-                subjectScope
+                subjectScope,
+                null
         );
     }
 

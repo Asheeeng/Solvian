@@ -28,6 +28,10 @@ public class DiagnosisRecordEntity {
 
     private String role;
 
+    private Long classId;
+
+    private Long submissionId;
+
     private String status;
 
     private String stepsJson;
@@ -54,4 +58,3 @@ public class DiagnosisRecordEntity {
 
     private OffsetDateTime createdAt;
 }
-

@@ -7,7 +7,9 @@ import com.example.springbootbase.dto.request.RegisterRequest;
 import com.example.springbootbase.dto.response.LoginResponse;
 import com.example.springbootbase.dto.response.RegisterResponse;
 import com.example.springbootbase.entity.SessionEntity;
+import com.example.springbootbase.entity.TeachingClassEntity;
 import com.example.springbootbase.entity.UserEntity;
+import com.example.springbootbase.mapper.TeachingClassMapper;
 import com.example.springbootbase.mapper.SessionMapper;
 import com.example.springbootbase.mapper.UserMapper;
 import com.example.springbootbase.model.SessionInfo;
@@ -30,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserMapper userMapper;
     private final SessionMapper sessionMapper;
+    private final TeachingClassMapper teachingClassMapper;
 
     @Override
     public RegisterResponse register(RegisterRequest request) {
@@ -50,6 +53,7 @@ public class AuthServiceImpl implements AuthService {
                 .username(username)
                 .password(request.getPassword())
                 .role(role.name())
+                .classId(role == Role.STUDENT ? 1L : null)
                 .createdAt(OffsetDateTime.now())
                 .updatedAt(OffsetDateTime.now())
                 .build();
@@ -82,10 +86,13 @@ public class AuthServiceImpl implements AuthService {
 
         String token = IdUtil.newId();
         SessionInfo sessionInfo = SessionInfo.builder()
+                .id(user.getId())
                 .token(token)
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .role(user.getRole())
+                .classId(user.getClassId())
+                .className(user.getClassName())
                 .createdAt(TimeUtil.now())
                 .build();
 
@@ -114,11 +121,16 @@ public class AuthServiceImpl implements AuthService {
         if (sessionEntity == null) {
             return null;
         }
+        UserEntity userEntity = findByUserId(sessionEntity.getUserId());
+        UserAccount user = userEntity == null ? null : toUserAccount(userEntity);
         return SessionInfo.builder()
+                .id(user == null ? null : user.getId())
                 .token(sessionEntity.getToken())
-                .userId(sessionEntity.getUserId())
-                .username(sessionEntity.getUsername())
-                .role(Role.fromInput(sessionEntity.getRole()))
+                .userId(user == null ? sessionEntity.getUserId() : user.getUserId())
+                .username(user == null ? sessionEntity.getUsername() : user.getUsername())
+                .role(user == null ? Role.fromInput(sessionEntity.getRole()) : user.getRole())
+                .classId(user == null ? null : user.getClassId())
+                .className(user == null ? null : user.getClassName())
                 .createdAt(sessionEntity.getCreatedAt() == null
                         ? TimeUtil.now()
                         : sessionEntity.getCreatedAt().toInstant())
@@ -164,9 +176,12 @@ public class AuthServiceImpl implements AuthService {
 
     private UserVO toUserVO(UserAccount user) {
         return UserVO.builder()
+                .id(user.getId())
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .role(user.getRole())
+                .classId(user.getClassId())
+                .className(user.getClassName())
                 .build();
     }
 
@@ -177,14 +192,46 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private UserAccount toUserAccount(UserEntity userEntity) {
+        TeachingClassEntity teachingClass = resolveClass(userEntity, Role.fromInput(userEntity.getRole()));
         return UserAccount.builder()
+                .id(userEntity.getId())
                 .userId(userEntity.getUserId())
                 .username(userEntity.getUsername())
                 .password(userEntity.getPassword())
                 .role(Role.fromInput(userEntity.getRole()))
+                .classId(teachingClass == null ? null : teachingClass.getId())
+                .className(teachingClass == null ? null : teachingClass.getClassName())
                 .createdAt(userEntity.getCreatedAt() == null
                         ? TimeUtil.now()
                         : userEntity.getCreatedAt().toInstant())
                 .build();
+    }
+
+    private TeachingClassEntity resolveClass(UserEntity userEntity, Role role) {
+        if (userEntity == null || role == null) {
+            return null;
+        }
+        if (role == Role.STUDENT) {
+            if (userEntity.getClassId() == null) {
+                return null;
+            }
+            return teachingClassMapper.selectById(userEntity.getClassId());
+        }
+        if (role == Role.TEACHER) {
+            return teachingClassMapper.selectOne(new LambdaQueryWrapper<TeachingClassEntity>()
+                    .eq(TeachingClassEntity::getTeacherId, userEntity.getId())
+                    .orderByAsc(TeachingClassEntity::getId)
+                    .last("LIMIT 1"));
+        }
+        return null;
+    }
+
+    private UserEntity findByUserId(String userId) {
+        if (userId == null || userId.isBlank()) {
+            return null;
+        }
+        return userMapper.selectOne(new LambdaQueryWrapper<UserEntity>()
+                .eq(UserEntity::getUserId, userId)
+                .last("LIMIT 1"));
     }
 }

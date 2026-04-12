@@ -128,6 +128,10 @@ export async function logoutUser() {
   }
 }
 
+export async function fetchCurrentProfile() {
+  return requestJson('/api/auth/me', { method: 'GET', auth: true });
+}
+
 export async function evaluateProblem({ file, isSocratic, problemType = 'matrix' }) {
   const formData = new FormData();
   formData.append('file', file);
@@ -190,6 +194,47 @@ export async function fetchHistory() {
 
 export async function fetchDashboardSummary() {
   return requestJson('/api/dashboard-summary', { method: 'GET', auth: true });
+}
+
+export async function createSubmission({ file }) {
+  const formData = new FormData();
+  formData.append('file', file);
+  return requestJson('/api/submissions', {
+    method: 'POST',
+    auth: true,
+    body: formData
+  });
+}
+
+export async function fetchMySubmissions(limit = 3) {
+  return requestJson(`/api/submissions/mine?limit=${encodeURIComponent(limit)}`, {
+    method: 'GET',
+    auth: true
+  });
+}
+
+export async function fetchTeacherSubmissions(limit = 20) {
+  return requestJson(`/api/submissions?limit=${encodeURIComponent(limit)}`, {
+    method: 'GET',
+    auth: true
+  });
+}
+
+export async function createSubmissionDiagnosisTask(submissionId, { isSocratic = false, problemType = 'matrix' } = {}) {
+  const params = new URLSearchParams({
+    isSocratic: String(Boolean(isSocratic)),
+    problemType
+  });
+  return requestJson(`/api/submissions/${encodeURIComponent(submissionId)}/diagnose?${params.toString()}`, {
+    method: 'POST',
+    auth: true
+  });
+}
+
+export function buildSubmissionImageUrl(submissionId) {
+  const session = getSession();
+  const token = session?.token ? `?token=${encodeURIComponent(session.token)}` : '';
+  return `/api/submissions/${encodeURIComponent(submissionId)}/image${token}`;
 }
 
 export async function downloadPdfReport(recordId) {

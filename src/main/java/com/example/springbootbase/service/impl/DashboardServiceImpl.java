@@ -91,6 +91,8 @@ public class DashboardServiceImpl implements DashboardService {
                 .orderByDesc(DiagnosisRecordEntity::getCreatedAt);
         if (sessionInfo.getRole() == Role.STUDENT) {
             wrapper.eq(DiagnosisRecordEntity::getUserId, sessionInfo.getUserId());
+        } else if (sessionInfo.getRole() == Role.TEACHER && sessionInfo.getClassId() != null) {
+            wrapper.eq(DiagnosisRecordEntity::getClassId, sessionInfo.getClassId());
         }
         return new ArrayList<>(diagnosisRecordMapper.selectList(wrapper));
     }

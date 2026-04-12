@@ -11,29 +11,21 @@ import lombok.NoArgsConstructor;
 import java.time.OffsetDateTime;
 
 /**
- * 用户表实体。
+ * 班级实体。
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName("app_user")
-public class UserEntity {
+@TableName("classes")
+public class TeachingClassEntity {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String userId;
+    private String className;
 
-    private String username;
-
-    private String password;
-
-    private String role;
-
-    private Long classId;
+    private Long teacherId;
 
     private OffsetDateTime createdAt;
-
-    private OffsetDateTime updatedAt;
 }

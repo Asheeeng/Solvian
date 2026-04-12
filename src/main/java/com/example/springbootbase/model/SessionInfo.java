@@ -16,9 +16,12 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SessionInfo {
+    private Long id;
     private String token;
     private String userId;
     private String username;
     private Role role;
+    private Long classId;
+    private String className;
     private Instant createdAt;
 }

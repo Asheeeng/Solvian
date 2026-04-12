@@ -38,15 +38,17 @@ public class ReasoningWorker {
                 image,
                 Boolean.TRUE.equals(task.getIsSocratic()),
                 finalResult,
-                task.getSubjectScope()
+                task.getSubjectScope(),
+                task.getSubmissionId()
         );
     }
 
     private SessionInfo toSessionInfo(DiagnosisTaskEntity task) {
         return SessionInfo.builder()
-                .userId(task.getUserId())
-                .username(task.getUsername())
-                .role(Role.valueOf(task.getRole()))
+                .userId(task.getTargetUserId() == null || task.getTargetUserId().isBlank() ? task.getUserId() : task.getTargetUserId())
+                .username(task.getTargetUsername() == null || task.getTargetUsername().isBlank() ? task.getUsername() : task.getTargetUsername())
+                .role(Role.valueOf(task.getTargetRole() == null || task.getTargetRole().isBlank() ? task.getRole() : task.getTargetRole()))
+                .classId(task.getClassId())
                 .createdAt(Instant.now())
                 .build();
     }

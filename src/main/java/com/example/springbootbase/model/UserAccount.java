@@ -16,9 +16,12 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserAccount {
+    private Long id;
     private String userId;
     private String username;
     private String password;
     private Role role;
+    private Long classId;
+    private String className;
     private Instant createdAt;
 }

@@ -40,12 +40,29 @@ public class ImagePreprocessServiceImpl implements ImagePreprocessService {
         }
 
         try {
-            byte[] originalBytes = file.getBytes();
+            return preprocess(file.getOriginalFilename(), file.getContentType(), file.getBytes(), file.getSize());
+        } catch (IOException e) {
+            throw new IllegalArgumentException("图片读取失败");
+        }
+    }
+
+    @Override
+    public PreprocessedImage preprocess(String fileName, String contentType, byte[] bytes) {
+        long size = bytes == null ? 0L : bytes.length;
+        return preprocess(fileName, contentType, bytes, size);
+    }
+
+    private PreprocessedImage preprocess(String fileName, String contentType, byte[] originalBytes, long originalSize) {
+        if (originalBytes == null || originalBytes.length == 0) {
+            throw new IllegalArgumentException("图片内容不能为空");
+        }
+
+        try {
             BufferedImage sourceImage = ImageIO.read(new ByteArrayInputStream(originalBytes));
 
             byte[] optimizedBytes = originalBytes;
-            String contentType = file.getContentType();
-            String fileName = file.getOriginalFilename();
+            String finalContentType = contentType;
+            String finalFileName = fileName;
             Integer width = null;
             Integer height = null;
 
@@ -53,19 +70,19 @@ public class ImagePreprocessServiceImpl implements ImagePreprocessService {
                 width = sourceImage.getWidth();
                 height = sourceImage.getHeight();
 
-                if (shouldOptimize(file.getSize(), width, height)) {
+                if (shouldOptimize(originalSize, width, height)) {
                     optimizedBytes = compressImage(sourceImage);
-                    contentType = "image/jpeg";
-                    fileName = normalizeFileName(fileName);
+                    finalContentType = "image/jpeg";
+                    finalFileName = normalizeFileName(fileName);
                 }
             }
 
             return PreprocessedImage.builder()
-                    .fileName(fileName)
-                    .contentType(contentType)
+                    .fileName(finalFileName)
+                    .contentType(finalContentType)
                     .bytes(optimizedBytes)
                     .fileSize(optimizedBytes.length)
-                    .originalFileSize(file.getSize())
+                    .originalFileSize(originalSize)
                     .imageHash(calculateImageHash(originalBytes))
                     .width(width)
                     .height(height)

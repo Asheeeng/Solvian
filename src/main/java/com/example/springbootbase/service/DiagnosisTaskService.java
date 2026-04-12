@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 public interface DiagnosisTaskService {
     DiagnosisTaskResponse createTask(MultipartFile file, boolean isSocratic, String problemType, SessionInfo sessionInfo);
 
+    DiagnosisTaskResponse createTaskForSubmissionId(Long submissionId, boolean isSocratic, String problemType, SessionInfo sessionInfo);
+
     DiagnosisTaskResponse getTask(String taskId, SessionInfo sessionInfo);
 
     DiagnosisTaskEntity requireTask(String taskId);

@@ -14,7 +14,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserVO {
+    private Long id;
     private String userId;
     private String username;
     private Role role;
+    private Long classId;
+    private String className;
 }

@@ -55,9 +55,12 @@ public class AuthController {
         }
 
         return UserVO.builder()
+                .id(sessionInfo.getId())
                 .userId(sessionInfo.getUserId())
                 .username(sessionInfo.getUsername())
                 .role(sessionInfo.getRole())
+                .classId(sessionInfo.getClassId())
+                .className(sessionInfo.getClassName())
                 .build();
     }
 }

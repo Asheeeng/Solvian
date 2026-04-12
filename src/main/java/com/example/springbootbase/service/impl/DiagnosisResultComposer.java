@@ -60,9 +60,10 @@ public class DiagnosisResultComposer {
                                                     com.example.springbootbase.model.PreprocessedImage preprocessedImage,
                                                     boolean isSocratic,
                                                     DiagnosisResult finalResult,
-                                                    String subjectScope) {
+                                                    String subjectScope,
+                                                    Long submissionId) {
         String recordId = IdUtil.newId();
-        persistDiagnosisRecord(recordId, sessionInfo, preprocessedImage, isSocratic, finalResult, subjectScope);
+        persistDiagnosisRecord(recordId, sessionInfo, preprocessedImage, isSocratic, finalResult, subjectScope, submissionId);
         return toEvaluateResponse(recordId, finalResult, isSocratic);
     }
 
@@ -151,12 +152,15 @@ public class DiagnosisResultComposer {
                                         com.example.springbootbase.model.PreprocessedImage preprocessedImage,
                                         boolean isSocratic,
                                         DiagnosisResult finalResult,
-                                        String subjectScope) {
+                                        String subjectScope,
+                                        Long submissionId) {
         DiagnosisRecordEntity entity = DiagnosisRecordEntity.builder()
                 .recordId(recordId)
                 .userId(sessionInfo.getUserId())
                 .username(sessionInfo.getUsername())
                 .role(sessionInfo.getRole().name())
+                .classId(sessionInfo.getClassId())
+                .submissionId(submissionId)
                 .status(finalResult.getStatus())
                 .stepsJson(toJson(toStepSummaries(finalResult.getSteps())))
                 .feedback(finalResult.getFeedback())

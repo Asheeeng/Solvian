@@ -37,6 +37,8 @@ public class HistoryServiceImpl implements HistoryService {
                 .orderByDesc(DiagnosisRecordEntity::getCreatedAt);
         if (sessionInfo.getRole() == Role.STUDENT) {
             wrapper.eq(DiagnosisRecordEntity::getUserId, sessionInfo.getUserId());
+        } else if (sessionInfo.getRole() == Role.TEACHER && sessionInfo.getClassId() != null) {
+            wrapper.eq(DiagnosisRecordEntity::getClassId, sessionInfo.getClassId());
         }
         List<DiagnosisRecordEntity> rows = diagnosisRecordMapper.selectList(wrapper);
         for (DiagnosisRecordEntity row : rows) {

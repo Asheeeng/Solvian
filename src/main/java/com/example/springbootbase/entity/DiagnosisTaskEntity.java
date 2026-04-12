@@ -30,6 +30,16 @@ public class DiagnosisTaskEntity {
 
     private String role;
 
+    private Long classId;
+
+    private Long submissionId;
+
+    private String targetUserId;
+
+    private String targetUsername;
+
+    private String targetRole;
+
     private String status;
 
     private Integer progress;

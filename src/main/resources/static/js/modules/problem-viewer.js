@@ -51,6 +51,66 @@ export class ProblemViewer {
     return this.selectedFile;
   }
 
+  setPreviewSource({ imageUrl, imageName, metaText = '' }) {
+    this.imageDataUrl = imageUrl || '';
+    this.imageName = imageName || '';
+    this.selectedFile = null;
+    this.clearHighlights();
+
+    if (this.fileMetaText && metaText) {
+      this.fileMetaText.textContent = metaText;
+    }
+
+    if (this.previewImage) {
+      this.previewImage.src = this.imageDataUrl;
+      this.previewImage.alt = this.imageName || '题目预览';
+    }
+    if (this.modalImage) {
+      this.modalImage.src = this.imageDataUrl;
+      this.modalImage.alt = this.imageName || '放大预览';
+    }
+    this.imageCanvas?.classList.remove('hidden');
+    this.placeholder?.classList.add('hidden');
+  }
+
+  showModalWithSource({ imageUrl, imageName }) {
+    if (!imageUrl) {
+      return;
+    }
+    this.imageDataUrl = imageUrl;
+    this.imageName = imageName || this.imageName;
+    if (this.modalImage) {
+      this.modalImage.src = imageUrl;
+      this.modalImage.alt = this.imageName || '放大预览';
+    }
+    this.modal?.classList.remove('hidden');
+    this.modal?.setAttribute('aria-hidden', 'false');
+  }
+
+  reset({ metaText = '' } = {}) {
+    this.imageDataUrl = '';
+    this.imageName = '';
+    this.selectedFile = null;
+    this.clearHighlights();
+
+    if (this.fileInput) {
+      this.fileInput.value = '';
+    }
+    if (this.previewImage) {
+      this.previewImage.removeAttribute('src');
+      this.previewImage.alt = '题目预览';
+    }
+    if (this.modalImage) {
+      this.modalImage.removeAttribute('src');
+      this.modalImage.alt = '放大预览';
+    }
+    if (this.fileMetaText && metaText) {
+      this.fileMetaText.textContent = metaText;
+    }
+    this.imageCanvas?.classList.add('hidden');
+    this.placeholder?.classList.remove('hidden');
+  }
+
   setHighlights(highlights = []) {
     this.highlights = Array.isArray(highlights) ? highlights : [];
   }

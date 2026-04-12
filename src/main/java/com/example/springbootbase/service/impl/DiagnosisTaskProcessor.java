@@ -2,7 +2,9 @@ package com.example.springbootbase.service.impl;
 
 import com.example.springbootbase.dto.response.EvaluateResponse;
 import com.example.springbootbase.entity.DiagnosisTaskEntity;
+import com.example.springbootbase.entity.SubmissionEntity;
 import com.example.springbootbase.mapper.DiagnosisTaskMapper;
+import com.example.springbootbase.mapper.SubmissionMapper;
 import com.example.springbootbase.model.VisionExtractionResult;
 import com.example.springbootbase.model.VisionStageResult;
 import com.example.springbootbase.service.DiagnosisInputStoreService;
@@ -31,6 +33,7 @@ public class DiagnosisTaskProcessor {
     private final DiagnosisInputStoreService diagnosisInputStoreService;
     private final VisionWorker visionWorker;
     private final ReasoningWorker reasoningWorker;
+    private final SubmissionMapper submissionMapper;
     private final ObjectMapper objectMapper;
 
     public void process(String taskId) {
@@ -68,6 +71,7 @@ public class DiagnosisTaskProcessor {
             task.setUpdatedAt(OffsetDateTime.now());
             task.setFinishedAt(OffsetDateTime.now());
             diagnosisTaskMapper.updateById(task);
+            markSubmissionChecked(task, finalResult);
         } catch (Exception ex) {
             log.error("[diagnosis-task] taskId={} failed", taskId, ex);
             markFailed(taskId, ex.getMessage());
@@ -94,6 +98,7 @@ public class DiagnosisTaskProcessor {
         task.setUpdatedAt(OffsetDateTime.now());
         task.setFinishedAt(OffsetDateTime.now());
         diagnosisTaskMapper.updateById(task);
+        markSubmissionFailed(task, task.getErrorMessage());
     }
 
     private Map<String, Object> buildPartialResult(VisionStageResult visionStageResult) {
@@ -116,5 +121,37 @@ public class DiagnosisTaskProcessor {
         } catch (JsonProcessingException ex) {
             throw new IllegalStateException("任务结果序列化失败", ex);
         }
+    }
+
+    private void markSubmissionChecked(DiagnosisTaskEntity task, EvaluateResponse finalResult) {
+        if (task.getSubmissionId() == null) {
+            return;
+        }
+        SubmissionEntity submission = submissionMapper.selectById(task.getSubmissionId());
+        if (submission == null) {
+            return;
+        }
+        submission.setCheckStatus("CHECKED");
+        submission.setDiagnosisRecordId(finalResult.getRecordId());
+        submission.setCheckResultJson(toJson(finalResult));
+        submission.setCheckedAt(OffsetDateTime.now());
+        submissionMapper.updateById(submission);
+    }
+
+    private void markSubmissionFailed(DiagnosisTaskEntity task, String errorMessage) {
+        if (task.getSubmissionId() == null) {
+            return;
+        }
+        SubmissionEntity submission = submissionMapper.selectById(task.getSubmissionId());
+        if (submission == null) {
+            return;
+        }
+        Map<String, Object> failedPayload = new LinkedHashMap<>();
+        failedPayload.put("message", errorMessage);
+        failedPayload.put("taskId", task.getTaskId());
+        submission.setCheckStatus("FAILED");
+        submission.setCheckResultJson(toJson(failedPayload));
+        submission.setCheckedAt(OffsetDateTime.now());
+        submissionMapper.updateById(submission);
     }
 }
