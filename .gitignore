@@ -14,5 +14,12 @@ target/
 # Logs
 *.log
 
+# Node.js
+node_modules/
+
+# Runtime uploads
+uploads/*
+!uploads/.gitkeep
+
 # Local secret config
 src/main/resources/application-local.yml

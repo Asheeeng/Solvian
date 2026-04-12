@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solvian · 智能作业诊断</title>
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-l">
+      <span class="logo-dot"></span>
+      <span class="logo-txt">Solvian</span>
+      <span class="logo-ver">v2</span>
+    </div>
+    <nav class="topbar-nav">
+      <a href="index.html" class="active">作业诊断</a>
+      <a href="#" onclick="App.showStats()">错题统计</a>
+      <a href="#" onclick="App.showSettings()">设置</a>
+    </nav>
+    <div class="topbar-r">
+      <span class="role-tag">教师</span>
+      <div class="avatar-circle">T</div>
+    </div>
+  </header>
+
+  <main class="app-layout">
+
+    <!-- 左侧学生栏 < 1/5 宽度 -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sb-head">
+        <div class="sb-title">
+          <h3>学生列表</h3>
+          <span class="sb-count" id="sbCount">0</span>
+        </div>
+        <p class="sb-hint">搜索姓名或学号</p>
+        <input class="sb-search" id="sbSearch" type="text" placeholder="搜索学生…">
+      </div>
+      <ul class="sb-list" id="sbList"></ul>
+      <div class="sb-footer">
+        <button class="sb-add-btn" onclick="App.showAddStudent()">+ 添加学生</button>
+      </div>
+    </aside>
+
+    <!-- 右侧工作区 -->
+    <section class="workspace" id="workspace">
+
+      <!-- 空白引导 -->
+      <div class="ws-empty" id="wsEmpty">
+        <div class="ws-empty-badge">SOLVIAN DIAGNOSIS</div>
+        <h1>智能作业诊断台</h1>
+        <p>选择学生 → 查看作业图片 → 启动 AI 诊断<br>错误位置、解题步骤、纠正建议一目了然</p>
+        <div class="ws-empty-cards">
+          <div class="guide-card">
+            <div class="gc-icon">👈</div>
+            <div class="gc-title">STUDENTS</div>
+            <div class="gc-desc">左侧选择学生，查看已提交的作业</div>
+          </div>
+          <div class="guide-card">
+            <div class="gc-icon">📷</div>
+            <div class="gc-title">HOMEWORK</div>
+            <div class="gc-desc">点击缩略图选中，右上角🔍放大原图</div>
+          </div>
+          <div class="guide-card">
+            <div class="gc-icon">🤖</div>
+            <div class="gc-title">AI DIAGNOSIS</div>
+            <div class="gc-desc">OCR识别 → 步骤追踪 → 错误定位 → 详细讲解</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 作业视图 -->
+      <div class="ws-hw hidden" id="wsHw">
+
+        <div class="ws-header">
+          <div class="ws-header-l">
+            <button class="btn-flat" onclick="App.goBack()">← 返回</button>
+            <div class="ws-stu-info">
+              <h2 id="wsName"></h2>
+              <span class="ws-meta" id="wsMeta"></span>
+            </div>
+          </div>
+          <div class="ws-header-r">
+            <span class="ws-tip" id="wsTip"></span>
+            <button class="btn-primary" id="btnRun" disabled onclick="App.runAI()">
+              <span class="btn-spin"></span>
+              <span class="btn-lbl">🤖 启动 AI 诊断</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="ws-cols">
+
+          <!-- 左栏：图片 -->
+          <div class="ws-col-l">
+            <div class="col-head">
+              <h3>📷 作业图片</h3>
+              <span class="col-hint">点击选中，🔍放大</span>
+            </div>
+            <div class="img-grid" id="imgGrid"></div>
+            <div class="upload-zone">
+              <input type="file" id="fileInput" accept="image/*" multiple hidden onchange="App.handleUpload(this)">
+              <button class="btn-upload" onclick="document.getElementById('fileInput').click()">📤 上传新作业</button>
+            </div>
+          </div>
+
+          <!-- 右栏：诊断 -->
+          <div class="ws-col-r">
+            <div class="col-head">
+              <h3>🔬 诊断结果</h3>
+              <span class="col-hint">选图后点击「启动AI诊断」</span>
+            </div>
+
+            <!-- 等待态 -->
+            <div class="diag-wait" id="diagWait">
+              <div class="dw-icon">🔬</div>
+              <p>选择作业图片并点击「启动AI诊断」</p>
+            </div>
+
+            <!-- 诊断内容 -->
+            <div class="diag-main hidden" id="diagMain">
+
+              <!-- 预览 + 错误框 -->
+              <div class="d-card">
+                <div class="d-card-h">
+                  <span>📄 作业预览 · 错误定位</span>
+                  <span class="d-tag" onclick="App.openLb()">点击放大</span>
+                </div>
+                <div class="d-card-b">
+                  <div class="pv-wrap" id="pvWrap" onclick="App.openLb()">
+                    <img id="pvImg" src="" alt="">
+                    <div id="errBoxes"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 流水线 -->
+              <div class="d-card">
+                <div class="d-card-h">
+                  <span>⚡ 诊断流水线</span>
+                  <span class="d-status" id="pipeStatus">等待</span>
+                </div>
+                <div class="d-card-b">
+                  <div class="pipeline" id="pipeline">
+                    <div class="pp" data-n="1">
+                      <div class="pp-dot">1</div>
+                      <div class="pp-info"><strong>任务接收</strong><span>图片进入队列</span></div>
+                    </div>
+                    <div class="pp" data-n="2">
+                      <div class="pp-dot">2</div>
+                      <div class="pp-info"><strong>OCR 识别</strong><span>提取公式与矩阵</span></div>
+                    </div>
+                    <div class="pp" data-n="3">
+                      <div class="pp-dot">3</div>
+                      <div class="pp-info"><strong>AI 推理</strong><span>逐步验证解题</span></div>
+                    </div>
+                    <div class="pp" data-n="4">
+                      <div class="pp-dot">4</div>
+                      <div class="pp-info"><strong>结果生成</strong><span>报告就绪</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- OCR -->
+              <div class="d-sec hidden" id="ocrSec">
+                <h4>🔍 OCR 识别结果</h4>
+                <div id="ocrOut"></div>
+              </div>
+
+              <!-- 步骤追踪 -->
+              <div class="d-sec hidden" id="traceSec">
+                <h4>📐 解题步骤追踪</h4>
+                <div id="traceOut"></div>
+              </div>
+
+              <!-- 错误详解 -->
+              <div class="d-sec hidden" id="explSec">
+                <h4>🎯 错误详解 · 一目了然</h4>
+                <div id="explOut"></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="App.closeLb(event)">
+    <button class="lb-x" onclick="App.closeLb()">✕</button>
+    <img id="lbImg" src="">
+  </div>
+
+  <!-- 添加学生弹窗 -->
+  <div class="modal-ov hidden" id="modalOv" onclick="App.closeModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3>添加学生</h3>
+      <div class="m-field">
+        <label>姓名</label>
+        <input type="text" id="addName" placeholder="张伟">
+      </div>
+      <div class="m-field">
+        <label>班级</label>
+        <input type="text" id="addClass" placeholder="数学A班" value="数学A班">
+      </div>
+      <div class="m-field">
+        <label>学号（可选）</label>
+        <input type="text" id="addSid" placeholder="2024001">
+      </div>
+      <div class="m-actions">
+        <button class="btn-flat" onclick="App.closeModal()">取消</button>
+        <button class="btn-primary" onclick="App.addStudent()">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
