@@ -231,3 +231,9 @@ body{font-family:-apple-system,"PingFang SC","Microsoft YaHei","Segoe UI",sans-s
   .ws-cols{grid-template-columns:1fr}
   .ws-empty-cards{grid-template-columns:1fr}
 }
+
+/* 顶栏 Tab */
+.topbar-tabs{display:flex;gap:2px;margin-left:12px;margin-right:auto}
+.topbar-tab{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;background:transparent;border:none;border-radius:var(--rs);color:var(--t2);font-size:.76rem;cursor:pointer;transition:var(--tr)}
+.topbar-tab:hover{color:var(--acc);background:var(--accg)}
+.topbar-tab.active{color:var(--acc);background:var(--accg);font-weight:600}

@@ -347,6 +347,28 @@ const App = (() => {
     document.body.style.overflow = '';
   }
 
+  function switchMainTab(name) {
+    document.querySelectorAll('.topbar-tab').forEach(function (btn) {
+      btn.classList.toggle('active', btn.dataset.tab === name);
+    });
+    ['viewDiagnosis', 'viewMistakes', 'viewStats'].forEach(function (id) {
+      const el = $(id);
+      if (el) el.classList.add('hidden');
+    });
+    const map = { diagnosis: 'viewDiagnosis', mistakes: 'viewMistakes', stats: 'viewStats' };
+    const target = $(map[name] || 'viewDiagnosis');
+    if (target) target.classList.remove('hidden');
+  }
+
+  function doLogout() {
+    if (!confirm('确认退出登录？')) return;
+    localStorage.removeItem('copilot_auth_session');
+    localStorage.removeItem('solvian_token');
+    localStorage.removeItem('solvian_user');
+    localStorage.removeItem('solvian_role');
+    window.location.href = '/login.html';
+  }
+
   function showStats() { alert('错题统计开发中'); }
   function showSettings() { alert('系统设置开发中'); }
 
@@ -428,7 +450,8 @@ const App = (() => {
   return {
     pickStu, pickW, goBack, runAI, handleUpload,
     showAddStudent, addStudent, closeModal,
-    openLb, closeLb, showStats, showSettings
+    openLb, closeLb, switchMainTab, doLogout,
+    showStats, showSettings
   };
 })();
 

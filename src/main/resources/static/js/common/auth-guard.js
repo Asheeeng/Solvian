@@ -12,7 +12,7 @@ export function requireAuth() {
 export function requireGuest() {
   const session = getCurrentUser();
   if (session?.token && session?.user) {
-    window.location.replace('/home.html');
+    window.location.replace('/student-review.html');
     return false;
   }
   return true;

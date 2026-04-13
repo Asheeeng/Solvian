@@ -5,12 +5,19 @@ const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname)));
+
+app.get('/', (_, res) => {
+  res.sendFile(path.join(__dirname, 'student-review.html'));
+});
+
+app.get(/^\/home(?:\.html)?$/, (_, res) => {
+  res.redirect('/');
+});
+
+app.use(express.static(path.join(__dirname), { index: false }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const apiRoutes = require('./api/routes');
 app.use('/api', apiRoutes);
-
-app.get('/', (_, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 app.listen(PORT, () => console.log(`\n  🚀 Solvian: http://127.0.0.1:${PORT}\n`));

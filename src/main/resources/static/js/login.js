@@ -125,7 +125,7 @@ if (requireGuest()) {
         return;
       }
 
-      window.location.href = '/home.html';
+      window.location.href = '/student-review.html';
     } finally {
       submitButton.disabled = false;
       submitButton.textContent = '登录';
