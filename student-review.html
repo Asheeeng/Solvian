@@ -4,9 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Solvian · 智能作业诊断</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
+  <script>
+  if (localStorage.getItem('solvian_logged') !== 'true') { window.location.replace('/login.html'); }
+  </script>
 
   <header class="topbar">
     <div class="topbar-l">

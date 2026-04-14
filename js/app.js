@@ -16,6 +16,7 @@ const App = (() => {
   //  INIT
   // ================================================================
   function init() {
+    syncSessionUi();
     if (MOCK) { students = mockStudents(); }
     else { loadStudents(); }
     renderList(students);
@@ -362,11 +363,20 @@ const App = (() => {
 
   function doLogout() {
     if (!confirm('确认退出登录？')) return;
+    localStorage.removeItem('solvian_logged');
     localStorage.removeItem('copilot_auth_session');
     localStorage.removeItem('solvian_token');
     localStorage.removeItem('solvian_user');
     localStorage.removeItem('solvian_role');
     window.location.href = '/login.html';
+  }
+
+  function syncSessionUi() {
+    const roleTag = document.querySelector('.role-tag');
+    if (!roleTag) return;
+    const role = (localStorage.getItem('solvian_role') || '').toLowerCase();
+    const map = { teacher: '教师', student: '学生', admin: '管理员' };
+    roleTag.textContent = map[role] || '教师';
   }
 
   function showStats() { alert('错题统计开发中'); }

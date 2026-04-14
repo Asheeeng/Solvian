@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (_, res) => {
-  res.sendFile(path.join(__dirname, 'student-review.html'));
+  res.sendFile(path.join(__dirname, 'login.html'));
 });
 
 app.get(/^\/home(?:\.html)?$/, (_, res) => {
