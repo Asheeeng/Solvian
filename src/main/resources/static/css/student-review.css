@@ -77,6 +77,21 @@ body {
   justify-content: flex-end;
 }
 
+.review-tabset {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.review-tab {
+  min-width: 124px;
+}
+
+.review-tab.is-active {
+  box-shadow: var(--shadow-sm);
+}
+
 .review-main {
   margin-top: 18px;
   display: grid;
@@ -310,6 +325,12 @@ body {
   border-color: rgba(110, 231, 183, 0.2);
 }
 
+.action-tip.error {
+  color: var(--err);
+  background: var(--err-bg);
+  border-color: rgba(251, 113, 133, 0.2);
+}
+
 .action-button.loading {
   position: relative;
   pointer-events: none;
@@ -410,6 +431,16 @@ body {
   background: var(--ok-bg);
 }
 
+.status-tag.running {
+  color: var(--hl);
+  background: var(--hl-bg);
+}
+
+.status-tag.failed {
+  color: var(--err);
+  background: var(--err-bg);
+}
+
 .overlay {
   position: absolute;
   inset: auto 0 0;
@@ -433,6 +464,15 @@ body {
   color: var(--text-muted);
   font-size: 13px;
   padding: 12px 0;
+}
+
+.student-list__empty {
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--line-soft);
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
 }
 
 .result-area {
@@ -897,6 +937,259 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
+.drawer-mask {
+  position: fixed;
+}
+
+.workspace-drawer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.workspace-drawer__shell {
+  position: relative;
+  width: min(620px, 100vw);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--line-soft);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0)),
+    var(--surface-2);
+  box-shadow: var(--shadow-lg);
+}
+
+.workspace-drawer__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.workspace-drawer__eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.workspace-drawer__title {
+  margin-top: 8px;
+  font-size: 28px;
+  line-height: 1.04;
+  letter-spacing: -0.05em;
+}
+
+.workspace-drawer__subtitle {
+  margin-top: 10px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.workspace-drawer__body {
+  flex: 1;
+  overflow: auto;
+  padding: 20px 22px 28px;
+}
+
+.drawer-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.drawer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.filter-chip:hover {
+  transform: translateY(-1px);
+  border-color: var(--line-mid);
+}
+
+.filter-chip.is-active {
+  color: var(--text-inverse);
+  border-color: transparent;
+  background: var(--surface-brand-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.record-list,
+.stat-list,
+.recent-list {
+  display: grid;
+  gap: 12px;
+}
+
+.record-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid var(--line-soft);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0)),
+    var(--surface-3);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.record-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--line-mid);
+  box-shadow: var(--shadow-sm);
+}
+
+.record-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.record-card__title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.record-card__subtitle {
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.record-card__meta,
+.record-card__chips,
+.recent-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.record-card__body {
+  display: grid;
+  gap: 10px;
+}
+
+.record-kv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.record-kv {
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.record-kv__label {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.record-kv__value {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summary-card,
+.distribution-card {
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line-soft);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0)),
+    var(--surface-3);
+}
+
+.summary-card__value {
+  margin-top: 14px;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.summary-card__desc,
+.distribution-card__hint,
+.recent-card__desc {
+  margin-top: 10px;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.distribution-card__title,
+.recent-card__title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.distribution-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.distribution-item {
+  display: grid;
+  gap: 8px;
+}
+
+.distribution-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.distribution-item__track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.16);
+}
+
+.distribution-item__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--brand-500), var(--accent-500));
+}
+
+.recent-card {
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 @keyframes student-review-spin {
   to {
     transform: rotate(360deg);
@@ -911,6 +1204,10 @@ body {
 
   .student-list {
     max-height: none;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -943,5 +1240,23 @@ body {
   .review-header,
   .workspace-bar__actions {
     flex-direction: column;
+  }
+
+  .review-tabset {
+    width: 100%;
+  }
+
+  .workspace-drawer__shell {
+    width: 100vw;
+  }
+
+  .workspace-drawer__header,
+  .workspace-drawer__body {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .record-kv-grid {
+    grid-template-columns: 1fr;
   }
 }

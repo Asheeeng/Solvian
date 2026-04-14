@@ -5,9 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>作业诊断 - Solvian</title>
   <link rel="stylesheet" href="/css/design-system.css?v=20260412a" />
-  <link rel="stylesheet" href="/css/student-review.css?v=20260412a" />
+  <link rel="stylesheet" href="/css/student-review.css?v=20260414a" />
 </head>
 <body class="workspace-shell" data-theme="dark">
+  <script>
+    if (!localStorage.getItem('copilot_auth_session')) {
+      window.location.replace('/login.html');
+    }
+  </script>
   <div class="review-shell">
     <header class="review-header">
       <div class="review-brand">
@@ -20,10 +25,24 @@
       </div>
 
       <div class="review-header__actions">
-        <a class="action-button action-button--secondary" href="/student-review.html">
-          <span class="action-button__icon">◎</span>
-          <span class="action-button__label">作业诊断</span>
-        </a>
+        <div class="review-tabset" role="tablist" aria-label="诊断工作区导航">
+          <button class="action-button action-button--secondary review-tab is-active" type="button" data-review-tab="diagnosis" onclick="App.focusDiagnosis()">
+            <span class="action-button__icon">◎</span>
+            <span class="action-button__label">作业诊断</span>
+          </button>
+          <button id="openNotebookBtn" class="action-button action-button--ghost review-tab" type="button" data-review-tab="notebook" onclick="App.openNotebook()">
+            <span class="action-button__icon">📕</span>
+            <span class="action-button__label">错题本</span>
+          </button>
+          <button id="openStatsBtn" class="action-button action-button--ghost review-tab" type="button" data-review-tab="stats" onclick="App.openStats()">
+            <span class="action-button__icon">📊</span>
+            <span class="action-button__label">统计</span>
+          </button>
+        </div>
+        <button id="logoutBtn" class="action-button action-button--ghost" type="button" onclick="App.logout()">
+          <span class="action-button__icon">⇥</span>
+          <span class="action-button__label">退出</span>
+        </button>
       </div>
     </header>
 
@@ -174,6 +193,24 @@
     <img id="lbImg" src="" alt="作业放大预览" />
   </div>
 
-  <script defer src="/js/student-review.js?v=20260412a"></script>
+  <div id="drawerMask" class="drawer-mask hidden" aria-hidden="true"></div>
+  <aside id="drawer" class="drawer workspace-drawer hidden" aria-hidden="true">
+    <div class="workspace-drawer__shell">
+      <header class="workspace-drawer__header">
+        <div>
+          <p id="drawerEyebrow" class="workspace-drawer__eyebrow">Notebook</p>
+          <h2 id="drawerTitle" class="workspace-drawer__title">错题本</h2>
+          <p id="drawerSubtitle" class="workspace-drawer__subtitle">按结构化卡片查看近期诊断记录。</p>
+        </div>
+        <button id="closeDrawerBtn" class="action-button action-button--ghost" type="button">
+          <span class="action-button__icon">×</span>
+          <span class="action-button__label">关闭</span>
+        </button>
+      </header>
+      <div id="drawerBody" class="workspace-drawer__body"></div>
+    </div>
+  </aside>
+
+  <script type="module" src="/js/student-review.js?v=20260414a"></script>
 </body>
 </html>
