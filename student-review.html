@@ -183,49 +183,165 @@
         <div class="sb-head">
           <div class="sb-title">
             <h3>错题筛选</h3>
-            <span class="sb-count">4</span>
+            <span class="sb-count">3</span>
           </div>
-          <p class="sb-hint">按学生 / 知识点 / 时间</p>
+          <p class="sb-hint">按学生 / 知识点筛选</p>
+          <input class="sb-search" type="text" placeholder="搜索错题…">
         </div>
         <ul class="sb-list">
           <li class="sb-item active">
             <div class="s-name">全部错题</div>
-            <div class="s-info"><span>近期归档</span></div>
+            <div class="s-info"><span>共 3 条记录</span><span class="s-badge">全部</span></div>
+            <div class="s-dot"></div>
           </li>
           <li class="sb-item">
             <div class="s-name">张伟</div>
-            <div class="s-info"><span>矩阵行变换</span></div>
-          </li>
-          <li class="sb-item">
-            <div class="s-name">李娜</div>
-            <div class="s-info"><span>初等行变换</span></div>
+            <div class="s-info"><span>1 条错题</span><span class="s-badge">矩阵行变换</span></div>
           </li>
           <li class="sb-item">
             <div class="s-name">王强</div>
-            <div class="s-info"><span>特征值求解</span></div>
+            <div class="s-info"><span>1 条错题</span><span class="s-badge">特征值求解</span></div>
+          </li>
+          <li class="sb-item">
+            <div class="s-name">李娜</div>
+            <div class="s-info"><span>1 条错题</span><span class="s-badge">初等行变换</span></div>
           </li>
         </ul>
       </aside>
       <section class="workspace">
-        <div class="ws-empty">
-          <div class="ws-empty-badge">MISTAKE BOOK</div>
-          <h1>错题本</h1>
-          <p>AI 诊断发现的错误步骤自动归档<br>支持按学生、知识点、时间筛选回顾</p>
-          <div class="ws-empty-cards">
-            <div class="guide-card">
-              <div class="gc-icon">📕</div>
-              <div class="gc-title">COLLECT</div>
-              <div class="gc-desc">诊断后错题自动收录</div>
+        <div class="ws-hw">
+          <div class="ws-header">
+            <div class="ws-header-l">
+              <div class="ws-stu-info">
+                <h2>📕 错题本</h2>
+                <span class="ws-meta">AI 诊断发现的错误步骤汇总</span>
+              </div>
             </div>
-            <div class="guide-card">
-              <div class="gc-icon">🔍</div>
-              <div class="gc-title">FILTER</div>
-              <div class="gc-desc">按学生、知识点筛选</div>
+            <div class="ws-header-r">
+              <span class="ws-tip ok">3 条重点错题</span>
             </div>
-            <div class="guide-card">
-              <div class="gc-icon">📈</div>
-              <div class="gc-title">REVIEW</div>
-              <div class="gc-desc">追踪改正进度</div>
+          </div>
+
+          <div class="d-card">
+            <div class="d-card-h">
+              <span>⚠️ 张伟 · 矩阵行变换</span>
+              <span class="d-tag">04-12 16:08</span>
+            </div>
+            <div class="d-card-b">
+              <div class="d-sec">
+                <h4>📐 错误步骤</h4>
+                <div class="tc bad open">
+                  <div class="tc-top">
+                    <div class="tc-l">
+                      <div class="tc-n">2</div>
+                      <div class="tc-nm">R1 → 2·R1 行变换</div>
+                    </div>
+                    <div class="tc-ic">❌</div>
+                  </div>
+                  <div class="tc-body">
+                    <div class="ex-grid">
+                      <div class="ex-cell loc"><div class="cl">📍 错误位置</div><div class="cv">R2(1,1)</div></div>
+                      <div class="ex-cell wrong"><div class="cl">❌ 学生写的</div><div class="cv">0</div></div>
+                      <div class="ex-cell right"><div class="cl">✅ 正确答案</div><div class="cv">-3</div></div>
+                      <div class="ex-cell"><div class="cl">📚 知识点</div><div class="cv">矩阵行变换</div></div>
+                    </div>
+                    <div class="tc-note"><strong>📝</strong> 执行 R1 → 2·R1 时，学生把第二行第一个元素误改成了 0。</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-sec">
+                <h4>🎯 错误分析</h4>
+                <div class="ex-exp">
+                  <div class="etag">💡 诊断说明</div>
+                  <p>执行 <span class="he">R1 → 2·R1</span> 时，这个操作只对第一行生效。第二行第一个元素应保持 <span class="ho">-3</span> 不变，但学生误改成了 <span class="he">0</span>。</p>
+                </div>
+                <div class="ex-tip">
+                  <div class="ti">🎯</div>
+                  <div class="tt">行变换只改目标行，做完后逐行核对一遍。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-card">
+            <div class="d-card-h">
+              <span>⚠️ 王强 · 特征值求解</span>
+              <span class="d-tag">04-12 08:10</span>
+            </div>
+            <div class="d-card-b">
+              <div class="d-sec">
+                <h4>📐 错误步骤</h4>
+                <div class="tc bad open">
+                  <div class="tc-top">
+                    <div class="tc-l">
+                      <div class="tc-n">3</div>
+                      <div class="tc-nm">求解 det(A - λI) = 0</div>
+                    </div>
+                    <div class="tc-ic">❌</div>
+                  </div>
+                  <div class="tc-body">
+                    <div class="ex-grid">
+                      <div class="ex-cell loc"><div class="cl">📍 错误位置</div><div class="cv">特征值 λ</div></div>
+                      <div class="ex-cell wrong"><div class="cl">❌ 学生写的</div><div class="cv">λ = 2</div></div>
+                      <div class="ex-cell right"><div class="cl">✅ 正确答案</div><div class="cv">λ = -2</div></div>
+                      <div class="ex-cell"><div class="cl">📚 知识点</div><div class="cv">特征值求解</div></div>
+                    </div>
+                    <div class="tc-note"><strong>📝</strong> 展开行列式时符号判断错误，最终把特征值符号算反了。</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-sec">
+                <h4>🎯 错误分析</h4>
+                <div class="ex-exp">
+                  <div class="etag">💡 诊断说明</div>
+                  <p>计算 det(A - λI) = 0 时，学生在展开行列式过程中遗漏了代数余子式的符号规则，导致结果从 <span class="ho">-2</span> 误写成了 <span class="he">2</span>。</p>
+                </div>
+                <div class="ex-tip">
+                  <div class="ti">🎯</div>
+                  <div class="tt">展开行列式时注意代数余子式的符号规则 <strong>(-1)^(i+j)</strong>。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-card">
+            <div class="d-card-h">
+              <span>⚠️ 李娜 · 初等行变换</span>
+              <span class="d-tag">04-11 19:45</span>
+            </div>
+            <div class="d-card-b">
+              <div class="d-sec">
+                <h4>📐 错误步骤</h4>
+                <div class="tc bad open">
+                  <div class="tc-top">
+                    <div class="tc-l">
+                      <div class="tc-n">4</div>
+                      <div class="tc-nm">R3 = R3 + 2R1</div>
+                    </div>
+                    <div class="tc-ic">❌</div>
+                  </div>
+                  <div class="tc-body">
+                    <div class="ex-grid">
+                      <div class="ex-cell loc"><div class="cl">📍 错误位置</div><div class="cv">R3 第1列、第4列</div></div>
+                      <div class="ex-cell wrong"><div class="cl">❌ 学生写的</div><div class="cv">[0, 3, 2, 3]</div></div>
+                      <div class="ex-cell right"><div class="cl">✅ 正确答案</div><div class="cv">[8, 3, 2, 9]</div></div>
+                      <div class="ex-cell"><div class="cl">📚 知识点</div><div class="cv">初等行变换</div></div>
+                    </div>
+                    <div class="tc-note"><strong>📝</strong> 学生只计算了部分列，没有把 2R1 的所有对应项完整加到 R3 上。</div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-sec">
+                <h4>🎯 错误分析</h4>
+                <div class="ex-exp">
+                  <div class="etag">💡 诊断说明</div>
+                  <p>执行 <span class="he">R3 = R3 + 2R1</span> 时，学生只处理了中间两列，漏掉了第 1 列和第 4 列，因此结果没有保持整行同步更新。</p>
+                </div>
+                <div class="ex-tip">
+                  <div class="ti">🎯</div>
+                  <div class="tt">行变换时每一列都要运算，建议列出完整计算过程并逐列核对。</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -241,47 +357,224 @@
             <h3>统计维度</h3>
             <span class="sb-count">4</span>
           </div>
-          <p class="sb-hint">按班级 / 时间范围</p>
+          <p class="sb-hint">按班级 / 学生 / 时间</p>
         </div>
         <ul class="sb-list">
           <li class="sb-item active">
             <div class="s-name">总览</div>
-            <div class="s-info"><span>课堂诊断概览</span></div>
+            <div class="s-info"><span>全班统计</span><span class="s-badge">总览</span></div>
           </li>
           <li class="sb-item">
             <div class="s-name">按学生</div>
-            <div class="s-info"><span>正确率对比</span></div>
+            <div class="s-info"><span>个人正确率</span><span class="s-badge">学生</span></div>
           </li>
           <li class="sb-item">
             <div class="s-name">按知识点</div>
-            <div class="s-info"><span>薄弱点排行</span></div>
+            <div class="s-info"><span>薄弱点分析</span><span class="s-badge">知识点</span></div>
           </li>
           <li class="sb-item">
             <div class="s-name">按时间</div>
-            <div class="s-info"><span>趋势变化</span></div>
+            <div class="s-info"><span>趋势变化</span><span class="s-badge">时间</span></div>
           </li>
         </ul>
       </aside>
       <section class="workspace">
-        <div class="ws-empty">
-          <div class="ws-empty-badge">STATISTICS</div>
-          <h1>统计面板</h1>
-          <p>查看班级错误分布、正确率趋势、知识薄弱点<br>帮助精准定位教学重点</p>
-          <div class="ws-empty-cards">
-            <div class="guide-card">
-              <div class="gc-icon">📊</div>
-              <div class="gc-title">OVERVIEW</div>
-              <div class="gc-desc">诊断次数、错误数、正确率</div>
+        <div class="ws-hw">
+          <div class="ws-header">
+            <div class="ws-header-l">
+              <div class="ws-stu-info">
+                <h2>📊 统计面板</h2>
+                <span class="ws-meta">班级错误分布、正确率趋势、知识薄弱点</span>
+              </div>
             </div>
-            <div class="guide-card">
-              <div class="gc-icon">🔥</div>
-              <div class="gc-title">WEAKNESS</div>
-              <div class="gc-desc">知识薄弱点排行</div>
+            <div class="ws-header-r">
+              <span class="ws-tip ok">班级总览已更新</span>
             </div>
-            <div class="guide-card">
-              <div class="gc-icon">👥</div>
-              <div class="gc-title">STUDENTS</div>
-              <div class="gc-desc">学生正确率对比</div>
+          </div>
+
+          <div class="d-card">
+            <div class="d-card-h">
+              <span>⚡ 数据概览</span>
+              <span class="d-tag">全班统计</span>
+            </div>
+            <div class="d-card-b">
+              <div class="pipeline">
+                <div class="pp done">
+                  <div class="pp-dot">12</div>
+                  <div class="pp-info"><strong>总诊断次数</strong><span>累计完成</span></div>
+                </div>
+                <div class="pp done">
+                  <div class="pp-dot">5</div>
+                  <div class="pp-info"><strong>累计错误数</strong><span>需要关注</span></div>
+                </div>
+                <div class="pp done">
+                  <div class="pp-dot">7</div>
+                  <div class="pp-info"><strong>参与学生</strong><span>已提交作业</span></div>
+                </div>
+                <div class="pp done">
+                  <div class="pp-dot">78</div>
+                  <div class="pp-info"><strong>平均正确率</strong><span>整体表现 78%</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-card">
+            <div class="d-card-h">
+              <span>🔥 知识薄弱点排行</span>
+              <span class="d-tag">按知识点</span>
+            </div>
+            <div class="d-card-b">
+              <div class="tc bad open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">1</div>
+                    <div class="tc-nm">矩阵行变换</div>
+                  </div>
+                  <div class="tc-ic">❌</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 出错 3 次，涉及 2 名学生。主要问题是行变换时误改非目标行。</div>
+                </div>
+              </div>
+              <div class="tc bad open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">2</div>
+                    <div class="tc-nm">特征值求解</div>
+                  </div>
+                  <div class="tc-ic">❌</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 出错 2 次，主要集中在 det(A - λI) 展开时的符号判断。</div>
+                </div>
+              </div>
+              <div class="tc ok open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">3</div>
+                    <div class="tc-nm">行列式计算</div>
+                  </div>
+                  <div class="tc-ic">✅</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 出错 1 次，主要是余子式计算时有局部遗漏。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-card">
+            <div class="d-card-h">
+              <span>👥 学生正确率</span>
+              <span class="d-tag">按学生</span>
+            </div>
+            <div class="d-card-b">
+              <div class="tc ok open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">1</div>
+                    <div class="tc-nm">赵敏</div>
+                  </div>
+                  <div class="tc-ic">✅</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 正确率 100%，诊断 2 次，暂未发现错误。</div>
+                </div>
+              </div>
+              <div class="tc ok open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">2</div>
+                    <div class="tc-nm">张伟</div>
+                  </div>
+                  <div class="tc-ic">✅</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 正确率 83%，诊断 3 次，累计 1 个错误。</div>
+                </div>
+              </div>
+              <div class="tc bad open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">3</div>
+                    <div class="tc-nm">李娜</div>
+                  </div>
+                  <div class="tc-ic">❌</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 正确率 67%，诊断 3 次，集中错误出现在初等行变换。</div>
+                </div>
+              </div>
+              <div class="tc bad open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">4</div>
+                    <div class="tc-nm">王强</div>
+                  </div>
+                  <div class="tc-ic">❌</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 正确率 50%，诊断 4 次，特征值求解相关错误最突出。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-card">
+            <div class="d-card-h">
+              <span>📋 最近诊断记录</span>
+              <span class="d-tag">最近 4 条</span>
+            </div>
+            <div class="d-card-b">
+              <div class="tc bad open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">1</div>
+                    <div class="tc-nm">张伟 · matrix_001.jpg</div>
+                  </div>
+                  <div class="tc-ic">❌</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 04-12 16:08 · 3 个步骤 · 1 个错误 · 已完成</div>
+                </div>
+              </div>
+              <div class="tc bad open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">2</div>
+                    <div class="tc-nm">王强 · linear_1.png</div>
+                  </div>
+                  <div class="tc-ic">❌</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 04-12 08:10 · 4 个步骤 · 2 个错误 · 已完成</div>
+                </div>
+              </div>
+              <div class="tc bad open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">3</div>
+                    <div class="tc-nm">李娜 · matrix_007.jpg</div>
+                  </div>
+                  <div class="tc-ic">❌</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 04-11 19:45 · 5 个步骤 · 1 个错误 · 已完成</div>
+                </div>
+              </div>
+              <div class="tc ok open">
+                <div class="tc-top">
+                  <div class="tc-l">
+                    <div class="tc-n">4</div>
+                    <div class="tc-nm">陈浩 · gauss.png</div>
+                  </div>
+                  <div class="tc-ic">⏳</div>
+                </div>
+                <div class="tc-body">
+                  <div class="tc-note"><strong>📝</strong> 04-12 11:00 · 待诊断</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
