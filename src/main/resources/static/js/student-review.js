@@ -169,10 +169,10 @@ const App = (() => {
 
     eyebrow.textContent = 'My Review';
     title.textContent = 'Solvian 我的作业诊断';
-    desc.textContent = '直接上传自己的作业图片，查看历史提交、已完成的 AI 诊断结果，以及同步回来的错题归档与统计信息。';
+    desc.textContent = '直接上传自己的作业图片，查看历史提交，以及同步回来的错题归档与统计信息。';
     sidebarEyebrow.textContent = 'My Submissions';
     sidebarTitle.textContent = '我的作业';
-    sidebarDesc.textContent = '按提交时间查看自己的作业，选择一张图片即可查看已有结果或重新发起诊断。';
+    sidebarDesc.textContent = '按提交时间查看自己的作业，选择一张图片即可查看详情。';
   }
 
   async function fetchSubmissionList() {
@@ -204,7 +204,7 @@ const App = (() => {
           emptyTitle: isTeacherView() ? '还没有学生提交作业' : '还没有提交作业',
           emptyDesc: isTeacherView()
             ? '等学生上传作业后，这里会自动出现作业卡片和诊断入口。'
-            : '点击右上角“上传作业”按钮，提交图片后这里会自动出现你的作业列表和诊断入口。'
+            : '点击右上角“上传作业”按钮，提交图片后这里会自动出现你的作业列表。'
         });
       } else if (isStudentView()) {
         const student = state.students[0];
@@ -544,6 +544,12 @@ const App = (() => {
 
     updateDetectButton(work);
 
+    if (isStudentView()) {
+      resetResult();
+      setActionTip(`✅ 已选：${work.file}，可点击图片右上角放大查看。`, 'ok');
+      return;
+    }
+
     if (work.diagnosis.hasResult && work.diagnosis.result) {
       renderDiagnosisResult(work.diagnosis.result, {
         imageUrl: work.url,
@@ -571,6 +577,15 @@ const App = (() => {
 
     const label = button.querySelector('.action-button__label');
     button.classList.remove('is-loading');
+
+    if (isStudentView()) {
+      button.disabled = true;
+      if (label) {
+        label.textContent = '老师端可用';
+      }
+      return;
+    }
+
     button.disabled = !work || work.status === 'running';
 
     if (!label) {
@@ -632,7 +647,7 @@ const App = (() => {
       emptyTitle || (isTeacherView() ? '先选择左侧的一位学生' : '还没有提交作业'),
       emptyDesc || (isTeacherView()
         ? '进入后可以浏览该学生的作业图片，选择一张作业执行诊断，并查看 OCR、步骤追踪与错误讲解。'
-        : '点击右上角“上传作业”按钮，提交图片后这里会自动出现你的作业列表和诊断入口。')
+        : '点击右上角“上传作业”按钮，提交图片后这里会自动出现你的作业列表。')
     );
   }
 
@@ -742,6 +757,11 @@ const App = (() => {
   }
 
   async function runDetection() {
+    if (!isTeacherView()) {
+      setActionTip('当前账号不能发起 AI 诊断。', 'error');
+      return;
+    }
+
     const work = getSelectedWork();
     if (!work) {
       setActionTip('请先选择一张作业图片。', 'error');

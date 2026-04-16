@@ -108,6 +108,19 @@ body {
   grid-column: 1 / -1;
 }
 
+.review-shell[data-role-view="student"] .workspace-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.review-shell[data-role-view="student"] #resultArea,
+.review-shell[data-role-view="student"] #btnDetect {
+  display: none !important;
+}
+
+.review-shell[data-role-view="student"] .workspace-bar__actions {
+  justify-content: flex-start;
+}
+
 .review-sidebar,
 .review-content,
 .review-panel,

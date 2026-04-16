@@ -8,10 +8,13 @@ import com.example.springbootbase.model.VisionStageResult;
 import com.example.springbootbase.service.ModelClientService;
 import com.example.springbootbase.service.PromptBuilderService;
 import com.example.springbootbase.service.VisionExtractionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +30,7 @@ public class ModelClientServiceImpl implements ModelClientService {
     private final MockModelClientService mockModelClientService;
     private final PromptBuilderService promptBuilderService;
     private final VisionExtractionService visionExtractionService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public VisionStageResult analyzeVision(PreprocessedImage preprocessedImage, String subjectScope) {
@@ -88,6 +92,16 @@ public class ModelClientServiceImpl implements ModelClientService {
             throw new IllegalArgumentException("视觉阶段结果为空，无法继续推理");
         }
 
+        if (shouldUseFastFallback(visionStageResult.getVisionExtractionResult())) {
+            return ModelChainResult.builder()
+                    .visionModel(visionStageResult.getVisionModel())
+                    .reasoningModel("rule-fallback")
+                    .visionRaw(visionStageResult.getVisionRaw())
+                    .reasoningRaw(buildFallbackReasoningJson(visionStageResult.getVisionExtractionResult(), subjectScope))
+                    .visionExtractionResult(visionStageResult.getVisionExtractionResult())
+                    .build();
+        }
+
         if (aiModelProperties.isMockEnabled()) {
             String raw = mockModelClientService.analyze(
                     PreprocessedImage.builder().fileSize(1).build(),
@@ -117,7 +131,33 @@ public class ModelClientServiceImpl implements ModelClientService {
                     reasoningPrompt
             );
         } catch (Exception ex) {
-            throw new IllegalArgumentException("推理模型调用失败: " + ex.getMessage());
+            log.warn("[reasoning-stage] fallback to rule-based result, reason={}", ex.getMessage());
+            return ModelChainResult.builder()
+                    .visionModel(visionStageResult.getVisionModel())
+                    .reasoningModel("rule-fallback")
+                    .visionRaw(visionStageResult.getVisionRaw())
+                    .reasoningRaw(buildTimeoutFallbackReasoningJson(
+                            visionStageResult.getVisionExtractionResult(),
+                            subjectScope,
+                            ex.getMessage()
+                    ))
+                    .visionExtractionResult(visionStageResult.getVisionExtractionResult())
+                    .build();
+        }
+
+        if (reasoningRaw == null || reasoningRaw.isBlank()) {
+            log.warn("[reasoning-stage] empty response, fallback to rule-based result");
+            return ModelChainResult.builder()
+                    .visionModel(visionStageResult.getVisionModel())
+                    .reasoningModel("rule-fallback")
+                    .visionRaw(visionStageResult.getVisionRaw())
+                    .reasoningRaw(buildTimeoutFallbackReasoningJson(
+                            visionStageResult.getVisionExtractionResult(),
+                            subjectScope,
+                            "empty_response"
+                    ))
+                    .visionExtractionResult(visionStageResult.getVisionExtractionResult())
+                    .build();
         }
 
         return ModelChainResult.builder()
@@ -163,5 +203,178 @@ public class ModelClientServiceImpl implements ModelClientService {
         } catch (Exception ex) {
             return "<invalid>";
         }
+    }
+
+    private boolean shouldUseFastFallback(VisionExtractionResult result) {
+        if (result == null) {
+            return true;
+        }
+
+        boolean noProblemText = isBlank(result.getProblemText());
+        boolean noSteps = result.getStudentSteps() == null || result.getStudentSteps().isEmpty();
+        boolean noMatrix = result.getMatrixExpressions() == null || result.getMatrixExpressions().isEmpty();
+        boolean flaggedNonMatrix = Boolean.FALSE.equals(result.getIsMatrixProblem());
+        boolean veryLowConfidence = result.getConfidence() != null && result.getConfidence() <= 0.15d;
+
+        return flaggedNonMatrix || (noProblemText && noSteps && noMatrix) || (veryLowConfidence && noSteps && noMatrix);
+    }
+
+    private String buildFallbackReasoningJson(VisionExtractionResult result, String subjectScope) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("status", "unable_to_judge");
+        payload.put("steps", List.of(Map.of(
+                "stepNo", 1,
+                "title", "题图信息不足",
+                "content", "当前题图中未识别出足够清晰的矩阵题目或解题步骤，无法继续进行严格批改。",
+                "latex", "",
+                "highlightedLatex", "",
+                "isWrong", false,
+                "explanation", "",
+                "latexHighlights", List.of(),
+                "matrixCellDiffs", List.of()
+        )));
+        payload.put("errorIndex", null);
+        payload.put("feedback", buildFallbackFeedback(result));
+        payload.put("tags", List.of("#矩阵初等变换"));
+        payload.put("imageHighlights", result.getImageHighlights() == null ? List.of() : result.getImageHighlights());
+        payload.put("diffInfo", Map.of(
+                "summary", "题图内容不足，暂时无法比较标准结果与学生作答",
+                "type", "insufficient_visual_data"
+        ));
+        payload.put("subjectScope", isBlank(subjectScope) ? "matrix" : subjectScope);
+        payload.put("isMatrixProblem", Boolean.TRUE.equals(result.getIsMatrixProblem()));
+
+        try {
+            return objectMapper.writeValueAsString(payload);
+        } catch (Exception ex) {
+            throw new IllegalStateException("生成兜底推理结果失败", ex);
+        }
+    }
+
+    private String buildTimeoutFallbackReasoningJson(VisionExtractionResult result, String subjectScope, String reason) {
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("status", "unable_to_judge");
+        payload.put("steps", buildTimeoutFallbackSteps(result));
+        payload.put("errorIndex", null);
+        payload.put("feedback", buildTimeoutFallbackFeedback(result, reason));
+        payload.put("tags", List.of("#矩阵初等变换"));
+        payload.put("imageHighlights", result == null || result.getImageHighlights() == null ? List.of() : result.getImageHighlights());
+        payload.put("diffInfo", Map.of(
+                "summary", "已识别到题图内容，但推理模型本次响应超时，当前先返回视觉识别结果供老师复核",
+                "type", "reasoning_timeout"
+        ));
+        payload.put("subjectScope", isBlank(subjectScope) ? "matrix" : subjectScope);
+        payload.put("isMatrixProblem", result == null || result.getIsMatrixProblem() == null || result.getIsMatrixProblem());
+
+        try {
+            return objectMapper.writeValueAsString(payload);
+        } catch (Exception ex) {
+            throw new IllegalStateException("生成超时兜底结果失败", ex);
+        }
+    }
+
+    private List<Map<String, Object>> buildTimeoutFallbackSteps(VisionExtractionResult result) {
+        if (result == null) {
+            return List.of(Map.of(
+                    "stepNo", 1,
+                    "title", "识别结果暂不可用",
+                    "content", "当前没有可展示的视觉识别结果。",
+                    "latex", "",
+                    "highlightedLatex", "",
+                    "isWrong", false,
+                    "explanation", "",
+                    "latexHighlights", List.of(),
+                    "matrixCellDiffs", List.of()
+            ));
+        }
+
+        java.util.ArrayList<Map<String, Object>> steps = new java.util.ArrayList<>();
+        List<String> studentSteps = result.getStudentSteps() == null ? List.of() : result.getStudentSteps();
+        List<String> matrixExpressions = result.getMatrixExpressions() == null ? List.of() : result.getMatrixExpressions();
+
+        int stepNo = 1;
+        for (String step : studentSteps.stream().limit(3).toList()) {
+            steps.add(Map.of(
+                    "stepNo", stepNo++,
+                    "title", "视觉识别步骤 " + (stepNo - 1),
+                    "content", shortenForFallback(step, 240),
+                    "latex", "",
+                    "highlightedLatex", "",
+                    "isWrong", false,
+                    "explanation", "当前先展示视觉识别结果，推理模型本次未及时返回。",
+                    "latexHighlights", List.of(),
+                    "matrixCellDiffs", List.of()
+            ));
+        }
+
+        for (String expr : matrixExpressions.stream().limit(Math.max(0, 3 - steps.size())).toList()) {
+            steps.add(Map.of(
+                    "stepNo", stepNo++,
+                    "title", "识别到的矩阵表达式",
+                    "content", shortenForFallback(expr, 240),
+                    "latex", shortenForFallback(expr, 240),
+                    "highlightedLatex", "",
+                    "isWrong", false,
+                    "explanation", "当前先展示视觉识别结果，推理模型本次未及时返回。",
+                    "latexHighlights", List.of(),
+                    "matrixCellDiffs", List.of()
+            ));
+        }
+
+        if (steps.isEmpty()) {
+            steps.add(Map.of(
+                    "stepNo", 1,
+                    "title", "视觉识别摘要",
+                    "content", shortenForFallback(result.getRawSummary(), 240),
+                    "latex", "",
+                    "highlightedLatex", "",
+                    "isWrong", false,
+                    "explanation", "当前先展示视觉识别摘要，推理模型本次未及时返回。",
+                    "latexHighlights", List.of(),
+                    "matrixCellDiffs", List.of()
+            ));
+        }
+
+        return steps;
+    }
+
+    private String buildTimeoutFallbackFeedback(VisionExtractionResult result, String reason) {
+        String detail = isBlank(reason) ? "推理模型本次未及时返回" : "推理模型本次响应超时";
+        if (result == null) {
+            return detail + "，请稍后重试。";
+        }
+
+        String summary = result.getRawSummary();
+        if (summary == null || summary.isBlank()) {
+            return "已识别到题图内容，但" + detail + "。当前先返回视觉识别结果供老师预览，建议稍后重新发起诊断。";
+        }
+        return summary + "。但" + detail + "，当前先返回视觉识别结果供老师预览，建议稍后重新发起诊断。";
+    }
+
+    private String buildFallbackFeedback(VisionExtractionResult result) {
+        if (result == null) {
+            return "当前没有可用的题图解析结果，请上传包含题目与解题过程的清晰作业图片后重试。";
+        }
+
+        String summary = result.getRawSummary();
+        if (summary == null || summary.isBlank()) {
+            return "当前没有识别出清晰的矩阵题目内容或学生步骤，请上传包含题目与完整解题过程的清晰图片后重试。";
+        }
+        return summary + "。请上传包含题目与完整解题过程的清晰图片后重试。";
+    }
+
+    private boolean isBlank(String text) {
+        return text == null || text.isBlank();
+    }
+
+    private String shortenForFallback(String raw, int maxLength) {
+        if (raw == null || raw.isBlank()) {
+            return "";
+        }
+        String text = raw.replaceAll("\\s+", " ").trim();
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + "...";
     }
 }

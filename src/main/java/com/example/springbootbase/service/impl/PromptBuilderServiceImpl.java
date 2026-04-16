@@ -1,9 +1,12 @@
 package com.example.springbootbase.service.impl;
 
+import com.example.springbootbase.model.ImageHighlight;
 import com.example.springbootbase.model.PreprocessedImage;
 import com.example.springbootbase.model.VisionExtractionResult;
 import com.example.springbootbase.service.PromptBuilderService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * 两阶段提示词构建实现。
@@ -151,18 +154,81 @@ public class PromptBuilderServiceImpl implements PromptBuilderService {
 
                 分析风格：%s
                 """.formatted(
-                safe(visionExtractionResult.getProblemText()),
-                safe(visionExtractionResult.getStudentSteps()),
-                safe(visionExtractionResult.getMatrixExpressions()),
-                safe(visionExtractionResult.getImageHighlights()),
+                normalizeText(visionExtractionResult.getProblemText(), 600),
+                summarizeList(visionExtractionResult.getStudentSteps(), 8, 220),
+                summarizeList(visionExtractionResult.getMatrixExpressions(), 8, 220),
+                summarizeHighlights(visionExtractionResult.getImageHighlights(), 6),
                 String.valueOf(visionExtractionResult.getIsMatrixProblem()),
                 String.valueOf(visionExtractionResult.getConfidence()),
-                safe(visionExtractionResult.getRawSummary()),
+                normalizeText(visionExtractionResult.getRawSummary(), 320),
                 modeText
         );
     }
 
     private String safe(Object raw) {
         return raw == null ? "" : String.valueOf(raw);
+    }
+
+    private String normalizeText(String raw, int maxLength) {
+        String text = raw == null ? "" : raw.replaceAll("\\s+", " ").trim();
+        if (text.length() <= maxLength) {
+            return text;
+        }
+        return text.substring(0, maxLength) + "...";
+    }
+
+    private String summarizeList(List<?> items, int maxItems, int maxItemLength) {
+        if (items == null || items.isEmpty()) {
+            return "[]";
+        }
+
+        StringBuilder builder = new StringBuilder("[");
+        int limit = Math.min(items.size(), maxItems);
+        for (int i = 0; i < limit; i++) {
+            if (i > 0) {
+                builder.append("; ");
+            }
+            builder.append(i + 1)
+                    .append(". ")
+                    .append(normalizeText(String.valueOf(items.get(i)), maxItemLength));
+        }
+        if (items.size() > limit) {
+            builder.append("; ... 共 ").append(items.size()).append(" 项");
+        }
+        builder.append(']');
+        return builder.toString();
+    }
+
+    private String summarizeHighlights(List<ImageHighlight> highlights, int maxItems) {
+        if (highlights == null || highlights.isEmpty()) {
+            return "[]";
+        }
+
+        StringBuilder builder = new StringBuilder("[");
+        int limit = Math.min(highlights.size(), maxItems);
+        for (int i = 0; i < limit; i++) {
+            ImageHighlight item = highlights.get(i);
+            if (i > 0) {
+                builder.append("; ");
+            }
+            builder.append("step=")
+                    .append(item.getStepNo() == null ? "-" : item.getStepNo())
+                    .append(", label=")
+                    .append(normalizeText(item.getLabel(), 40))
+                    .append(", box=(")
+                    .append(item.getX())
+                    .append(',')
+                    .append(item.getY())
+                    .append(',')
+                    .append(item.getWidth())
+                    .append(',')
+                    .append(item.getHeight())
+                    .append(')');
+        }
+        if (highlights.size() > limit) {
+            builder.append("; ... 共 ").append(highlights.size()).append(" 项");
+        }
+        builder.append(']');
+        return builder.toString();
     }
 }
