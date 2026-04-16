@@ -1,6 +1,7 @@
 import { requireAuth, roleToLabel } from './common/auth-guard.js?v=20260407e';
 import {
   buildSubmissionImageUrl,
+  createSubmission,
   createSubmissionDiagnosisTask,
   fetchCurrentProfile,
   fetchDashboardSummary,
@@ -48,6 +49,15 @@ const App = (() => {
       renderList(getFilteredStudents());
     });
 
+    $('uploadInput')?.addEventListener('change', async (event) => {
+      const files = Array.from(event.target?.files || []);
+      event.target.value = '';
+      if (!files.length) {
+        return;
+      }
+      await uploadFiles(files);
+    });
+
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'Escape') {
         return;
@@ -90,6 +100,7 @@ const App = (() => {
     }
 
     updateShellCopy();
+    syncRoleLayout();
     await refreshSubmissionData();
   }
 
@@ -100,6 +111,37 @@ const App = (() => {
   function isTeacherView() {
     const role = getRole();
     return role === 'TEACHER' || role === 'ADMIN';
+  }
+
+  function isStudentView() {
+    return getRole() === 'STUDENT';
+  }
+
+  function syncRoleLayout() {
+    const shell = document.querySelector('.review-shell');
+    const sidebar = document.querySelector('.review-sidebar');
+    const headerUploadBtn = $('headerUploadBtn');
+    const emptyUploadActions = $('emptyUploadActions');
+    const backToListBtn = $('btnBackToList');
+    const searchInput = $('searchInput');
+
+    if (isStudentView()) {
+      shell?.setAttribute('data-role-view', 'student');
+      sidebar?.classList.add('hidden');
+      headerUploadBtn?.classList.remove('hidden');
+      emptyUploadActions?.classList.remove('hidden');
+      backToListBtn?.classList.add('hidden');
+      if (searchInput) {
+        searchInput.value = '';
+      }
+      return;
+    }
+
+    shell?.setAttribute('data-role-view', 'teacher');
+    sidebar?.classList.remove('hidden');
+    headerUploadBtn?.classList.add('hidden');
+    emptyUploadActions?.classList.add('hidden');
+    backToListBtn?.classList.remove('hidden');
   }
 
   function updateShellCopy() {
@@ -127,7 +169,7 @@ const App = (() => {
 
     eyebrow.textContent = 'My Review';
     title.textContent = 'Solvian 我的作业诊断';
-    desc.textContent = '查看自己提交的作业、已完成的 AI 诊断结果，以及同步回来的错题归档与统计信息。';
+    desc.textContent = '直接上传自己的作业图片，查看历史提交、已完成的 AI 诊断结果，以及同步回来的错题归档与统计信息。';
     sidebarEyebrow.textContent = 'My Submissions';
     sidebarTitle.textContent = '我的作业';
     sidebarDesc.textContent = '按提交时间查看自己的作业，选择一张图片即可查看已有结果或重新发起诊断。';
@@ -159,10 +201,19 @@ const App = (() => {
 
       if (!state.students.length) {
         goBack({
-          emptyTitle: isTeacherView() ? '还没有学生提交作业' : '你还没有提交作业',
+          emptyTitle: isTeacherView() ? '还没有学生提交作业' : '还没有提交作业',
           emptyDesc: isTeacherView()
             ? '等学生上传作业后，这里会自动出现作业卡片和诊断入口。'
-            : '先从学生端提交一张作业图片，诊断记录就会回到这里。'
+            : '点击右上角“上传作业”按钮，提交图片后这里会自动出现你的作业列表和诊断入口。'
+        });
+      } else if (isStudentView()) {
+        const student = state.students[0];
+        const autoSelectWorkId = preservedWorkId || student.works[0]?.id || '';
+
+        pickStu(student.id, {
+          preserveWork: Boolean(preservedWorkId),
+          autoSelectWorkId,
+          silentScroll: true
         });
       } else if (preservedStudentId) {
         restoreSelection(preservedStudentId, preservedWorkId);
@@ -321,6 +372,10 @@ const App = (() => {
   }
 
   function getFilteredStudents() {
+    if (isStudentView()) {
+      return state.students;
+    }
+
     const keyword = String($('searchInput')?.value || '').trim().toLowerCase();
     if (!keyword) {
       return state.students;
@@ -407,10 +462,15 @@ const App = (() => {
 
     $('emptyState').classList.add('hidden');
     $('homeworkView').classList.remove('hidden');
-    $('viewStuName').textContent = student.name;
 
     const pendingText = student.pendingCount ? ` · ${student.pendingCount} 份待处理` : '';
-    $('viewMeta').textContent = `${student.cls} · 共 ${student.works.length} 份作业${pendingText}`;
+    if (isTeacherView()) {
+      $('viewStuName').textContent = student.name;
+      $('viewMeta').textContent = `${student.cls} · 共 ${student.works.length} 份作业${pendingText}`;
+    } else {
+      $('viewStuName').textContent = '我的作业';
+      $('viewMeta').textContent = `共 ${student.works.length} 份作业${pendingText}`;
+    }
 
     renderGrid(student.works);
 
@@ -569,9 +629,94 @@ const App = (() => {
     updateDetectButton(null);
     resetResult();
     showEmptyPanel(
-      emptyTitle || '先选择左侧的一位学生',
-      emptyDesc || '进入后可以浏览该学生的作业图片，选择一张作业执行诊断，并查看 OCR、步骤追踪与错误讲解。'
+      emptyTitle || (isTeacherView() ? '先选择左侧的一位学生' : '还没有提交作业'),
+      emptyDesc || (isTeacherView()
+        ? '进入后可以浏览该学生的作业图片，选择一张作业执行诊断，并查看 OCR、步骤追踪与错误讲解。'
+        : '点击右上角“上传作业”按钮，提交图片后这里会自动出现你的作业列表和诊断入口。')
     );
+  }
+
+  function triggerUpload() {
+    if (!isStudentView()) {
+      return;
+    }
+    $('uploadInput')?.click();
+  }
+
+  async function uploadFiles(files = []) {
+    if (!isStudentView()) {
+      return;
+    }
+
+    const imageFiles = files.filter(isImageFile);
+    if (!imageFiles.length) {
+      if (state.students.length) {
+        setActionTip('请选择图片格式的作业文件，例如 JPG、PNG、WEBP。', 'error');
+      } else {
+        showEmptyPanel('请选择图片文件', '目前仅支持上传图片格式的作业文件，例如 JPG、PNG、WEBP。');
+      }
+      return;
+    }
+
+    const headerUploadBtn = $('headerUploadBtn');
+    const emptyUploadBtn = $('emptyUploadBtn');
+    setButtonBusy(headerUploadBtn, true, '上传中');
+    setButtonBusy(emptyUploadBtn, true, '上传中');
+
+    if (state.students.length) {
+      setActionTip(`正在上传 ${imageFiles.length} 张作业图片...`);
+    } else {
+      showEmptyPanel('正在上传作业...', `共 ${imageFiles.length} 张图片，上传完成后会自动出现在你的作业列表中。`);
+    }
+
+    let successCount = 0;
+    const failures = [];
+
+    try {
+      for (const file of imageFiles) {
+        try {
+          await createSubmission({ file });
+          successCount += 1;
+        } catch (error) {
+          failures.push(`${file.name}：${error.message || '上传失败'}`);
+        }
+      }
+
+      if (successCount > 0) {
+        await refreshSubmissionData();
+      }
+
+      if (successCount > 0 && failures.length === 0) {
+        setActionTip(`✅ 已上传 ${successCount} 张作业图片。`, 'ok');
+        return;
+      }
+
+      if (successCount > 0) {
+        setActionTip(`✅ 已上传 ${successCount} 张，另有 ${failures.length} 张失败。`, 'error');
+        return;
+      }
+
+      if (state.students.length) {
+        setActionTip(failures[0] || '当前无法完成上传，请稍后重试。', 'error');
+      } else {
+        showEmptyPanel('上传失败', failures[0] || '当前无法完成上传，请稍后重试。');
+      }
+    } finally {
+      setButtonBusy(headerUploadBtn, false);
+      setButtonBusy(emptyUploadBtn, false);
+    }
+  }
+
+  function isImageFile(file) {
+    if (!file) {
+      return false;
+    }
+
+    if (String(file.type || '').startsWith('image/')) {
+      return true;
+    }
+
+    return /\.(png|jpe?g|webp|bmp|gif)$/i.test(String(file.name || ''));
   }
 
   function resetResult() {
@@ -1267,6 +1412,7 @@ const App = (() => {
     pickImg,
     goBack,
     runDetection,
+    triggerUpload,
     focusDiagnosis,
     openNotebook,
     openStats,

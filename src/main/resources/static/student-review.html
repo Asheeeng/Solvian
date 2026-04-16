@@ -39,6 +39,10 @@
             <span class="action-button__label">统计</span>
           </button>
         </div>
+        <button id="headerUploadBtn" class="action-button action-button--primary hidden" type="button" onclick="App.triggerUpload()">
+          <span class="action-button__icon">⤴</span>
+          <span class="action-button__label">上传作业</span>
+        </button>
         <button id="logoutBtn" class="action-button action-button--ghost" type="button" onclick="App.logout()">
           <span class="action-button__icon">⇥</span>
           <span class="action-button__label">退出</span>
@@ -70,6 +74,12 @@
             <div class="empty-panel__icon">🧠</div>
             <h2 class="empty-panel__title">先选择左侧的一位学生</h2>
             <p class="desc">进入后可以浏览该学生的作业图片，选择一张作业执行诊断，并查看 OCR、步骤追踪与错误讲解。</p>
+            <div id="emptyUploadActions" class="action-group hidden">
+              <button id="emptyUploadBtn" class="action-button action-button--primary action-button--large" type="button" onclick="App.triggerUpload()">
+                <span class="action-button__icon">⤴</span>
+                <span class="action-button__label">上传第一份作业</span>
+              </button>
+            </div>
           </div>
         </article>
 
@@ -82,7 +92,7 @@
                 <p id="viewMeta" class="meta-text">-</p>
               </div>
               <div class="action-group">
-                <button class="action-button action-button--ghost" type="button" onclick="App.goBack()">
+                <button id="btnBackToList" class="action-button action-button--ghost" type="button" onclick="App.goBack()">
                   <span class="action-button__icon">←</span>
                   <span class="action-button__label">返回学生列表</span>
                 </button>
@@ -210,6 +220,8 @@
       <div id="drawerBody" class="workspace-drawer__body"></div>
     </div>
   </aside>
+
+  <input id="uploadInput" class="visually-hidden" type="file" accept="image/*" multiple />
 
   <script type="module" src="/js/student-review.js?v=20260414a"></script>
 </body>
