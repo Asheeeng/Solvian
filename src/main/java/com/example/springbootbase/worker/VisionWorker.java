@@ -21,15 +21,23 @@ public class VisionWorker {
     private final ObjectMapper objectMapper;
 
     public VisionStageResult process(DiagnosisTaskEntity task, com.example.springbootbase.model.PreprocessedImage image) {
-        VisionStageResult cachedResult = findReusableVisionResult(task.getInputImageHash());
-        if (cachedResult != null) {
-            cachedResult.setCacheHit(true);
-            return cachedResult;
+        if (!isMatrixTask(task)) {
+            VisionStageResult cachedResult = findReusableVisionResult(task.getInputImageHash());
+            if (cachedResult != null) {
+                cachedResult.setCacheHit(true);
+                return cachedResult;
+            }
         }
 
         VisionStageResult freshResult = modelClientService.analyzeVision(image, task.getSubjectScope());
         freshResult.setCacheHit(false);
         return freshResult;
+    }
+
+    private boolean isMatrixTask(DiagnosisTaskEntity task) {
+        return task != null
+                && task.getSubjectScope() != null
+                && "matrix".equalsIgnoreCase(task.getSubjectScope());
     }
 
     private VisionStageResult findReusableVisionResult(String imageHash) {

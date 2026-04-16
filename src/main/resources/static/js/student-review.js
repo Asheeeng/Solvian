@@ -11,7 +11,8 @@ import {
   fetchTeacherSubmissions,
   logoutUser
 } from './common/storage.js?v=20260407g';
-import { normalizeDiagnosisPreview, normalizeDiagnosisResult } from './common/diagnosis-normalizer.js?v=20260408a';
+import { normalizeDiagnosisPreview, normalizeDiagnosisResult } from './common/diagnosis-normalizer.js?v=20260416b';
+import { renderLatexBatch } from './common/latex-renderer.js?v=20260407g';
 import { NotebookDrawer } from './modules/notebook-drawer.js?v=20260407e';
 
 const App = (() => {
@@ -1087,15 +1088,22 @@ const App = (() => {
     }
 
     $('traceCards').innerHTML = steps.map((step, index) => {
-      const isWrong = Boolean(step.isWrong || step.errorMessage || (step.matrixCellDiffs || []).length);
+      const diffLines = Array.isArray(step.matrixCellDiffs) ? step.matrixCellDiffs : [];
+      const isWrong = Boolean(step.isWrong || diffLines.length);
       const open = isWrong ? ' open' : '';
       const cls = isWrong ? 'wrong' : 'correct';
       const icon = isWrong ? '❌' : '✅';
-      const formulaText = step.highlightedLatex || step.latex || step.content || '暂无公式内容';
       const noteText = step.explanation || step.errorMessage || '';
-      const diffLines = Array.isArray(step.matrixCellDiffs) ? step.matrixCellDiffs : [];
 
-      let body = `<div class="formula-box">${esc(formulaText)}</div>`;
+      let body = '';
+      if (step.highlightedLatex || step.latex) {
+        body += latexBlockHtml(step.highlightedLatex || step.latex, isWrong);
+        if (step.content) {
+          body += `<div class="step-note">${renderText(step.content)}</div>`;
+        }
+      } else {
+        body += `<div class="formula-box">${esc(step.content || '暂无公式内容')}</div>`;
+      }
       if (noteText) {
         body += `<div class="step-note"><strong>📝</strong> ${renderText(noteText)}</div>`;
       }
@@ -1120,6 +1128,7 @@ const App = (() => {
       `;
     }).join('');
 
+    scheduleTraceLatexRender();
     block.classList.remove('hidden');
   }
 
@@ -1148,7 +1157,7 @@ const App = (() => {
         return;
       }
 
-      if (step.isWrong || step.errorMessage || step.explanation) {
+      if (step.isWrong) {
         items.push({
           title: `步骤 ${step.stepNo || index + 1} · ${step.title || '错误定位'}`,
           loc: result.errorIndex ? `第 ${result.errorIndex} 步附近` : '当前步骤',
@@ -1414,6 +1423,30 @@ const App = (() => {
   function parseTime(timestamp) {
     const time = new Date(timestamp || 0).getTime();
     return Number.isFinite(time) ? time : 0;
+  }
+
+  function latexBlockHtml(latex, isWrong) {
+    const normalized = String(latex || '').trim();
+    if (!normalized) {
+      return '<div class="formula-box">暂无公式内容</div>';
+    }
+    return `
+      <div class="formula-box formula-box--latex${isWrong ? ' formula-box--latex-wrong' : ''}" data-has-latex="true">
+        \\[${esc(normalized)}\\]
+      </div>
+    `;
+  }
+
+  function scheduleTraceLatexRender() {
+    const elements = Array.from(document.querySelectorAll('#traceCards .step-card'));
+    if (!elements.length) {
+      return;
+    }
+    window.requestAnimationFrame(() => {
+      renderLatexBatch(elements).catch(() => {
+        // MathJax 不可用时保留清洗后的纯文本公式，不阻塞内容展示。
+      });
+    });
   }
 
   function esc(value) {

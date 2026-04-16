@@ -5,7 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>作业诊断 - Solvian</title>
   <link rel="stylesheet" href="/css/design-system.css?v=20260412a" />
-  <link rel="stylesheet" href="/css/student-review.css?v=20260414a" />
+  <link rel="stylesheet" href="/css/student-review.css?v=20260416b" />
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body class="workspace-shell" data-theme="dark">
   <script>
@@ -223,6 +235,6 @@
 
   <input id="uploadInput" class="visually-hidden" type="file" accept="image/*" multiple />
 
-  <script type="module" src="/js/student-review.js?v=20260414a"></script>
+  <script type="module" src="/js/student-review.js?v=20260416b"></script>
 </body>
 </html>

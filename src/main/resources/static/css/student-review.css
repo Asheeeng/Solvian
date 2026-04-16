@@ -713,6 +713,16 @@ body {
   color: var(--text-secondary);
 }
 
+.formula-box--latex {
+  overflow-x: auto;
+  font-family: var(--font-math);
+  color: var(--text-primary);
+}
+
+.formula-box--latex-wrong {
+  border-color: rgba(251, 113, 133, 0.2);
+}
+
 .trace-cards,
 .explain-cards {
   display: grid;

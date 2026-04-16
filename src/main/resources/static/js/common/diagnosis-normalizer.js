@@ -73,6 +73,22 @@ function normalizeText(value) {
   return String(value).trim();
 }
 
+function normalizeLatexSyntax(value) {
+  const text = normalizeText(value);
+  if (!text) {
+    return '';
+  }
+  if (!text.includes('\\begin{bmatrix}')) {
+    return text;
+  }
+  return text
+    .replace(/\\\\/g, ' __ROW_BREAK__ ')
+    .replace(/\\(?=\s*[-+\d])/g, ' __ROW_BREAK__ ')
+    .replace(/\s*__ROW_BREAK__\s*/g, ' \\\\ ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function looksLikeResultObject(value) {
   return isPlainObject(value) && (Array.isArray(value.steps) || value.status || value.errorIndex || value.error_index);
 }
@@ -147,7 +163,7 @@ function normalizeHighlights(rawHighlights, errorIndex = null) {
 }
 
 function extractLatexFromText(value) {
-  const text = normalizeText(value);
+  const text = normalizeLatexSyntax(value);
   if (!text || looksLikeRawJsonText(text)) {
     return '';
   }
@@ -171,16 +187,16 @@ function extractLatexFromText(value) {
 }
 
 function unwrapLatex(value) {
-  let text = normalizeText(value);
+  let text = normalizeLatexSyntax(value);
   if (!text) {
     return '';
   }
 
   const parsed = tryParseJson(text);
   if (typeof parsed === 'string') {
-    text = normalizeText(parsed);
+    text = normalizeLatexSyntax(parsed);
   } else if (looksLikeResultObject(parsed) || isPlainObject(parsed)) {
-    text = normalizeText(firstDefined(parsed, ['highlightedLatex', 'highlighted_latex', 'latex', 'tex', 'formula'], ''));
+    text = normalizeLatexSyntax(firstDefined(parsed, ['highlightedLatex', 'highlighted_latex', 'latex', 'tex', 'formula'], ''));
   }
 
   if (text.startsWith('\\[') && text.endsWith('\\]')) {
@@ -306,15 +322,17 @@ function normalizeStep(rawStep, index) {
     explanation = '';
   }
 
+  const isWrong = Boolean(firstDefined(source, ['isWrong', 'is_wrong', 'wrong'], false));
+
   return {
     stepNo: normalizeNumber(firstDefined(source, ['stepNo', 'step_no', 'step'], index + 1)) || index + 1,
     title,
     content,
     latex,
     highlightedLatex,
-    isWrong: Boolean(firstDefined(source, ['isWrong', 'is_wrong', 'wrong'], false)),
+    isWrong,
     explanation,
-    errorMessage: explanation || null,
+    errorMessage: isWrong ? (explanation || null) : null,
     latexHighlights,
     matrixCellDiffs,
     imageHighlights: normalizeHighlights(firstDefined(source, ['imageHighlights', 'image_highlights', 'boxes', 'boundingBoxes'], []), null)

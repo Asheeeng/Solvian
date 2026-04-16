@@ -51,9 +51,9 @@ public class GlmModelClientService {
                 Map.of("role", "user", "content", prompt)
         ));
         requestBody.put("temperature", 0.2);
-        requestBody.put("max_tokens", Math.max(aiModelProperties.getReasoningMaxTokens(), 512));
+        requestBody.put("max_tokens", Math.min(Math.max(aiModelProperties.getReasoningMaxTokens(), 512), 1200));
 
-        String responseBody = postChatCompletion(requestBody);
+        String responseBody = postChatCompletion(requestBody, Math.min(aiModelProperties.getTimeoutMs(), 8000));
         return extractAssistantContent(responseBody);
     }
 
@@ -77,7 +77,7 @@ public class GlmModelClientService {
         requestBody.put("temperature", 0.1);
         requestBody.put("max_tokens", Math.max(aiModelProperties.getVisionMaxTokens(), 256));
 
-        String responseBody = postChatCompletion(requestBody);
+        String responseBody = postChatCompletion(requestBody, aiModelProperties.getTimeoutMs());
         return extractAssistantContent(responseBody);
     }
 
@@ -101,7 +101,7 @@ public class GlmModelClientService {
             ));
             requestBody.put("temperature", 0.1);
 
-            HttpResponse<String> response = postRawChatCompletion(requestBody);
+            HttpResponse<String> response = postRawChatCompletion(requestBody, aiModelProperties.getTimeoutMs());
             int statusCode = response.statusCode();
             result.put("httpStatus", statusCode);
 
@@ -126,9 +126,9 @@ public class GlmModelClientService {
         return result;
     }
 
-    private String postChatCompletion(Map<String, Object> requestBody) {
+    private String postChatCompletion(Map<String, Object> requestBody, int timeoutMs) {
         try {
-            HttpResponse<String> response = postRawChatCompletion(requestBody);
+            HttpResponse<String> response = postRawChatCompletion(requestBody, timeoutMs);
             if (!HttpStatus.valueOf(response.statusCode()).is2xxSuccessful()) {
                 String detail = extractErrorMessage(response.body());
                 throw new IllegalArgumentException("GLM 调用失败，HTTP 状态: " + response.statusCode() + "，详情: " + detail);
@@ -142,13 +142,14 @@ public class GlmModelClientService {
         }
     }
 
-    private HttpResponse<String> postRawChatCompletion(Map<String, Object> requestBody) throws IOException, InterruptedException {
+    private HttpResponse<String> postRawChatCompletion(Map<String, Object> requestBody, int timeoutMs) throws IOException, InterruptedException {
         String endpoint = buildEndpoint(aiModelProperties.getBaseUrl());
         String body = objectMapper.writeValueAsString(requestBody);
+        int finalTimeoutMs = Math.max(timeoutMs, 3000);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(endpoint))
-                .timeout(Duration.ofMillis(Math.max(aiModelProperties.getTimeoutMs(), 3000)))
+                .timeout(Duration.ofMillis(finalTimeoutMs))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .header("Authorization", "Bearer " + aiModelProperties.getApiKey())
