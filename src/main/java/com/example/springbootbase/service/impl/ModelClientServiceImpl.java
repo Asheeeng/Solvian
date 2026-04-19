@@ -85,21 +85,28 @@ public class ModelClientServiceImpl implements ModelClientService {
         );
 
         String visionPrompt = promptBuilderService.buildVisionPrompt(preprocessedImage, subjectScope);
-        String visionRaw;
-        try {
-            visionRaw = glmModelClientService.callVisionModel(
-                    aiModelProperties.getVisionModel(),
+        VisionCallOutcome visionOutcome = callVisionModelWithFallback(preprocessedImage, visionPrompt);
+        String visionRaw = visionOutcome.rawResponse();
+        VisionExtractionResult extractionResult = visionExtractionService.parse(visionRaw);
+        String finalVisionModel = visionOutcome.model();
+
+        if (shouldRunStrictMatrixAudit(extractionResult, subjectScope)) {
+            VisionCallOutcome auditOutcome = callVisionModelWithFallback(
                     preprocessedImage,
-                    visionPrompt
+                    promptBuilderService.buildStrictMatrixAuditPrompt(extractionResult)
             );
-        } catch (Exception ex) {
-            throw new IllegalArgumentException("视觉模型调用失败: " + ex.getMessage());
+            VisionExtractionResult auditResult = visionExtractionService.parse(auditOutcome.rawResponse());
+            if (isUsableAuditResult(auditResult)) {
+                finalVisionModel = auditOutcome.model();
+                visionRaw = auditOutcome.rawResponse();
+                extractionResult = markAuditSummary(auditResult);
+            }
         }
 
         return VisionStageResult.builder()
-                .visionModel(aiModelProperties.getVisionModel())
+                .visionModel(finalVisionModel)
                 .visionRaw(visionRaw)
-                .visionExtractionResult(visionExtractionService.parse(visionRaw))
+                .visionExtractionResult(extractionResult)
                 .cacheHit(false)
                 .build();
     }
@@ -203,12 +210,9 @@ public class ModelClientServiceImpl implements ModelClientService {
                 subjectScope
         );
 
-        String reasoningRaw;
+        ReasoningCallOutcome reasoningOutcome;
         try {
-            reasoningRaw = glmModelClientService.callTextModel(
-                    aiModelProperties.getModel(),
-                    reasoningPrompt
-            );
+            reasoningOutcome = callReasoningModelWithFallback(reasoningPrompt);
         } catch (Exception ex) {
             log.warn("[reasoning-stage] fallback to rule-based result, reason={}", ex.getMessage());
             return ModelChainResult.builder()
@@ -224,6 +228,7 @@ public class ModelClientServiceImpl implements ModelClientService {
                     .build();
         }
 
+        String reasoningRaw = reasoningOutcome.rawResponse();
         if (reasoningRaw == null || reasoningRaw.isBlank()) {
             log.warn("[reasoning-stage] empty response, fallback to rule-based result");
             return ModelChainResult.builder()
@@ -241,7 +246,7 @@ public class ModelClientServiceImpl implements ModelClientService {
 
         return ModelChainResult.builder()
                 .visionModel(visionStageResult.getVisionModel())
-                .reasoningModel(aiModelProperties.getModel())
+                .reasoningModel(reasoningOutcome.model())
                 .visionRaw(visionStageResult.getVisionRaw())
                 .reasoningRaw(reasoningRaw)
                 .visionExtractionResult(visionStageResult.getVisionExtractionResult())
@@ -256,10 +261,22 @@ public class ModelClientServiceImpl implements ModelClientService {
 
     @Override
     public Map<String, Object> testTextModel() {
-        return glmModelClientService.testTextModel(
-                aiModelProperties.getModel(),
-                "请仅返回字符串: model_test_ok"
-        );
+        return testTextModel(null, null);
+    }
+
+    @Override
+    public Map<String, Object> testTextModel(String modelOverride, String promptOverride) {
+        String resolvedModel = isBlank(modelOverride) ? aiModelProperties.getModel() : modelOverride.trim();
+        String resolvedPrompt = isBlank(promptOverride)
+                ? "请仅返回 JSON：{\"ok\":true,\"model\":\"" + resolvedModel + "\"}"
+                : promptOverride.trim();
+
+        Map<String, Object> result = glmModelClientService.testTextModel(resolvedModel, resolvedPrompt);
+        result.put("configuredPrimaryModel", aiModelProperties.getModel());
+        result.put("configuredSecondaryModel", aiModelProperties.getSecondaryModel());
+        result.put("configuredVisionModel", aiModelProperties.getVisionModel());
+        result.put("configuredSecondaryVisionModel", aiModelProperties.getSecondaryVisionModel());
+        return result;
     }
 
     private void validateProvider() {
@@ -267,9 +284,83 @@ public class ModelClientServiceImpl implements ModelClientService {
             throw new IllegalArgumentException("AI 调用已关闭，请检查 app.ai.enabled 配置");
         }
 
-        if (!"zhipu".equalsIgnoreCase(aiModelProperties.getProvider())) {
-            throw new IllegalArgumentException("当前仅支持 zhipu provider，实际为: " + aiModelProperties.getProvider());
+        if (!"zhipu".equalsIgnoreCase(aiModelProperties.getProvider())
+                && !"dashscope".equalsIgnoreCase(aiModelProperties.getProvider())) {
+            throw new IllegalArgumentException("当前仅支持 zhipu / dashscope provider，实际为: " + aiModelProperties.getProvider());
         }
+    }
+
+    private VisionCallOutcome callVisionModelWithFallback(PreprocessedImage preprocessedImage, String prompt) {
+        List<String> candidates = distinctNonBlankModels(
+                aiModelProperties.getVisionModel(),
+                aiModelProperties.getSecondaryVisionModel()
+        );
+        if (candidates.isEmpty()) {
+            throw new IllegalArgumentException("未配置视觉模型");
+        }
+
+        IllegalArgumentException lastError = null;
+        for (String candidate : candidates) {
+            try {
+                String raw = glmModelClientService.callVisionModel(candidate, preprocessedImage, prompt);
+                if (raw != null && !raw.isBlank()) {
+                    if (!candidate.equals(aiModelProperties.getVisionModel())) {
+                        log.warn("[vision-stage] fallback vision model hit, primary={}, actual={}",
+                                aiModelProperties.getVisionModel(), candidate);
+                    }
+                    return new VisionCallOutcome(candidate, raw);
+                }
+            } catch (IllegalArgumentException ex) {
+                lastError = ex;
+                log.warn("[vision-stage] model={} failed, reason={}", candidate, ex.getMessage());
+            }
+        }
+
+        throw lastError == null ? new IllegalArgumentException("视觉模型调用失败") : lastError;
+    }
+
+    private ReasoningCallOutcome callReasoningModelWithFallback(String prompt) {
+        List<String> candidates = distinctNonBlankModels(
+                aiModelProperties.getModel(),
+                aiModelProperties.getSecondaryModel()
+        );
+        if (candidates.isEmpty()) {
+            throw new IllegalArgumentException("未配置推理模型");
+        }
+
+        IllegalArgumentException lastError = null;
+        for (String candidate : candidates) {
+            try {
+                String raw = glmModelClientService.callTextModel(candidate, prompt);
+                if (raw != null && !raw.isBlank()) {
+                    if (!candidate.equals(aiModelProperties.getModel())) {
+                        log.warn("[reasoning-stage] fallback reasoning model hit, primary={}, actual={}",
+                                aiModelProperties.getModel(), candidate);
+                    }
+                    return new ReasoningCallOutcome(candidate, raw);
+                }
+            } catch (IllegalArgumentException ex) {
+                lastError = ex;
+                log.warn("[reasoning-stage] model={} failed, reason={}", candidate, ex.getMessage());
+            }
+        }
+
+        throw lastError == null ? new IllegalArgumentException("推理模型调用失败") : lastError;
+    }
+
+    private List<String> distinctNonBlankModels(String... models) {
+        List<String> result = new ArrayList<>();
+        Set<String> seen = new LinkedHashSet<>();
+        for (String model : models) {
+            if (isBlank(model)) {
+                continue;
+            }
+            String normalized = model.trim();
+            if (seen.add(normalized)) {
+                result.add(normalized);
+            }
+        }
+        return result;
     }
 
     private String extractHost(String baseUrl) {
@@ -446,6 +537,56 @@ public class ModelClientServiceImpl implements ModelClientService {
         return text == null || text.isBlank();
     }
 
+    private boolean shouldRunStrictMatrixAudit(VisionExtractionResult result, String subjectScope) {
+        if (result == null || subjectScope == null || !"matrix".equalsIgnoreCase(subjectScope)) {
+            return false;
+        }
+        if (result.getMatrixExpressions() == null || result.getMatrixExpressions().size() < 2) {
+            return false;
+        }
+        if (result.getStudentSteps() != null) {
+            for (String step : result.getStudentSteps()) {
+                if (!isBlank(step) && step.toUpperCase().contains("R")) {
+                    return true;
+                }
+            }
+        }
+        String problemText = result.getProblemText();
+        return !isBlank(problemText) && problemText.toUpperCase().contains("R");
+    }
+
+    private boolean isUsableAuditResult(VisionExtractionResult result) {
+        return result != null
+                && result.getMatrixExpressions() != null
+                && result.getMatrixExpressions().size() >= 2
+                && !isBlank(result.getMatrixExpressions().get(0))
+                && !isBlank(result.getMatrixExpressions().get(1));
+    }
+
+    private VisionExtractionResult markAuditSummary(VisionExtractionResult result) {
+        String summary = result.getRawSummary();
+        if (isBlank(summary)) {
+            summary = "已执行逐字复核，结果以图片字面抄写为准。";
+        } else {
+            summary = summary + "；已执行逐字复核，结果以图片字面抄写为准。";
+        }
+        result.setRawSummary(summary);
+        return result;
+    }
+
+    private boolean isTrustedVisionResult(VisionExtractionResult result) {
+        if (result == null || result.getConfidence() == null) {
+            return false;
+        }
+        return result.getConfidence() >= 0.9d;
+    }
+
+    private record VisionCallOutcome(String model, String rawResponse) {
+    }
+
+    private record ReasoningCallOutcome(String model, String rawResponse) {
+    }
+
     private String shortenForFallback(String raw, int maxLength) {
         if (raw == null || raw.isBlank()) {
             return "";
@@ -490,7 +631,9 @@ public class ModelClientServiceImpl implements ModelClientService {
 
         String status = diffs.isEmpty()
                 ? "correct"
-                : (onlyUntouchedMismatch ? "unable_to_judge" : "error_found");
+                : (onlyUntouchedMismatch
+                ? (isTrustedVisionResult(result) ? "error_found" : "unable_to_judge")
+                : "error_found");
 
         String originalLatex = toBmatrixLatex(matrixPair.source(), Set.of());
         String expectedLatex = toBmatrixLatex(expectedMatrix, Set.of());

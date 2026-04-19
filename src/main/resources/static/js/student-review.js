@@ -350,7 +350,8 @@ const App = (() => {
     }
     return Array.isArray(result.steps) && result.steps.some((step) => {
       const diffs = Array.isArray(step.matrixCellDiffs) ? step.matrixCellDiffs : [];
-      return Boolean(step.isWrong || step.errorMessage || step.explanation || diffs.length);
+      const latexHighlights = Array.isArray(step.latexHighlights) ? step.latexHighlights : [];
+      return Boolean(step.isWrong || step.errorMessage || diffs.length || latexHighlights.length);
     });
   }
 
@@ -783,11 +784,18 @@ const App = (() => {
     stopDiagnosisPolling();
     state.activeSubmissionId = work.id;
 
-    $('resultArea').classList.remove('hidden');
-    $('previewImg').src = work.url;
-    $('errorBoxes').innerHTML = '';
-    resetPipeline();
-    tag('正在创建批改任务');
+    // 重新批改时，先清空当前会话里的旧结果，避免把历史记录误认为本次结果。
+    work.diagnosis = {
+      hasResult: false,
+      result: null,
+      hasError: false
+    };
+    work.status = 'running';
+    updateDetectButton(work);
+
+    resetResult();
+    showTaskWaiting(work);
+    tag('已清空上次结果，正在创建批改任务');
     $('resultArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     try {
@@ -1017,6 +1025,27 @@ const App = (() => {
 
   function buildOcrFragments(result = {}) {
     const fragments = [];
+    const mathData = result.mathData && typeof result.mathData === 'object' ? result.mathData : {};
+    const provider = String(mathData.provider || '').trim();
+    const visionModel = String(mathData.visionModel || '').trim();
+    const reasoningModel = String(mathData.reasoningModel || '').trim();
+
+    if (provider || visionModel || reasoningModel) {
+      const modelParts = [];
+      if (provider) {
+        modelParts.push(`提供方: ${provider}`);
+      }
+      if (visionModel) {
+        modelParts.push(`视觉: ${visionModel}`);
+      }
+      if (reasoningModel) {
+        modelParts.push(`推理: ${reasoningModel}`);
+      }
+      fragments.push({
+        label: '当前模型',
+        text: modelParts.join(' | ')
+      });
+    }
 
     if (result.problemText) {
       fragments.push({ label: '题目摘要', text: result.problemText });
@@ -1048,13 +1077,16 @@ const App = (() => {
       fragments.push({ label: '标签', text: result.tags.join(' / ') });
     }
 
-    if (result.mathData && typeof result.mathData === 'object') {
-      Object.entries(result.mathData).slice(0, 2).forEach(([key, value]) => {
+    if (Object.keys(mathData).length) {
+      Object.entries(mathData)
+        .filter(([key]) => !['provider', 'visionModel', 'reasoningModel'].includes(key))
+        .slice(0, 2)
+        .forEach(([key, value]) => {
         fragments.push({
           label: key,
           text: typeof value === 'string' ? value : JSON.stringify(value, null, 2)
         });
-      });
+        });
     }
 
     if (!fragments.length) {
@@ -1282,10 +1314,15 @@ const App = (() => {
 
     steps.forEach((step, index) => {
       const diffs = Array.isArray(step.matrixCellDiffs) ? step.matrixCellDiffs : [];
-      if (step.isWrong || diffs.length) {
+      const latexHighlights = Array.isArray(step.latexHighlights) ? step.latexHighlights : [];
+      if (step.isWrong || diffs.length || latexHighlights.length) {
         wrongSteps.add(step.stepNo || index + 1);
       }
     });
+
+    if (result.status === 'error_found' && result.errorIndex) {
+      wrongSteps.add(result.errorIndex);
+    }
 
     if (!wrongSteps.size && items.length) {
       items.forEach((item, index) => {
@@ -1295,7 +1332,8 @@ const App = (() => {
 
     const explicitScore = Number(result.score ?? result.totalScore ?? result.grade);
     const totalSteps = Math.max(steps.length, items.length, wrongSteps.size, 1);
-    const wrongCount = Math.min(wrongSteps.size, totalSteps);
+    const fallbackWrongCount = result.status === 'error_found' ? 1 : 0;
+    const wrongCount = Math.min(Math.max(wrongSteps.size, fallbackWrongCount), totalSteps);
     if (wrongCount > 0) {
       const heuristicScore = Math.max(0, Math.round(((totalSteps - wrongCount) / totalSteps) * 100));
       if (Number.isFinite(explicitScore)) {
@@ -1305,7 +1343,11 @@ const App = (() => {
     }
 
     if (Number.isFinite(explicitScore)) {
-      return Math.max(0, Math.min(100, Math.round(explicitScore)));
+      const cappedScore = Math.max(0, Math.min(100, Math.round(explicitScore)));
+      if (result.status === 'error_found') {
+        return Math.min(95, cappedScore);
+      }
+      return cappedScore;
     }
 
     if (result.status === 'correct') {

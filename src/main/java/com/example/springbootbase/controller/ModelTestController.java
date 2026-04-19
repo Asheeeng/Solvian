@@ -7,6 +7,7 @@ import com.example.springbootbase.service.ModelClientService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,5 +34,18 @@ public class ModelTestController {
         }
         return modelClientService.testTextModel();
     }
-}
 
+    @GetMapping("/probe")
+    public Map<String, Object> probe(HttpServletRequest request,
+                                     @RequestParam(value = "model", required = false) String model,
+                                     @RequestParam(value = "prompt", required = false) String prompt) {
+        SessionInfo sessionInfo = (SessionInfo) request.getAttribute(AuthInterceptor.CURRENT_SESSION_KEY);
+        if (sessionInfo == null) {
+            throw new IllegalArgumentException("未登录");
+        }
+        if (sessionInfo.getRole() != Role.TEACHER) {
+            throw new IllegalArgumentException("当前接口仅老师可用");
+        }
+        return modelClientService.testTextModel(model, prompt);
+    }
+}

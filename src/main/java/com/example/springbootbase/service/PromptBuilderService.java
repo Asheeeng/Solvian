@@ -9,5 +9,7 @@ import com.example.springbootbase.model.VisionExtractionResult;
 public interface PromptBuilderService {
     String buildVisionPrompt(PreprocessedImage preprocessedImage, String subjectScope);
 
+    String buildStrictMatrixAuditPrompt(VisionExtractionResult firstPassResult);
+
     String buildReasoningPrompt(VisionExtractionResult visionExtractionResult, boolean isSocratic, String subjectScope);
 }

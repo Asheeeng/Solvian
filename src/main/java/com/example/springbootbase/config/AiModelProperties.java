@@ -19,13 +19,29 @@ public class AiModelProperties {
      */
     private String model = "glm-4.7";
     /**
+     * 推理模型失败后的候补模型。
+     */
+    private String secondaryModel = "";
+    /**
      * 视觉模型（第一阶段）。
      */
     private String visionModel = "glm-4.6v";
+    /**
+     * 视觉模型失败后的候补模型。
+     */
+    private String secondaryVisionModel = "";
     private String apiKey = "";
     private String baseUrl = "";
     private boolean mockEnabled = true;
     private boolean fallbackToMock = false;
+    /**
+     * 是否显式开启深度思考；null 表示沿用模型默认行为。
+     */
+    private Boolean enableThinking = null;
+    /**
+     * 推理预算，仅在支持深度思考的模型上生效。
+     */
+    private Integer thinkingBudget = null;
     private int timeoutMs = 30000;
     private int visionMaxTokens = 1400;
     private int reasoningMaxTokens = 2600;

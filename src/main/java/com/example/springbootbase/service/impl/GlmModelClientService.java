@@ -52,8 +52,9 @@ public class GlmModelClientService {
         ));
         requestBody.put("temperature", 0.2);
         requestBody.put("max_tokens", Math.min(Math.max(aiModelProperties.getReasoningMaxTokens(), 512), 1200));
+        applyThinkingControls(requestBody, model);
 
-        String responseBody = postChatCompletion(requestBody, Math.min(aiModelProperties.getTimeoutMs(), 8000));
+        String responseBody = postChatCompletion(requestBody, Math.min(aiModelProperties.getTimeoutMs(), 15000));
         return extractAssistantContent(responseBody);
     }
 
@@ -76,6 +77,7 @@ public class GlmModelClientService {
         ));
         requestBody.put("temperature", 0.1);
         requestBody.put("max_tokens", Math.max(aiModelProperties.getVisionMaxTokens(), 256));
+        applyThinkingControls(requestBody, model);
 
         String responseBody = postChatCompletion(requestBody, aiModelProperties.getTimeoutMs());
         return extractAssistantContent(responseBody);
@@ -100,6 +102,7 @@ public class GlmModelClientService {
                     Map.of("role", "user", "content", prompt)
             ));
             requestBody.put("temperature", 0.1);
+            applyThinkingControls(requestBody, model);
 
             HttpResponse<String> response = postRawChatCompletion(requestBody, aiModelProperties.getTimeoutMs());
             int statusCode = response.statusCode();
@@ -195,6 +198,28 @@ public class GlmModelClientService {
         if (aiModelProperties.getBaseUrl() == null || aiModelProperties.getBaseUrl().isBlank()) {
             throw new IllegalArgumentException("未配置 GLM baseUrl");
         }
+    }
+
+    private void applyThinkingControls(Map<String, Object> requestBody, String model) {
+        if (requestBody == null || model == null || model.isBlank()) {
+            return;
+        }
+        if (!supportsThinkingControls(model)) {
+            return;
+        }
+        if (aiModelProperties.getEnableThinking() != null) {
+            requestBody.put("enable_thinking", aiModelProperties.getEnableThinking());
+        }
+        if (aiModelProperties.getThinkingBudget() != null && aiModelProperties.getThinkingBudget() > 0) {
+            requestBody.put("thinking_budget", aiModelProperties.getThinkingBudget());
+        }
+    }
+
+    private boolean supportsThinkingControls(String model) {
+        String normalized = model == null ? "" : model.trim().toLowerCase();
+        return normalized.startsWith("qwen3")
+                || normalized.startsWith("qwen-plus")
+                || normalized.startsWith("qwen-turbo");
     }
 
     private String buildEndpoint(String baseUrl) {

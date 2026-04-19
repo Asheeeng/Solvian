@@ -1,5 +1,6 @@
 package com.example.springbootbase.service.impl;
 
+import com.example.springbootbase.config.AiModelProperties;
 import com.example.springbootbase.dto.response.EvaluateResponse;
 import com.example.springbootbase.entity.DiagnosisRecordEntity;
 import com.example.springbootbase.mapper.DiagnosisRecordMapper;
@@ -36,6 +37,7 @@ public class DiagnosisResultComposer {
     private final ErrorAnalysisService errorAnalysisService;
     private final DiagnosisRecordMapper diagnosisRecordMapper;
     private final ObjectMapper objectMapper;
+    private final AiModelProperties aiModelProperties;
 
     public DiagnosisResult compose(ModelChainResult chainResult, String subjectScope) {
         DiagnosisResult parsed = responseParserService.parse(chainResult.getReasoningRaw());
@@ -89,7 +91,7 @@ public class DiagnosisResultComposer {
         if (currentMathData != null) {
             merged.putAll(currentMathData);
         }
-        merged.put("provider", "zhipu");
+        merged.put("provider", aiModelProperties.getProvider());
         merged.put("pipeline", "vision_then_reasoning");
         merged.put("visionModel", chainResult.getVisionModel());
         merged.put("reasoningModel", chainResult.getReasoningModel());

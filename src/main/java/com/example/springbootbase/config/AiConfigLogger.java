@@ -26,17 +26,21 @@ public class AiConfigLogger {
         int keyLength = aiModelProperties.getApiKey() == null ? 0 : aiModelProperties.getApiKey().length();
 
         log.info(
-                "[ai-config] profiles={}, enabled={}, provider={}, visionModel={}, reasoningModel={}, baseUrlHost={}, apiKeyMasked={}, apiKeyLength={}, mockEnabled={}, fallbackToMock={}, timeoutMs={}",
+                "[ai-config] profiles={}, enabled={}, provider={}, visionModel={}, secondaryVisionModel={}, reasoningModel={}, secondaryModel={}, baseUrlHost={}, apiKeyMasked={}, apiKeyLength={}, mockEnabled={}, fallbackToMock={}, enableThinking={}, thinkingBudget={}, timeoutMs={}",
                 Arrays.toString(environment.getActiveProfiles()),
                 aiModelProperties.isEnabled(),
                 aiModelProperties.getProvider(),
                 aiModelProperties.getVisionModel(),
+                aiModelProperties.getSecondaryVisionModel(),
                 aiModelProperties.getModel(),
+                aiModelProperties.getSecondaryModel(),
                 host,
                 aiModelProperties.maskedApiKey(),
                 keyLength,
                 aiModelProperties.isMockEnabled(),
                 aiModelProperties.isFallbackToMock(),
+                aiModelProperties.getEnableThinking(),
+                aiModelProperties.getThinkingBudget(),
                 aiModelProperties.getTimeoutMs()
         );
     }
@@ -53,4 +57,3 @@ public class AiConfigLogger {
         }
     }
 }
-

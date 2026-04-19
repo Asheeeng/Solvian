@@ -17,4 +17,6 @@ public interface ModelClientService {
     ModelChainResult analyze(PreprocessedImage preprocessedImage, boolean isSocratic, String subjectScope);
 
     Map<String, Object> testTextModel();
+
+    Map<String, Object> testTextModel(String modelOverride, String promptOverride);
 }
