@@ -1,7 +1,7 @@
 # Solvian
 
-基于 Java 17 + Spring Boot 3.2.5 的 AI 数学逻辑诊断系统可运行基础版。  
-当前版本目标是“业务链路完整、可演示、易扩展”，暂不接数据库。
+基于 Java 17 + Spring Boot 3.2.5 的 AI 数学逻辑诊断系统。  
+当前版本目标是“业务链路完整、可演示、易扩展”，前后端统一由 Spring Boot 提供静态资源与接口能力。
 
 ## 技术栈
 
@@ -64,17 +64,15 @@ src/main/resources/static
 └── js/modules/auth-scene.js
 ```
 
-前端工作台相关资源：
+前端学生/教师批改工作台相关资源：
 
 ```text
 src/main/resources/static
-├── home.html
+├── index.html
+├── student-review.html
 ├── css/design-system.css
-├── css/app.css
-├── js/home.js
-├── js/modules/theme-controller.js
-├── js/modules/problem-viewer.js
-├── js/modules/diagnosis-panel.js
+├── css/student-review.css
+├── js/student-review.js
 └── js/modules/notebook-drawer.js
 ```
 
@@ -98,7 +96,7 @@ http://localhost:8080
 
 - 登录页沿用现有业务接口 `POST /api/auth/login`
 - 登录请求字段保持不变：`username`、`password`、`role`
-- 登录成功后仍跳转到 `/home.html`
+- 登录成功后仍跳转到 `/student-review.html`
 - 注册页沿用现有业务接口 `POST /api/auth/register`
 - 注册请求字段保持不变：`username`、`password`、`role`
 - 图形验证码为前端可用版，不改变现有后端接口语义
