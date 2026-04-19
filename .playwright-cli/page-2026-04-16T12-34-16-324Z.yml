@@ -1,0 +1,41 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: S
+        - generic [ref=e6]:
+          - paragraph [ref=e7]: Student Review
+          - heading "Solvian 学生作业诊断台" [level=1] [ref=e8]
+          - paragraph [ref=e9]: 按学生快速筛选最近提交的作业，查看图片、运行 AI 诊断，并把错误定位、步骤追踪和讲解建议集中在同一个工作区中。
+      - generic [ref=e10]:
+        - tablist "诊断工作区导航" [ref=e11]:
+          - button "◎ 作业诊断" [ref=e12] [cursor=pointer]:
+            - generic [ref=e13]: ◎
+            - generic [ref=e14]: 作业诊断
+          - button "📕 错题本" [ref=e15] [cursor=pointer]:
+            - generic [ref=e16]: 📕
+            - generic [ref=e17]: 错题本
+          - button "📊 统计" [ref=e18] [cursor=pointer]:
+            - generic [ref=e19]: 📊
+            - generic [ref=e20]: 统计
+        - button "⇥ 退出" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22]: ⇥
+          - generic [ref=e23]: 退出
+    - main [ref=e24]:
+      - complementary [ref=e25]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - paragraph [ref=e28]: Students
+            - heading "学生列表" [level=2] [ref=e29]
+            - paragraph [ref=e30]: 按姓名或学号筛选，优先处理有待批作业的同学。
+          - generic [ref=e31]:
+            - generic [ref=e32]: "0"
+            - text: 人
+        - textbox "搜索学生姓名或学号" [ref=e34]
+        - list
+      - article [ref=e36]:
+        - generic [ref=e37]:
+          - generic [ref=e38]: 🧠
+          - heading "先选择左侧的一位学生" [level=2] [ref=e39]
+          - paragraph [ref=e40]: 进入后可以浏览该学生的作业图片，选择一张作业执行诊断，并查看 OCR、步骤追踪与错误讲解。
+  - button "Choose File" [ref=e41]

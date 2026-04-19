@@ -1,0 +1,127 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: S
+        - generic [ref=e6]:
+          - paragraph [ref=e7]: Teacher Studio
+          - heading "Solvian 智能诊断工作台" [level=1] [ref=e8]
+          - generic [ref=e9]:
+            - generic [ref=e10]:
+              - text: 当前角色：
+              - strong [ref=e11]: 老师
+            - generic [ref=e12]:
+              - text: 当前用户：
+              - strong [ref=e13]: tea123
+            - generic [ref=e14]:
+              - text: 班级：
+              - strong [ref=e15]: 默认测试班级
+      - generic [ref=e16]:
+        - button "☾ 深色界面" [ref=e17] [cursor=pointer]:
+          - generic [ref=e18]: ☾
+          - generic [ref=e19]: 深色界面
+        - button "⌘ 查看错题本" [ref=e20] [cursor=pointer]:
+          - generic [ref=e21]: ⌘
+          - generic [ref=e22]: 查看错题本
+        - button "◫ 查看统计面板" [ref=e23] [cursor=pointer]:
+          - generic [ref=e24]: ◫
+          - generic [ref=e25]: 查看统计面板
+        - button "↗ 退出登录" [ref=e26] [cursor=pointer]:
+          - generic [ref=e27]: ↗
+          - generic [ref=e28]: 退出登录
+    - main [ref=e29]:
+      - article [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - paragraph [ref=e34]: Submission Queue
+            - heading "学生提交列表" [level=2] [ref=e35]
+            - paragraph [ref=e36]: 老师可以先查看本班学生提交，再选择图片进入 AI 检测流程。
+          - generic [ref=e37]: 自动按最近提交排序
+        - generic [ref=e38]:
+          - article [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - generic [ref=e42]: S
+                - generic [ref=e43]:
+                  - paragraph [ref=e44]: stu123
+                  - paragraph [ref=e45]: 螢幕截圖 2026-04-10 16.03.07.png
+              - paragraph [ref=e46]: 4月10日 16:08
+            - img "螢幕截圖 2026-04-10 16.03.07.png" [ref=e49]
+            - generic [ref=e50]:
+              - generic [ref=e51]: 已批改
+              - generic [ref=e52]:
+                - button "📋 查看诊断结果" [ref=e53] [cursor=pointer]:
+                  - generic [ref=e54]: 📋
+                  - generic [ref=e55]: 查看诊断结果
+                - button "▶ 重新AI检测" [ref=e56] [cursor=pointer]:
+                  - generic [ref=e57]: ▶
+                  - generic [ref=e58]: 重新AI检测
+          - article [ref=e59]:
+            - generic [ref=e60]:
+              - generic [ref=e61]:
+                - generic [ref=e62]: S
+                - generic [ref=e63]:
+                  - paragraph [ref=e64]: stu123
+                  - paragraph [ref=e65]: matrix_001.jpg
+              - paragraph [ref=e66]: 4月10日 16:02
+            - img "matrix_001.jpg" [ref=e69]
+            - generic [ref=e70]:
+              - generic [ref=e71]: 待批改
+              - button "▶ AI检测" [ref=e73] [cursor=pointer]:
+                - generic [ref=e74]: ▶
+                - generic [ref=e75]: AI检测
+          - article [ref=e76]:
+            - generic [ref=e77]:
+              - generic [ref=e78]:
+                - generic [ref=e79]: S
+                - generic [ref=e80]:
+                  - paragraph [ref=e81]: student_demo
+                  - paragraph [ref=e82]: 螢幕截圖 2026-04-10 13.38.02.png
+              - paragraph [ref=e83]: 4月10日 15:16
+            - img "螢幕截圖 2026-04-10 13.38.02.png" [ref=e86]
+            - generic [ref=e87]:
+              - generic [ref=e88]: 已批改
+              - generic [ref=e89]:
+                - button "📋 查看诊断结果" [ref=e90] [cursor=pointer]:
+                  - generic [ref=e91]: 📋
+                  - generic [ref=e92]: 查看诊断结果
+                - button "▶ 重新AI检测" [ref=e93] [cursor=pointer]:
+                  - generic [ref=e94]: ▶
+                  - generic [ref=e95]: 重新AI检测
+          - article [ref=e96]:
+            - generic [ref=e97]:
+              - generic [ref=e98]:
+                - generic [ref=e99]: S
+                - generic [ref=e100]:
+                  - paragraph [ref=e101]: student_demo
+                  - paragraph [ref=e102]: solvian-student-test.png
+              - paragraph [ref=e103]: 4月10日 15:09
+            - img "solvian-student-test.png" [ref=e106]
+            - generic [ref=e107]:
+              - generic [ref=e108]: 检测失败
+              - button "▶ 重新AI检测" [ref=e110] [cursor=pointer]:
+                - generic [ref=e111]: ▶
+                - generic [ref=e112]: 重新AI检测
+          - article [ref=e113]:
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - generic [ref=e116]: 张
+                - generic [ref=e117]:
+                  - paragraph [ref=e118]: 张三
+                  - paragraph [ref=e119]: solvian-test.png
+              - paragraph [ref=e120]: 4月10日 14:57
+            - img "solvian-test.png" [ref=e123]
+            - generic [ref=e124]:
+              - generic [ref=e125]: 检测失败
+              - button "▶ 重新AI检测" [ref=e127] [cursor=pointer]:
+                - generic [ref=e128]: ▶
+                - generic [ref=e129]: 重新AI检测
+  - generic [ref=e132]:
+    - button "关闭" [ref=e133] [cursor=pointer]:
+      - generic [ref=e134]: ×
+    - generic [ref=e135]:
+      - generic [ref=e136]:
+        - paragraph [ref=e137]: stu123
+        - paragraph [ref=e138]: 4月10日 16:02 · matrix_001.jpg
+      - generic [ref=e139]: 待批改
+    - img "matrix_001.jpg" [ref=e159]

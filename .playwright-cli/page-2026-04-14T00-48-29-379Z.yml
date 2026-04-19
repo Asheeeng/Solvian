@@ -1,0 +1,56 @@
+- generic [ref=e2]:
+  - region "品牌展示区" [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e7]: Solvian
+        - generic [ref=e8]: v2
+      - generic [ref=e9]: Secure Login
+    - generic [ref=e10]:
+      - paragraph [ref=e11]: Explain Every Step
+      - heading "进入智能作业诊断系统，从更安全也更有趣的登录开始。" [level=1] [ref=e12]
+      - paragraph [ref=e13]: 角色会跟随鼠标、在输入密码时主动转头避开，并在显示密码时由紫色角色偷偷瞄一眼后马上装作没看见。
+    - generic [ref=e51]:
+      - button "隐私政策" [ref=e52] [cursor=pointer]
+      - button "服务条款" [ref=e53] [cursor=pointer]
+      - button "联系我们" [ref=e54] [cursor=pointer]
+  - region "登录表单区" [ref=e55]:
+    - generic [ref=e56]:
+      - generic [ref=e57]: WELCOME BACK
+      - heading "登录你的 Solvian 账户" [level=2] [ref=e58]
+      - paragraph [ref=e59]: 登录成功后会直接进入 student-review 页面，继续使用作业诊断、错题本和统计面板。
+      - generic [ref=e60]:
+        - generic [ref=e61]:
+          - generic [ref=e62]: 用户名
+          - textbox "用户名" [active] [ref=e63]:
+            - /placeholder: 请输入用户名
+            - text: tea123
+        - generic [ref=e64]:
+          - generic [ref=e65]: 密码
+          - generic [ref=e66]:
+            - textbox "密码" [ref=e67]:
+              - /placeholder: 请输入密码
+              - text: "123456"
+            - button "显示密码" [ref=e68] [cursor=pointer]: 👁
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - checkbox "记住本次体验" [checked] [ref=e71]
+            - generic [ref=e72]: 记住本次体验
+          - button "忘记密码？" [ref=e73] [cursor=pointer]
+        - button "登录进入作业诊断" [ref=e74] [cursor=pointer]:
+          - generic [ref=e75]: 登录进入作业诊断
+      - generic [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]: 🚀 演示账号
+          - generic [ref=e79] [cursor=pointer]: DEMO
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e82]:
+              - generic [ref=e83]: 教师账号
+              - generic [ref=e84]: tea123 / 123456
+            - button "一键填入" [ref=e85] [cursor=pointer]
+          - generic [ref=e86]:
+            - generic [ref=e87]:
+              - generic [ref=e88]: 学生账号
+              - generic [ref=e89]: stu001 / 123456
+            - button "一键填入" [ref=e90] [cursor=pointer]
+      - paragraph [ref=e91]: 智能作业诊断系统 · 深色体验已对齐现有 Solvian 主题

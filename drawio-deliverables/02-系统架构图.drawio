@@ -1,0 +1,175 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
+  <diagram id="copilot-architecture" name="系统架构图">
+    <mxGraphModel dx="1301" dy="861" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" value="&lt;font style=&quot;font-size:24px;&quot;&gt;&lt;b&gt;Solvian（Copilot）系统架构图&lt;/b&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="480" x="720" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#666666;" value="业务主线：老师登录 → 上传题目 → 异步诊断 → 轮询结果 → 反馈回收 → 历史/统计 → 报告下载" vertex="1">
+          <mxGeometry height="30" width="800" x="560" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="actorStudent" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;arcSize=12;" value="&lt;b&gt;学生&lt;/b&gt;&lt;br/&gt;查看本人记录&lt;br/&gt;提交反馈&lt;br/&gt;下载本人报告" vertex="1">
+          <mxGeometry height="110" width="150" x="70" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="actorTeacher" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;arcSize=12;" value="&lt;b&gt;老师&lt;/b&gt;&lt;br/&gt;登录工作台&lt;br/&gt;上传题目&lt;br/&gt;发起AI诊断" vertex="1">
+          <mxGeometry height="110" width="150" x="70" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="actorAdmin" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;arcSize=12;" value="&lt;b&gt;管理员&lt;/b&gt;&lt;br/&gt;查看全局数据&lt;br/&gt;高权限访问" vertex="1">
+          <mxGeometry height="95" width="150" x="70" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="frontendGroup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#666666;fontSize=15;fontStyle=1;align=left;spacingLeft=10;spacingTop=8;" value="&lt;b&gt;前端页面与交互层&lt;/b&gt;&lt;br/&gt;src/main/resources/static" vertex="1">
+          <mxGeometry height="500" width="420" x="280" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="loginPage" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;login.html + login.js&lt;/b&gt;&lt;br/&gt;登录、验证码、角色切换、主题切换" vertex="1">
+          <mxGeometry height="95" width="160" x="320" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="registerPage" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;register.html + register.js&lt;/b&gt;&lt;br/&gt;注册、确认密码、验证码、角色选择" vertex="1">
+          <mxGeometry height="95" width="160" x="500" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="homePage" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=13;" value="&lt;b&gt;home.html + home.js&lt;/b&gt;&lt;br/&gt;上传预览、诊断轮询、反馈、错题本、统计、下载报告" vertex="1">
+          <mxGeometry height="110" width="340" x="320" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="frontendModules" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=13;" value="&lt;b&gt;前端模块&lt;/b&gt;&lt;br/&gt;storage.js 统一请求封装&lt;br/&gt;auth-guard.js 登录态守卫&lt;br/&gt;ProblemViewer / DiagnosisPanel / NotebookDrawer" vertex="1">
+          <mxGeometry height="130" width="340" x="320" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="gatewayGroup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=15;fontStyle=1;align=left;spacingLeft=10;spacingTop=8;" value="&lt;b&gt;网关与鉴权层&lt;/b&gt;" vertex="1">
+          <mxGeometry height="140" width="230" x="760" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="authInterceptor" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" value="&lt;b&gt;AuthInterceptor&lt;/b&gt;&lt;br/&gt;拦截 /api/**&lt;br/&gt;校验 X-Auth-Token&lt;br/&gt;注入 SessionInfo" vertex="1">
+          <mxGeometry height="75" width="170" x="790" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="controllerGroup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#666666;fontSize=15;fontStyle=1;align=left;spacingLeft=10;spacingTop=8;" value="&lt;b&gt;控制器层（Controller）&lt;/b&gt;" vertex="1">
+          <mxGeometry height="330" width="420" x="760" y="325" as="geometry" />
+        </mxCell>
+        <mxCell id="authController" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;AuthController&lt;/b&gt;&lt;br/&gt;/api/auth/register&lt;br/&gt;/api/auth/login&lt;br/&gt;/api/auth/logout&lt;br/&gt;/api/auth/me" vertex="1">
+          <mxGeometry height="120" width="180" x="790" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="diagnosisController" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=13;" value="&lt;b&gt;DiagnosisTaskController&lt;/b&gt;&lt;br/&gt;/api/diagnose&lt;br/&gt;/api/diagnose/{taskId}" vertex="1">
+          <mxGeometry height="90" width="165" x="985" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="historyController" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=13;" value="&lt;b&gt;HistoryController&lt;/b&gt;&lt;br/&gt;/api/history" vertex="1">
+          <mxGeometry height="65" width="180" x="790" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="dashboardController" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=13;" value="&lt;b&gt;DashboardController&lt;/b&gt;&lt;br/&gt;/api/dashboard-summary" vertex="1">
+          <mxGeometry height="65" width="165" x="985" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="supportController" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontSize=13;" value="&lt;b&gt;AiFeedback / Report / EventLog / ModelTest&lt;/b&gt;&lt;br/&gt;/api/ai-feedback&lt;br/&gt;/api/report/{recordId}/pdf&lt;br/&gt;/api/log-event&lt;br/&gt;/api/model/test" vertex="1">
+          <mxGeometry height="90" width="360" x="790" y="565" as="geometry" />
+        </mxCell>
+        <mxCell id="serviceGroup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#666666;fontSize=15;fontStyle=1;align=left;spacingLeft=10;spacingTop=8;" value="&lt;b&gt;业务服务层（Service）&lt;/b&gt;" vertex="1">
+          <mxGeometry height="350" width="420" x="1240" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="authService" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=13;" value="&lt;b&gt;AuthServiceImpl&lt;/b&gt;&lt;br/&gt;用户注册登录&lt;br/&gt;Token 会话落库与查询" vertex="1">
+          <mxGeometry height="90" width="170" x="1270" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="taskService" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=13;" value="&lt;b&gt;DiagnosisTaskServiceImpl&lt;/b&gt;&lt;br/&gt;校验教师权限&lt;br/&gt;图片预处理&lt;br/&gt;创建并查询任务" vertex="1">
+          <mxGeometry height="110" width="170" x="1460" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="queryService" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;fontSize=13;" value="&lt;b&gt;History / Dashboard / AiFeedback / Report / EventLog&lt;/b&gt;&lt;br/&gt;历史聚合、统计分析、反馈回写、报告下载、事件落库" vertex="1">
+          <mxGeometry height="110" width="360" x="1270" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="asyncGroup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#666666;fontSize=15;fontStyle=1;align=left;spacingLeft=10;spacingTop=8;" value="&lt;b&gt;异步诊断流水线&lt;/b&gt;" vertex="1">
+          <mxGeometry height="260" width="420" x="1240" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="queueService" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontSize=13;" value="&lt;b&gt;DiagnosisQueueServiceImpl&lt;/b&gt;&lt;br/&gt;提交任务到 Executor" vertex="1">
+          <mxGeometry height="80" width="170" x="1270" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="taskProcessor" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;fontSize=13;" value="&lt;b&gt;DiagnosisTaskProcessor&lt;/b&gt;&lt;br/&gt;更新任务状态&lt;br/&gt;组织视觉阶段与推理阶段" vertex="1">
+          <mxGeometry height="90" width="170" x="1460" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="workers" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontSize=13;" value="&lt;b&gt;VisionWorker / ReasoningWorker&lt;/b&gt;&lt;br/&gt;视觉识别缓存复用&lt;br/&gt;推理分析与结果持久化" vertex="1">
+          <mxGeometry height="80" width="360" x="1270" y="655" as="geometry" />
+        </mxCell>
+        <mxCell id="dataGroup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#666666;fontSize=15;fontStyle=1;align=left;spacingLeft=10;spacingTop=8;" value="&lt;b&gt;数据与外部依赖&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="1380" x="300" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="database" parent="1" style="shape=cylinder;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;align=left;spacingLeft=10;spacingTop=10;" value="&lt;b&gt;PostgreSQL&lt;/b&gt;&lt;hr/&gt;app_user&lt;br/&gt;app_session&lt;br/&gt;diagnosis_record&lt;br/&gt;diagnosis_task&lt;br/&gt;ai_feedback_record&lt;br/&gt;event_record" vertex="1">
+          <mxGeometry height="130" width="250" x="450" y="845" as="geometry" />
+        </mxCell>
+        <mxCell id="inputStore" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" value="&lt;b&gt;输入存储&lt;/b&gt;&lt;br/&gt;DiagnosisInputStoreService&lt;br/&gt;保存预处理后的题目图片" vertex="1">
+          <mxGeometry height="90" width="220" x="760" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="modelService" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=13;" value="&lt;b&gt;模型调用编排&lt;/b&gt;&lt;br/&gt;ModelClientServiceImpl&lt;br/&gt;GlmModelClientService&lt;br/&gt;Vision + Reasoning Prompt Builder" vertex="1">
+          <mxGeometry height="105" width="260" x="1020" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="externalAi" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;arcSize=12;" value="&lt;b&gt;外部 AI 模型服务&lt;/b&gt;&lt;br/&gt;glm-4.6v（视觉）&lt;br/&gt;glm-4.7（推理）" vertex="1">
+          <mxGeometry height="95" width="210" x="1420" y="885" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="actorStudent" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="loginPage" value="访问页面">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="actorTeacher" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="homePage" value="进入工作台">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="actorAdmin" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="homePage" value="高权限访问">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="frontendModules" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="authInterceptor" value="统一请求">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="loginPage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="authController" value="认证/会话">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="registerPage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="authController" value="注册">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="homePage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="diagnosisController" value="诊断/反馈/统计">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="homePage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="historyController" value="历史">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="homePage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="dashboardController" value="统计">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="homePage" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="supportController" value="支撑接口">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="authController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="authService" value="调用">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="diagnosisController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="taskService" value="创建/查询任务">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="historyController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="queryService" value="聚合查询">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="dashboardController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="queryService" value="统计分析">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="supportController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="queryService" value="反馈/报告/事件/测试">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="taskService" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="inputStore" value="保存输入">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="taskService" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="queueService" value="入队">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e18" edge="1" parent="1" source="queueService" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="taskProcessor" value="异步执行">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e19" edge="1" parent="1" source="taskProcessor" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="workers" value="视觉+推理">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e20" edge="1" parent="1" source="workers" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="modelService" value="调用模型">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e21" edge="1" parent="1" source="modelService" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="externalAi" value="HTTP API">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e22" edge="1" parent="1" source="authService" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="database" value="持久化">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e23" edge="1" parent="1" source="taskProcessor" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="database" value="任务/结果表">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e24" edge="1" parent="1" source="queryService" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;strokeWidth=2;fontSize=12;" target="database" value="历史/统计/反馈/事件">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

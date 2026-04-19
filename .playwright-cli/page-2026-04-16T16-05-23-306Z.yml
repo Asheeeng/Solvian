@@ -1,0 +1,195 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: S
+        - generic [ref=e6]:
+          - paragraph [ref=e7]: Student Review
+          - heading "Solvian 学生作业诊断台" [level=1] [ref=e8]
+          - paragraph [ref=e9]: 当前登录：老师 tea123。按学生快速筛选最近提交的作业，查看图片、运行 AI 诊断，并把错题本与统计集中在同一个工作区中。
+      - generic [ref=e10]:
+        - tablist "诊断工作区导航" [ref=e11]:
+          - button "◎ 作业诊断" [ref=e12] [cursor=pointer]:
+            - generic [ref=e13]: ◎
+            - generic [ref=e14]: 作业诊断
+          - button "📕 错题本" [ref=e15] [cursor=pointer]:
+            - generic [ref=e16]: 📕
+            - generic [ref=e17]: 错题本
+          - button "📊 统计" [ref=e18] [cursor=pointer]:
+            - generic [ref=e19]: 📊
+            - generic [ref=e20]: 统计
+        - button "⇥ 退出" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22]: ⇥
+          - generic [ref=e23]: 退出
+    - main [ref=e24]:
+      - complementary [ref=e25]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - paragraph [ref=e28]: Students
+            - heading "学生列表" [level=2] [ref=e29]
+            - paragraph [ref=e30]: 按姓名或学号筛选，优先处理有待批作业的同学。
+          - generic [ref=e31]:
+            - generic [ref=e32]: "2"
+            - text: 人
+        - textbox "搜索学生姓名或学号" [ref=e34]
+        - list [ref=e42]:
+          - listitem [ref=e43] [cursor=pointer]:
+            - generic [ref=e44]: stu123
+            - generic [ref=e45]:
+              - generic [ref=e46]: 默认测试班级
+              - generic [ref=e47]: 5 份
+          - listitem [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]: student_demo
+            - generic [ref=e50]:
+              - generic [ref=e51]: 默认测试班级
+              - generic [ref=e52]: 3 份
+      - generic [ref=e53]:
+        - article [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - paragraph [ref=e57]: Workspace
+              - heading "stu123" [level=2] [ref=e58]
+              - paragraph [ref=e59]: 默认测试班级 · 共 5 份作业
+            - button "← 返回学生列表" [ref=e61] [cursor=pointer]:
+              - generic [ref=e62]: ←
+              - generic [ref=e63]: 返回学生列表
+          - generic [ref=e64]:
+            - generic [ref=e65]: ✅ 已载入 matrix_007.jpg 的历史诊断，可再次运行 AI 诊断。
+            - button "▶ 重新运行 AI 诊断" [ref=e113] [cursor=pointer]:
+              - generic [ref=e68]: ▶
+              - generic [ref=e69]: 重新运行 AI 诊断
+        - generic [ref=e70]:
+          - article [ref=e71]:
+            - generic [ref=e73]:
+              - paragraph [ref=e74]: Homework Gallery
+              - heading "作业图片" [level=3] [ref=e75]
+              - paragraph [ref=e76]: 点击缩略图选择作业，右上角可直接放大原图。
+            - generic [ref=e77]:
+              - generic [ref=e78] [cursor=pointer]:
+                - img "matrix_007.jpg" [ref=e79]
+                - generic [ref=e80]: 🔍
+                - generic [ref=e81]: 已批改
+                - generic [ref=e82]:
+                  - generic [ref=e83]: matrix_007.jpg
+                  - generic [ref=e84]: 2026/4/16 22:09:21
+              - generic [ref=e85] [cursor=pointer]:
+                - img "螢幕截圖 2026-03-25 23.41.55.png" [ref=e86]
+                - generic [ref=e87]: 🔍
+                - generic [ref=e88]: 已批改
+                - generic [ref=e89]:
+                  - generic [ref=e90]: 螢幕截圖 2026-03-25 23.41.55.png
+                  - generic [ref=e91]: 2026/4/16 20:02:33
+              - generic [ref=e92] [cursor=pointer]:
+                - img "螢幕截圖 2026-03-24 12.31.47.png" [ref=e93]
+                - generic [ref=e94]: 🔍
+                - generic [ref=e95]: 已批改
+                - generic [ref=e96]:
+                  - generic [ref=e97]: 螢幕截圖 2026-03-24 12.31.47.png
+                  - generic [ref=e98]: 2026/4/16 20:00:11
+              - generic [ref=e99] [cursor=pointer]:
+                - img "螢幕截圖 2026-04-10 16.03.07.png" [ref=e100]
+                - generic [ref=e101]: 🔍
+                - generic [ref=e102]: 已批改
+                - generic [ref=e103]:
+                  - generic [ref=e104]: 螢幕截圖 2026-04-10 16.03.07.png
+                  - generic [ref=e105]: 2026/4/10 16:08:19
+              - generic [ref=e106] [cursor=pointer]:
+                - img "matrix_001.jpg" [ref=e107]
+                - generic [ref=e108]: 🔍
+                - generic [ref=e109]: 已批改
+                - generic [ref=e110]:
+                  - generic [ref=e111]: matrix_001.jpg
+                  - generic [ref=e112]: 2026/4/10 16:02:31
+          - article [ref=e114]:
+            - generic [ref=e116]:
+              - paragraph [ref=e117]: Diagnosis Result
+              - heading "AI 诊断结果" [level=3] [ref=e118]
+              - paragraph [ref=e119]: 诊断过程会依次展示预览图、流程状态、OCR 识别、步骤追踪和错误讲解。
+            - generic [ref=e120]:
+              - generic [ref=e121]:
+                - img "作业预览" [ref=e123]
+                - generic [ref=e124]:
+                  - generic [ref=e125]: 诊断流水线
+                  - generic [ref=e126]: 已从数据库载入诊断结果
+                - generic [ref=e127]:
+                  - generic [ref=e128]:
+                    - generic [ref=e129]: "1"
+                    - generic [ref=e130]: 载入题图
+                    - generic [ref=e131]: 准备图片与上下文
+                  - generic [ref=e132]:
+                    - generic [ref=e133]: "2"
+                    - generic [ref=e134]: OCR 提取
+                    - generic [ref=e135]: 抽取矩阵与关键文本
+                  - generic [ref=e136]:
+                    - generic [ref=e137]: "3"
+                    - generic [ref=e138]: 步骤追踪
+                    - generic [ref=e139]: 校验每一步是否正确
+                  - generic [ref=e140]:
+                    - generic [ref=e141]: "4"
+                    - generic [ref=e142]: 错误讲解
+                    - generic [ref=e143]: 生成可读反馈建议
+              - generic [ref=e144]:
+                - paragraph [ref=e145]: OCR Result
+                - heading "OCR 识别内容" [level=3] [ref=e146]
+                - paragraph [ref=e147]: 按块展示题目与学生书写内容，便于快速对照。
+                - generic [ref=e148]:
+                  - generic [ref=e149]:
+                    - generic [ref=e150]: 诊断摘要
+                    - generic [ref=e151]: 识别矩阵M及其行变换R3 -> -1R3后的结果矩阵。但推理模型本次响应超时，当前先返回视觉识别结果供老师预览，建议稍后重新发起诊断。
+                  - generic [ref=e152]:
+                    - generic [ref=e153]: 标签
+                    - generic [ref=e154]: "#矩阵初等变换"
+                  - generic [ref=e155]:
+                    - generic [ref=e156]: provider
+                    - generic [ref=e157]: zhipu
+                  - generic [ref=e158]:
+                    - generic [ref=e159]: pipeline
+                    - generic [ref=e160]: vision_then_reasoning
+              - generic [ref=e161]:
+                - paragraph [ref=e162]: Step Trace
+                - heading "步骤追踪" [level=3] [ref=e163]
+                - paragraph [ref=e164]: 错误步骤默认展开，便于直接定位问题。
+                - generic [ref=e165]:
+                  - generic [ref=e167] [cursor=pointer]:
+                    - generic [ref=e168]:
+                      - generic [ref=e169]: "1"
+                      - generic [ref=e170]: 视觉识别步骤 1
+                    - generic [ref=e171]: ✅
+                  - generic [ref=e173] [cursor=pointer]:
+                    - generic [ref=e174]:
+                      - generic [ref=e175]: "2"
+                      - generic [ref=e176]: 识别到的矩阵表达式
+                    - generic [ref=e177]: ✅
+                  - generic [ref=e179] [cursor=pointer]:
+                    - generic [ref=e180]:
+                      - generic [ref=e181]: "3"
+                      - generic [ref=e182]: 识别到的矩阵表达式
+                    - generic [ref=e183]: ✅
+              - generic [ref=e184]:
+                - paragraph [ref=e185]: Error Review
+                - heading "错误详解" [level=3] [ref=e186]
+                - paragraph [ref=e187]: 聚焦错误位置、正确答案、原因和教学建议。
+                - generic [ref=e189]:
+                  - generic [ref=e190]:
+                    - generic [ref=e191]: ⚠️
+                    - text: 系统诊断摘要
+                  - generic [ref=e192]:
+                    - generic [ref=e193]:
+                      - generic [ref=e194]: 错误位置
+                      - generic [ref=e195]: 待人工复核
+                    - generic [ref=e196]:
+                      - generic [ref=e197]: 所在步骤
+                      - generic [ref=e198]: 系统诊断摘要
+                    - generic [ref=e199]:
+                      - generic [ref=e200]: 学生写的
+                      - generic [ref=e201]: 请查看系统摘要
+                    - generic [ref=e202]:
+                      - generic [ref=e203]: 建议参考
+                      - generic [ref=e204]: 请结合教师讲评进一步确认
+                  - generic [ref=e205]:
+                    - generic [ref=e206]: 错误分析
+                    - paragraph [ref=e207]: 识别矩阵M及其行变换R3 -> -1R3后的结果矩阵。但推理模型本次响应超时，当前先返回视觉识别结果供老师预览，建议稍后重新发起诊断。
+                  - generic [ref=e208]:
+                    - generic [ref=e209]: 🎯
+                    - generic [ref=e210]: 建议结合原题和作答图片一起回看，必要时重新发起诊断。
+  - button "Choose File" [ref=e41]

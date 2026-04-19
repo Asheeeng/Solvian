@@ -1,0 +1,185 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e5]: Solvian
+      - generic [ref=e6]: v2
+    - navigation [ref=e7]:
+      - button "🔬 作业诊断" [ref=e8] [cursor=pointer]
+      - button "📕 错题本" [ref=e9] [cursor=pointer]
+      - button "📊 统计面板" [active] [ref=e10] [cursor=pointer]
+    - generic [ref=e11]:
+      - generic [ref=e12]: 教师
+      - button "退出" [ref=e13] [cursor=pointer]
+  - main [ref=e196]:
+    - complementary [ref=e197]:
+      - generic [ref=e198]:
+        - generic [ref=e199]:
+          - heading "统计维度" [level=3] [ref=e200]
+          - generic [ref=e201]: "4"
+        - paragraph [ref=e202]: 按班级 / 学生 / 时间
+      - list [ref=e203]:
+        - listitem [ref=e204] [cursor=pointer]:
+          - generic [ref=e205]: 总览
+          - generic [ref=e206]:
+            - generic [ref=e207]: 全班统计
+            - generic [ref=e208]: 总览
+        - listitem [ref=e209] [cursor=pointer]:
+          - generic [ref=e210]: 按学生
+          - generic [ref=e211]:
+            - generic [ref=e212]: 个人正确率
+            - generic [ref=e213]: 学生
+        - listitem [ref=e214] [cursor=pointer]:
+          - generic [ref=e215]: 按知识点
+          - generic [ref=e216]:
+            - generic [ref=e217]: 薄弱点分析
+            - generic [ref=e218]: 知识点
+        - listitem [ref=e219] [cursor=pointer]:
+          - generic [ref=e220]: 按时间
+          - generic [ref=e221]:
+            - generic [ref=e222]: 趋势变化
+            - generic [ref=e223]: 时间
+    - generic [ref=e225]:
+      - generic [ref=e226]:
+        - generic [ref=e228]:
+          - heading "📊 统计面板" [level=2] [ref=e229]
+          - text: 班级错误分布、正确率趋势、知识薄弱点
+        - generic [ref=e231]: 班级总览已更新
+      - generic [ref=e232]:
+        - generic [ref=e233]:
+          - generic [ref=e234]: ⚡ 数据概览
+          - generic [ref=e235] [cursor=pointer]: 全班统计
+        - generic [ref=e237]:
+          - generic [ref=e238]:
+            - generic [ref=e239]: "12"
+            - generic [ref=e240]:
+              - strong [ref=e241]: 总诊断次数
+              - text: 累计完成
+          - generic [ref=e242]:
+            - generic [ref=e243]: "5"
+            - generic [ref=e244]:
+              - strong [ref=e245]: 累计错误数
+              - text: 需要关注
+          - generic [ref=e246]:
+            - generic [ref=e247]: "7"
+            - generic [ref=e248]:
+              - strong [ref=e249]: 参与学生
+              - text: 已提交作业
+          - generic [ref=e250]:
+            - generic [ref=e251]: "78"
+            - generic [ref=e252]:
+              - strong [ref=e253]: 平均正确率
+              - text: 整体表现 78%
+      - generic [ref=e254]:
+        - generic [ref=e255]:
+          - generic [ref=e256]: 🔥 知识薄弱点排行
+          - generic [ref=e257] [cursor=pointer]: 按知识点
+        - generic [ref=e258]:
+          - generic [ref=e259]:
+            - generic [ref=e260] [cursor=pointer]:
+              - generic [ref=e261]:
+                - generic [ref=e262]: "1"
+                - generic [ref=e263]: 矩阵行变换
+              - generic [ref=e264]: ❌
+            - generic [ref=e266]:
+              - strong [ref=e267]: 📝
+              - text: 出错 3 次，涉及 2 名学生。主要问题是行变换时误改非目标行。
+          - generic [ref=e268]:
+            - generic [ref=e269] [cursor=pointer]:
+              - generic [ref=e270]:
+                - generic [ref=e271]: "2"
+                - generic [ref=e272]: 特征值求解
+              - generic [ref=e273]: ❌
+            - generic [ref=e275]:
+              - strong [ref=e276]: 📝
+              - text: 出错 2 次，主要集中在 det(A - λI) 展开时的符号判断。
+          - generic [ref=e277]:
+            - generic [ref=e278] [cursor=pointer]:
+              - generic [ref=e279]:
+                - generic [ref=e280]: "3"
+                - generic [ref=e281]: 行列式计算
+              - generic [ref=e282]: ✅
+            - generic [ref=e284]:
+              - strong [ref=e285]: 📝
+              - text: 出错 1 次，主要是余子式计算时有局部遗漏。
+      - generic [ref=e286]:
+        - generic [ref=e287]:
+          - generic [ref=e288]: 👥 学生正确率
+          - generic [ref=e289] [cursor=pointer]: 按学生
+        - generic [ref=e290]:
+          - generic [ref=e291]:
+            - generic [ref=e292] [cursor=pointer]:
+              - generic [ref=e293]:
+                - generic [ref=e294]: "1"
+                - generic [ref=e295]: 赵敏
+              - generic [ref=e296]: ✅
+            - generic [ref=e298]:
+              - strong [ref=e299]: 📝
+              - text: 正确率 100%，诊断 2 次，暂未发现错误。
+          - generic [ref=e300]:
+            - generic [ref=e301] [cursor=pointer]:
+              - generic [ref=e302]:
+                - generic [ref=e303]: "2"
+                - generic [ref=e304]: 张伟
+              - generic [ref=e305]: ✅
+            - generic [ref=e307]:
+              - strong [ref=e308]: 📝
+              - text: 正确率 83%，诊断 3 次，累计 1 个错误。
+          - generic [ref=e309]:
+            - generic [ref=e310] [cursor=pointer]:
+              - generic [ref=e311]:
+                - generic [ref=e312]: "3"
+                - generic [ref=e313]: 李娜
+              - generic [ref=e314]: ❌
+            - generic [ref=e316]:
+              - strong [ref=e317]: 📝
+              - text: 正确率 67%，诊断 3 次，集中错误出现在初等行变换。
+          - generic [ref=e318]:
+            - generic [ref=e319] [cursor=pointer]:
+              - generic [ref=e320]:
+                - generic [ref=e321]: "4"
+                - generic [ref=e322]: 王强
+              - generic [ref=e323]: ❌
+            - generic [ref=e325]:
+              - strong [ref=e326]: 📝
+              - text: 正确率 50%，诊断 4 次，特征值求解相关错误最突出。
+      - generic [ref=e327]:
+        - generic [ref=e328]:
+          - generic [ref=e329]: 📋 最近诊断记录
+          - generic [ref=e330] [cursor=pointer]: 最近 4 条
+        - generic [ref=e331]:
+          - generic [ref=e332]:
+            - generic [ref=e333] [cursor=pointer]:
+              - generic [ref=e334]:
+                - generic [ref=e335]: "1"
+                - generic [ref=e336]: 张伟 · matrix_001.jpg
+              - generic [ref=e337]: ❌
+            - generic [ref=e339]:
+              - strong [ref=e340]: 📝
+              - text: 04-12 16:08 · 3 个步骤 · 1 个错误 · 已完成
+          - generic [ref=e341]:
+            - generic [ref=e342] [cursor=pointer]:
+              - generic [ref=e343]:
+                - generic [ref=e344]: "2"
+                - generic [ref=e345]: 王强 · linear_1.png
+              - generic [ref=e346]: ❌
+            - generic [ref=e348]:
+              - strong [ref=e349]: 📝
+              - text: 04-12 08:10 · 4 个步骤 · 2 个错误 · 已完成
+          - generic [ref=e350]:
+            - generic [ref=e351] [cursor=pointer]:
+              - generic [ref=e352]:
+                - generic [ref=e353]: "3"
+                - generic [ref=e354]: 李娜 · matrix_007.jpg
+              - generic [ref=e355]: ❌
+            - generic [ref=e357]:
+              - strong [ref=e358]: 📝
+              - text: 04-11 19:45 · 5 个步骤 · 1 个错误 · 已完成
+          - generic [ref=e359]:
+            - generic [ref=e360] [cursor=pointer]:
+              - generic [ref=e361]:
+                - generic [ref=e362]: "4"
+                - generic [ref=e363]: 陈浩 · gauss.png
+              - generic [ref=e364]: ⏳
+            - generic [ref=e366]:
+              - strong [ref=e367]: 📝
+              - text: 04-12 11:00 · 待诊断

@@ -1,0 +1,94 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: S
+      - generic [ref=e6]:
+        - paragraph [ref=e7]: Teacher Studio
+        - heading "Solvian 智能诊断工作台" [level=1] [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]:
+            - text: 当前角色：
+            - strong [ref=e11]: 学生
+          - generic [ref=e12]:
+            - text: 当前用户：
+            - strong [ref=e13]: student_demo
+          - generic [ref=e14]:
+            - text: 班级：
+            - strong [ref=e15]: 默认测试班级
+    - generic [ref=e16]:
+      - button "☾ 深色界面" [ref=e17] [cursor=pointer]:
+        - generic [ref=e18]: ☾
+        - generic [ref=e19]: 深色界面
+      - button "⌘ 查看错题本" [ref=e20] [cursor=pointer]:
+        - generic [ref=e21]: ⌘
+        - generic [ref=e22]: 查看错题本
+      - button "◫ 查看统计面板" [ref=e23] [cursor=pointer]:
+        - generic [ref=e24]: ◫
+        - generic [ref=e25]: 查看统计面板
+      - button "↗ 退出登录" [ref=e26] [cursor=pointer]:
+        - generic [ref=e27]: ↗
+        - generic [ref=e28]: 退出登录
+  - main [ref=e29]:
+    - article [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - paragraph [ref=e34]: Problem Intake
+          - heading "上传作业" [level=2] [ref=e35]
+          - paragraph [ref=e36]: 选择作业图片后，点击提交按钮发送给老师批改。
+        - generic [ref=e37]: 上传作业图片，提交给老师批改
+      - generic [ref=e38]:
+        - generic [ref=e39]: 上传作业
+        - generic [ref=e40]: 预览放大
+      - generic [ref=e41]:
+        - generic [ref=e42]:
+          - generic [ref=e43]: 图片资源
+          - generic [ref=e44]: 请选择要提交的作业图片
+        - generic [ref=e45]:
+          - generic [ref=e46] [cursor=pointer]:
+            - generic [ref=e47]: ＋
+            - generic [ref=e48]: 选择作业图片
+          - button "＋ 选择作业图片" [ref=e49]
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - generic [ref=e52]: 支持 JPG / PNG / WebP
+          - generic [ref=e53]: 上传后可直接点击放大查看细节
+        - generic [ref=e56]:
+          - generic [ref=e57]: ⌁
+          - generic [ref=e58]:
+            - paragraph [ref=e59]: 等待上传作业
+            - paragraph [ref=e60]: 选择作业图片后，点击提交按钮发送给老师批改。
+      - button "📤 提交作业" [disabled] [ref=e62]:
+        - generic [ref=e63]: 📤
+        - generic [ref=e64]: 提交作业
+      - paragraph [ref=e65]
+    - generic [ref=e67]:
+      - article [ref=e68]:
+        - generic [ref=e70]:
+          - paragraph [ref=e71]: Recent Work
+          - heading "最近提交" [level=3] [ref=e72]
+          - paragraph [ref=e73]: 这里会显示你最近提交给老师批改的作业记录。
+        - generic [ref=e74]:
+          - article [ref=e75]:
+            - generic [ref=e76]:
+              - generic [ref=e77]:
+                - paragraph [ref=e78]: solvian-student-test.png
+                - paragraph [ref=e79]: 2026/4/10 15:09:48
+              - generic [ref=e80]: 检测失败
+          - article [ref=e81]:
+            - generic [ref=e82]:
+              - generic [ref=e83]:
+                - paragraph [ref=e84]: solvian-test.png
+                - paragraph [ref=e85]: 2026/4/10 14:57:44
+              - generic [ref=e86]: 检测失败
+      - article [ref=e87]:
+        - generic [ref=e89]:
+          - paragraph [ref=e90]: Notebook Entry
+          - heading "错题本入口" [level=3] [ref=e91]
+          - paragraph [ref=e92]: 老师批改完成后，这里可以快速进入你的错题本和统计面板。
+        - generic [ref=e93]:
+          - button "⌘ 查看错题本" [ref=e94] [cursor=pointer]:
+            - generic [ref=e95]: ⌘
+            - generic [ref=e96]: 查看错题本
+          - button "◫ 查看统计面板" [ref=e97] [cursor=pointer]:
+            - generic [ref=e98]: ◫
+            - generic [ref=e99]: 查看统计面板

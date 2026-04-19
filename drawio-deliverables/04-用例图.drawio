@@ -1,0 +1,77 @@
+<mxfile host="app.diagrams.net" modified="2026-04-08T13:50:00.000Z" agent="Claude Code" version="24.7.17">
+  <diagram id="copilot-usecase" name="用例图">
+    <mxGraphModel dx="1500" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="&lt;font style=&quot;font-size:24px;&quot;&gt;&lt;b&gt;Solvian（Copilot）系统用例图&lt;/b&gt;&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1"><mxGeometry x="700" y="20" width="500" height="40" as="geometry" /></mxCell>
+
+        <mxCell id="student" value="&lt;b&gt;学生&lt;/b&gt;" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=16;" vertex="1" parent="1"><mxGeometry x="80" y="270" width="50" height="100" as="geometry" /></mxCell>
+        <mxCell id="teacher" value="&lt;b&gt;老师&lt;/b&gt;" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=16;" vertex="1" parent="1"><mxGeometry x="80" y="500" width="50" height="100" as="geometry" /></mxCell>
+        <mxCell id="admin" value="&lt;b&gt;管理员&lt;/b&gt;" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=16;" vertex="1" parent="1"><mxGeometry x="80" y="720" width="50" height="100" as="geometry" /></mxCell>
+
+        <mxCell id="systemBoundary" value="&lt;b&gt;Solvian AI 数学诊断系统&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#666666;fontSize=16;fontStyle=1;align=left;spacingLeft=10;spacingTop=6;" vertex="1" parent="1"><mxGeometry x="220" y="120" width="1450" height="860" as="geometry" /></mxCell>
+
+        <mxCell id="ucRegister" value="注册账户" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1"><mxGeometry x="320" y="180" width="140" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucLogin" value="登录系统" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1"><mxGeometry x="500" y="180" width="140" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucLogout" value="退出登录" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1"><mxGeometry x="680" y="180" width="140" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucMe" value="查看当前用户信息" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" vertex="1" parent="1"><mxGeometry x="860" y="180" width="180" height="55" as="geometry" /></mxCell>
+
+        <mxCell id="ucUpload" value="上传题目图片" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1"><mxGeometry x="360" y="340" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucPreview" value="查看题目预览" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1"><mxGeometry x="550" y="340" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucDiagnose" value="发起 AI 诊断" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1"><mxGeometry x="740" y="340" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucPoll" value="查看诊断进度" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1"><mxGeometry x="930" y="340" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucResult" value="查看诊断结果" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" vertex="1" parent="1"><mxGeometry x="1120" y="340" width="150" height="55" as="geometry" /></mxCell>
+
+        <mxCell id="ucFeedback" value="提交 AI 反馈" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;" vertex="1" parent="1"><mxGeometry x="420" y="520" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucHistory" value="查看历史记录 / 错题本" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;" vertex="1" parent="1"><mxGeometry x="620" y="520" width="200" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucStats" value="查看统计面板" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;" vertex="1" parent="1"><mxGeometry x="870" y="520" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucDownload" value="下载诊断报告" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;" vertex="1" parent="1"><mxGeometry x="1070" y="520" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucModelTest" value="模型连通性测试" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;" vertex="1" parent="1"><mxGeometry x="1270" y="520" width="170" height="55" as="geometry" /></mxCell>
+
+        <mxCell id="ucEvent" value="记录事件日志" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" parent="1"><mxGeometry x="520" y="710" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucAuthCheck" value="统一鉴权校验" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" parent="1"><mxGeometry x="760" y="710" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucTaskFlow" value="异步任务执行" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" parent="1"><mxGeometry x="1000" y="710" width="150" height="55" as="geometry" /></mxCell>
+        <mxCell id="ucPersist" value="持久化业务数据" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" vertex="1" parent="1"><mxGeometry x="1240" y="710" width="160" height="55" as="geometry" /></mxCell>
+
+        <mxCell id="s1" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="student" target="ucRegister"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s2" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="student" target="ucLogin"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s3" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="student" target="ucLogout"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s4" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="student" target="ucFeedback"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s5" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="student" target="ucHistory"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s6" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="student" target="ucDownload"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="s7" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="student" target="ucResult"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="t1" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucRegister"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t2" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucLogin"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t3" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucUpload"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t4" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucPreview"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t5" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucDiagnose"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t6" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucPoll"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t7" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucResult"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t8" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucFeedback"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t9" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucHistory"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t10" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucStats"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t11" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucDownload"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t12" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucModelTest"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="t13" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="teacher" target="ucLogout"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="a1" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="admin" target="ucLogin"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a2" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="admin" target="ucHistory"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a3" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="admin" target="ucStats"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a4" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="admin" target="ucDownload"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="a5" style="edgeStyle=none;html=1;endArrow=none;strokeWidth=2;" edge="1" parent="1" source="admin" target="ucMe"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <mxCell id="inc1" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;dashed=1;fontSize=12;" edge="1" parent="1" source="ucDiagnose" target="ucTaskFlow"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc2" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;dashed=1;fontSize=12;" edge="1" parent="1" source="ucLogin" target="ucAuthCheck"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc3" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;dashed=1;fontSize=12;" edge="1" parent="1" source="ucFeedback" target="ucPersist"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc4" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;dashed=1;fontSize=12;" edge="1" parent="1" source="ucHistory" target="ucPersist"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc5" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;dashed=1;fontSize=12;" edge="1" parent="1" source="ucStats" target="ucPersist"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc6" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;dashed=1;fontSize=12;" edge="1" parent="1" source="ucUpload" target="ucEvent"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc7" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;dashed=1;fontSize=12;" edge="1" parent="1" source="ucDiagnose" target="ucEvent"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc8" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;dashed=1;fontSize=12;" edge="1" parent="1" source="ucHistory" target="ucEvent"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="note" value="说明：老师拥有最完整的主业务链路；学生主要进行查看与反馈；管理员强调全局访问权限。" style="shape=note;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;align=left;spacingLeft=8;spacingTop=8;" vertex="1" parent="1"><mxGeometry x="1380" y="180" width="220" height="120" as="geometry" /></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

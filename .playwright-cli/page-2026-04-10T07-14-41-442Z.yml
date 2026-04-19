@@ -1,0 +1,192 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: S
+      - generic [ref=e6]:
+        - paragraph [ref=e7]: Teacher Studio
+        - heading "Solvian 智能诊断工作台" [level=1] [ref=e8]
+        - generic [ref=e9]:
+          - generic [ref=e10]:
+            - text: 当前角色：
+            - strong [ref=e11]: 老师
+          - generic [ref=e12]:
+            - text: 当前用户：
+            - strong [ref=e13]: teacher_demo
+          - generic [ref=e14]:
+            - text: 班级：
+            - strong [ref=e15]: 默认测试班级
+    - generic [ref=e16]:
+      - button "☾ 深色界面" [ref=e17] [cursor=pointer]:
+        - generic [ref=e18]: ☾
+        - generic [ref=e19]: 深色界面
+      - button "⌘ 查看错题本" [ref=e20] [cursor=pointer]:
+        - generic [ref=e21]: ⌘
+        - generic [ref=e22]: 查看错题本
+      - button "◫ 查看统计面板" [ref=e23] [cursor=pointer]:
+        - generic [ref=e24]: ◫
+        - generic [ref=e25]: 查看统计面板
+      - button "↗ 退出登录" [ref=e26] [cursor=pointer]:
+        - generic [ref=e27]: ↗
+        - generic [ref=e28]: 退出登录
+  - main [ref=e29]:
+    - generic [ref=e30]:
+      - article [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - paragraph [ref=e34]: Submission Queue
+            - heading "学生提交列表" [level=2] [ref=e35]
+            - paragraph [ref=e36]: 老师可以先查看本班学生提交，再选择图片进入 AI 检测流程。
+          - generic [ref=e37]: 自动按最近提交排序
+        - generic [ref=e38]:
+          - article [ref=e39]:
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - paragraph [ref=e42]: student_demo
+                - paragraph [ref=e43]: solvian-student-test.png · 2026/4/10 15:09:48
+              - generic [ref=e44]: 检测失败
+            - generic [ref=e45]:
+              - generic [ref=e46]:
+                - paragraph [ref=e47]: 学生账号
+                - paragraph [ref=e48]: u_student_demo
+              - generic [ref=e49]:
+                - paragraph [ref=e50]: 提交时间
+                - paragraph [ref=e51]: 2026/4/10 15:09:48
+            - generic [ref=e52]:
+              - button "◱ 查看图片" [ref=e53] [cursor=pointer]:
+                - generic [ref=e54]: ◱
+                - generic [ref=e55]: 查看图片
+              - button "▶ AI 检测" [ref=e56] [cursor=pointer]:
+                - generic [ref=e57]: ▶
+                - generic [ref=e58]: AI 检测
+          - article [ref=e59]:
+            - generic [ref=e60]:
+              - generic [ref=e61]:
+                - paragraph [ref=e62]: 张三
+                - paragraph [ref=e63]: solvian-test.png · 2026/4/10 14:57:44
+              - generic [ref=e64]: 检测失败
+            - generic [ref=e65]:
+              - generic [ref=e66]:
+                - paragraph [ref=e67]: 学生账号
+                - paragraph [ref=e68]: u_student_demo
+              - generic [ref=e69]:
+                - paragraph [ref=e70]: 提交时间
+                - paragraph [ref=e71]: 2026/4/10 14:57:44
+            - generic [ref=e72]:
+              - button "◱ 查看图片" [ref=e73] [cursor=pointer]:
+                - generic [ref=e74]: ◱
+                - generic [ref=e75]: 查看图片
+              - button "▶ AI 检测" [ref=e76] [cursor=pointer]:
+                - generic [ref=e77]: ▶
+                - generic [ref=e78]: AI 检测
+      - article [ref=e79]:
+        - generic [ref=e80]:
+          - generic [ref=e81]:
+            - paragraph [ref=e82]: Problem Intake
+            - heading "题目主展示区" [level=2] [ref=e83]
+            - paragraph [ref=e84]: 上传作业图片后即可进入教师诊断流程。工作台会保留更清晰的操作节奏、预览层级与状态反馈， 让每次 AI 检测都更像完整产品体验，而不是简单功能页面。
+          - generic [ref=e85]: 支持点击预览与工作流记忆
+        - generic [ref=e86]:
+          - generic [ref=e87]: 上传题目
+          - generic [ref=e88]: 预览放大
+          - generic [ref=e89]: 教师端诊断流程
+        - generic [ref=e90]:
+          - generic [ref=e91]:
+            - generic [ref=e92]: 图片资源
+            - generic [ref=e93]: 尚未选择图片，请先上传题目截图或作业照片。
+          - generic [ref=e94]:
+            - generic [ref=e95] [cursor=pointer]:
+              - generic [ref=e96]: ＋
+              - generic [ref=e97]: 选择题目图片
+            - button "＋ 选择题目图片" [ref=e98]
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - generic [ref=e101]: 支持 JPG / PNG / WebP
+            - generic [ref=e102]: 上传后可直接点击放大查看细节
+          - generic [ref=e105]:
+            - generic [ref=e106]: ⌁
+            - generic [ref=e107]:
+              - paragraph [ref=e108]: 等待题目进入工作台
+              - paragraph [ref=e109]: 先上传一张需要诊断的数学题图片。上传完成后，这里会切换为大图预览，并可进入 AI 检测。
+        - generic [ref=e110]:
+          - generic [ref=e111]:
+            - checkbox "启发式引导模式 更偏向教学思路拆解，帮助老师查看过程性引导结果。" [ref=e112]
+            - generic [ref=e114]:
+              - generic [ref=e115]: 启发式引导模式
+              - generic [ref=e116]: 更偏向教学思路拆解，帮助老师查看过程性引导结果。
+          - button "▶ 启动 AI 诊断" [ref=e117] [cursor=pointer]:
+            - generic [ref=e118]: ▶
+            - generic [ref=e119]: 启动 AI 诊断
+    - generic [ref=e121]:
+      - article [ref=e122]:
+        - generic [ref=e123]:
+          - generic [ref=e124]:
+            - generic [ref=e125]: 等待诊断
+            - generic [ref=e126]:
+              - heading "AI 诊断结果区" [level=2] [ref=e127]
+              - paragraph [ref=e128]: 请先上传题目并启动诊断，系统会在这里返回完整结论。
+          - generic [ref=e129]: Teacher Analysis
+        - generic [ref=e130]:
+          - generic [ref=e131]:
+            - paragraph [ref=e132]: 记录 ID
+            - paragraph [ref=e133]: "-"
+          - generic [ref=e134]:
+            - paragraph [ref=e135]: 题型范围
+            - paragraph [ref=e136]: matrix
+          - generic [ref=e137]:
+            - paragraph [ref=e138]: 错误定位
+            - paragraph [ref=e139]: "-"
+        - generic [ref=e141]:
+          - paragraph [ref=e142]: 异步诊断流水线
+          - paragraph [ref=e143]: 启动 AI 诊断后，这里会先展示视觉识别进度，再逐步显示推理分析状态，减少老师等待完整结果的空窗时间。
+      - generic [ref=e144]:
+        - article [ref=e145]:
+          - generic [ref=e147]:
+            - paragraph [ref=e148]: Step Trace
+            - heading "步骤重构" [level=3] [ref=e149]
+            - paragraph [ref=e150]: 将模型返回的过程拆成结构化步骤，方便老师快速定位推理链路。
+          - list [ref=e151]:
+            - listitem [ref=e152]:
+              - generic [ref=e153]:
+                - generic [ref=e154]: "1"
+                - generic [ref=e156]: 尚未生成诊断步骤
+              - paragraph [ref=e158]: 完成上传并启动诊断后，这里会展示 AI 返回的分步分析。
+        - article [ref=e159]:
+          - generic [ref=e161]:
+            - paragraph [ref=e162]: Insights
+            - heading "错误反馈与标签" [level=3] [ref=e163]
+            - paragraph [ref=e164]: 把结论、错误说明与标签分类拆开，让老师在一次浏览里就能完成判断。
+          - generic [ref=e165]:
+            - generic [ref=e166]:
+              - paragraph [ref=e167]: 诊断反馈
+              - paragraph [ref=e168]: 请先上传题目并启动诊断。
+            - generic [ref=e169]:
+              - paragraph [ref=e170]: 错误说明
+              - paragraph [ref=e171]: "-"
+          - generic [ref=e173]: "#待检测"
+        - article [ref=e174]:
+          - generic [ref=e176]:
+            - paragraph [ref=e177]: Feedback Loop
+            - heading "AI 识别反馈" [level=3] [ref=e178]
+            - paragraph [ref=e179]: 将老师的反馈继续回收到系统里，形成后续诊断优化的闭环。
+          - generic [ref=e180]:
+            - generic [ref=e181]:
+              - generic [ref=e182]:
+                - generic [ref=e183]: 反馈结果
+                - generic [ref=e184]: 选择本次识别是否准确
+              - combobox "反馈结果 选择本次识别是否准确" [ref=e185]:
+                - option "识别准确" [selected]
+                - option "识别不准确"
+            - generic [ref=e186]:
+              - generic [ref=e187]:
+                - generic [ref=e188]: 备注说明
+                - generic [ref=e189]: 可填写补充信息，便于后续归档
+              - textbox "备注说明 可填写补充信息，便于后续归档" [ref=e190]:
+                - /placeholder: 可填写补充说明
+            - generic [ref=e191]:
+              - button "✓ 保存反馈" [ref=e192] [cursor=pointer]:
+                - generic [ref=e193]: ✓
+                - generic [ref=e194]: 保存反馈
+              - button "↓ 下载 PDF 报告" [ref=e195] [cursor=pointer]:
+                - generic [ref=e196]: ↓
+                - generic [ref=e197]: 下载 PDF 报告
+          - paragraph [ref=e198]

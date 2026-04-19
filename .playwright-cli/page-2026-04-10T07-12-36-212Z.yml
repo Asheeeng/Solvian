@@ -1,0 +1,74 @@
+- main [ref=e2]:
+  - region "品牌展示区" [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: S
+      - generic [ref=e7]:
+        - paragraph [ref=e8]: Solvian
+        - paragraph [ref=e9]: AI 数学诊断系统
+    - generic [ref=e10]:
+      - paragraph [ref=e11]: Explain every step
+      - heading "每一次登录，都是一次更清晰的推理入口。" [level=1] [ref=e12]
+    - generic [ref=e14]:
+      - generic: ∑
+      - generic: ∫
+      - generic: π
+    - generic [ref=e57]:
+      - button "隐私说明" [ref=e58] [cursor=pointer]
+      - button "服务条款" [ref=e59] [cursor=pointer]
+      - button "联系我们" [ref=e60] [cursor=pointer]
+  - region "登录表单区" [ref=e61]:
+    - button "深色模式" [ref=e62] [cursor=pointer]:
+      - generic [ref=e63]: ☀
+      - generic [ref=e64]: ☾
+      - generic [ref=e65]: 深色模式
+    - generic [ref=e66]:
+      - paragraph [ref=e67]: Welcome back
+      - heading "登录你的 Solvian 账户" [level=2] [ref=e68]
+      - paragraph [ref=e69]: 继续使用现有账号、密码和角色进入系统。接口、登录态写入和跳转逻辑全部保持不变。
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - generic [ref=e72]: 账号
+          - textbox "账号" [ref=e74]:
+            - /placeholder: 请输入用户名
+        - generic [ref=e75]:
+          - generic [ref=e76]:
+            - generic [ref=e77]: 密码
+            - button "忘记密码？" [ref=e78] [cursor=pointer]
+          - generic [ref=e79]:
+            - textbox "密码" [ref=e80]:
+              - /placeholder: 请输入密码
+            - button "显示密码" [ref=e81] [cursor=pointer]:
+              - img [ref=e83]
+              - img [ref=e87]
+        - generic [ref=e92]:
+          - generic [ref=e93]:
+            - generic [ref=e94]: 登录身份
+            - generic [ref=e95]: 继续沿用现有角色语义
+          - radiogroup "登录身份" [ref=e96]:
+            - radio "学生 上传题目并查看诊断结果" [checked] [ref=e97]:
+              - generic [ref=e98]: 学生
+              - generic [ref=e99]: 上传题目并查看诊断结果
+            - radio "老师 跟踪课堂反馈与作答表现" [ref=e100]:
+              - generic [ref=e101]: 老师
+              - generic [ref=e102]: 跟踪课堂反馈与作答表现
+            - radio "管理员 管理系统与全局角色配置" [ref=e103]:
+              - generic [ref=e104]: 管理员
+              - generic [ref=e105]: 管理系统与全局角色配置
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - generic [ref=e108]: 图形验证码
+            - generic [ref=e109]: 前端可用版，支持刷新
+          - generic [ref=e110]:
+            - textbox "图形验证码" [ref=e112]:
+              - /placeholder: 请输入验证码
+            - button "换一张" [ref=e115]
+        - paragraph [ref=e116]
+        - paragraph [ref=e117]
+        - button "登录" [ref=e118]
+        - button "企业微信登录（暂未开放）" [ref=e119]:
+          - generic [ref=e120]: 企
+          - text: 企业微信登录（暂未开放）
+      - paragraph [ref=e121]:
+        - text: 没有账号？
+        - link "立即创建" [ref=e122] [cursor=pointer]:
+          - /url: /register.html

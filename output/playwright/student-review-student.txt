@@ -1,0 +1,17 @@
+### Result
+- [Screenshot of viewport](.playwright-cli/page-2026-04-16T12-34-39-060Z.png)
+### Ran Playwright code
+```js
+// Screenshot viewport and save it as .playwright-cli/page-2026-04-16T12-34-39-060Z.png
+await page.screenshot({
+  path: '.playwright-cli/page-2026-04-16T12-34-39-060Z.png',
+  scale: 'css',
+  type: 'png'
+});
+```
+### Page
+- Page URL: http://127.0.0.1:8080/student-review.html
+- Page Title: 作业诊断 - Solvian
+- Console: 3 errors, 0 warnings
+### Events
+- New console entries: .playwright-cli/console-2026-04-16T12-34-16-193Z.log#L2-L3

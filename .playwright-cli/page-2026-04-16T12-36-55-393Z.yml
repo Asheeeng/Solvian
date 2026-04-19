@@ -1,0 +1,95 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: S
+        - generic [ref=e6]:
+          - paragraph [ref=e7]: Student Review
+          - heading "Solvian 学生作业诊断台" [level=1] [ref=e8]
+          - paragraph [ref=e9]: 当前登录：老师 tea123。按学生快速筛选最近提交的作业，查看图片、运行 AI 诊断，并把错题本与统计集中在同一个工作区中。
+      - generic [ref=e10]:
+        - tablist "诊断工作区导航" [ref=e11]:
+          - button "◎ 作业诊断" [ref=e12] [cursor=pointer]:
+            - generic [ref=e13]: ◎
+            - generic [ref=e14]: 作业诊断
+          - button "📕 错题本" [ref=e15] [cursor=pointer]:
+            - generic [ref=e16]: 📕
+            - generic [ref=e17]: 错题本
+          - button "📊 统计" [ref=e18] [cursor=pointer]:
+            - generic [ref=e19]: 📊
+            - generic [ref=e20]: 统计
+        - button "⇥ 退出" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22]: ⇥
+          - generic [ref=e23]: 退出
+    - main [ref=e24]:
+      - complementary [ref=e25]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - paragraph [ref=e28]: Students
+            - heading "学生列表" [level=2] [ref=e29]
+            - paragraph [ref=e30]: 按姓名或学号筛选，优先处理有待批作业的同学。
+          - generic [ref=e31]:
+            - generic [ref=e32]: "2"
+            - text: 人
+        - textbox "搜索学生姓名或学号" [ref=e34]
+        - list [ref=e42]:
+          - listitem [ref=e43] [cursor=pointer]:
+            - generic [ref=e44]: stu123
+            - generic [ref=e45]:
+              - generic [ref=e46]: 默认测试班级
+              - generic [ref=e47]: 4 份
+          - listitem [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]: student_demo
+            - generic [ref=e50]:
+              - generic [ref=e51]: 默认测试班级
+              - generic [ref=e52]: 3 份
+      - generic [ref=e53]:
+        - article [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - paragraph [ref=e57]: Workspace
+              - heading "stu123" [level=2] [ref=e58]
+              - paragraph [ref=e59]: 默认测试班级 · 共 4 份作业
+            - button "← 返回学生列表" [ref=e61] [cursor=pointer]:
+              - generic [ref=e62]: ←
+              - generic [ref=e63]: 返回学生列表
+          - generic [ref=e64]:
+            - generic [ref=e65]: 请先选择一张作业图片
+            - button "▶ 启动 AI 诊断" [disabled] [ref=e67]:
+              - generic [ref=e68]: ▶
+              - generic [ref=e69]: 启动 AI 诊断
+        - article [ref=e71]:
+          - generic [ref=e73]:
+            - paragraph [ref=e74]: Homework Gallery
+            - heading "作业图片" [level=3] [ref=e75]
+            - paragraph [ref=e76]: 点击缩略图选择作业，右上角可直接放大原图。
+          - generic [ref=e77]:
+            - generic [ref=e78] [cursor=pointer]:
+              - img "螢幕截圖 2026-03-25 23.41.55.png" [ref=e79]
+              - generic [ref=e80]: 🔍
+              - generic [ref=e81]: 已批改
+              - generic [ref=e82]:
+                - generic [ref=e83]: 螢幕截圖 2026-03-25 23.41.55.png
+                - generic [ref=e84]: 2026/4/16 20:02:33
+            - generic [ref=e85] [cursor=pointer]:
+              - img "螢幕截圖 2026-03-24 12.31.47.png" [ref=e86]
+              - generic [ref=e87]: 🔍
+              - generic [ref=e88]: 已批改
+              - generic [ref=e89]:
+                - generic [ref=e90]: 螢幕截圖 2026-03-24 12.31.47.png
+                - generic [ref=e91]: 2026/4/16 20:00:11
+            - generic [ref=e92] [cursor=pointer]:
+              - img "螢幕截圖 2026-04-10 16.03.07.png" [ref=e93]
+              - generic [ref=e94]: 🔍
+              - generic [ref=e95]: 已批改
+              - generic [ref=e96]:
+                - generic [ref=e97]: 螢幕截圖 2026-04-10 16.03.07.png
+                - generic [ref=e98]: 2026/4/10 16:08:19
+            - generic [ref=e99] [cursor=pointer]:
+              - img "matrix_001.jpg" [ref=e100]
+              - generic [ref=e101]: 🔍
+              - generic [ref=e102]: 已批改
+              - generic [ref=e103]:
+                - generic [ref=e104]: matrix_001.jpg
+                - generic [ref=e105]: 2026/4/10 16:02:31
+  - button "Choose File" [ref=e41]

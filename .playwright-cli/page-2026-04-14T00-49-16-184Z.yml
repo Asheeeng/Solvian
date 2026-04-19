@@ -1,0 +1,164 @@
+- generic [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e5]: Solvian
+      - generic [ref=e6]: v2
+    - navigation [ref=e7]:
+      - button "🔬 作业诊断" [ref=e8] [cursor=pointer]
+      - button "📕 错题本" [active] [ref=e9] [cursor=pointer]
+      - button "📊 统计面板" [ref=e10] [cursor=pointer]
+    - generic [ref=e11]:
+      - generic [ref=e12]: 教师
+      - button "退出" [ref=e13] [cursor=pointer]
+  - main [ref=e45]:
+    - complementary [ref=e46]:
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - heading "错题筛选" [level=3] [ref=e49]
+          - generic [ref=e50]: "3"
+        - paragraph [ref=e51]: 按学生 / 知识点筛选
+        - textbox "搜索错题…" [ref=e52]
+      - list [ref=e53]:
+        - listitem [ref=e54] [cursor=pointer]:
+          - generic [ref=e55]: 全部错题
+          - generic [ref=e56]:
+            - generic [ref=e57]: 共 3 条记录
+            - generic [ref=e58]: 全部
+        - listitem [ref=e60] [cursor=pointer]:
+          - generic [ref=e61]: 张伟
+          - generic [ref=e62]:
+            - generic [ref=e63]: 1 条错题
+            - generic [ref=e64]: 矩阵行变换
+        - listitem [ref=e65] [cursor=pointer]:
+          - generic [ref=e66]: 王强
+          - generic [ref=e67]:
+            - generic [ref=e68]: 1 条错题
+            - generic [ref=e69]: 特征值求解
+        - listitem [ref=e70] [cursor=pointer]:
+          - generic [ref=e71]: 李娜
+          - generic [ref=e72]:
+            - generic [ref=e73]: 1 条错题
+            - generic [ref=e74]: 初等行变换
+    - generic [ref=e76]:
+      - generic [ref=e77]:
+        - generic [ref=e79]:
+          - heading "📕 错题本" [level=2] [ref=e80]
+          - text: AI 诊断发现的错误步骤汇总
+        - generic [ref=e82]: 3 条重点错题
+      - generic [ref=e83]:
+        - generic [ref=e84]:
+          - generic [ref=e85]: ⚠️ 张伟 · 矩阵行变换
+          - generic [ref=e86] [cursor=pointer]: 04-12 16:08
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - heading "📐 错误步骤" [level=4] [ref=e89]
+            - generic [ref=e90]:
+              - generic [ref=e91] [cursor=pointer]:
+                - generic [ref=e92]:
+                  - generic [ref=e93]: "2"
+                  - generic [ref=e94]: R1 → 2·R1 行变换
+                - generic [ref=e95]: ❌
+              - generic [ref=e96]:
+                - generic [ref=e97]:
+                  - generic [ref=e98]:
+                    - generic [ref=e99]: 📍 错误位置
+                    - generic [ref=e100]: R2(1,1)
+                  - generic [ref=e101]:
+                    - generic [ref=e102]: ❌ 学生写的
+                    - generic [ref=e103]: "0"
+                  - generic [ref=e104]:
+                    - generic [ref=e105]: ✅ 正确答案
+                    - generic [ref=e106]: "-3"
+                  - generic [ref=e107]:
+                    - generic [ref=e108]: 📚 知识点
+                    - generic [ref=e109]: 矩阵行变换
+                - generic [ref=e110]:
+                  - strong [ref=e111]: 📝
+                  - text: 执行 R1 → 2·R1 时，学生把第二行第一个元素误改成了 0。
+          - generic [ref=e112]:
+            - heading "🎯 错误分析" [level=4] [ref=e113]
+            - generic [ref=e114]:
+              - generic [ref=e115]: 💡 诊断说明
+              - paragraph [ref=e116]: 执行 R1 → 2·R1 时，这个操作只对第一行生效。第二行第一个元素应保持 -3 不变，但学生误改成了 0。
+            - generic [ref=e117]:
+              - generic [ref=e118]: 🎯
+              - generic [ref=e119]: 行变换只改目标行，做完后逐行核对一遍。
+      - generic [ref=e120]:
+        - generic [ref=e121]:
+          - generic [ref=e122]: ⚠️ 王强 · 特征值求解
+          - generic [ref=e123] [cursor=pointer]: 04-12 08:10
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - heading "📐 错误步骤" [level=4] [ref=e126]
+            - generic [ref=e127]:
+              - generic [ref=e128] [cursor=pointer]:
+                - generic [ref=e129]:
+                  - generic [ref=e130]: "3"
+                  - generic [ref=e131]: 求解 det(A - λI) = 0
+                - generic [ref=e132]: ❌
+              - generic [ref=e133]:
+                - generic [ref=e134]:
+                  - generic [ref=e135]:
+                    - generic [ref=e136]: 📍 错误位置
+                    - generic [ref=e137]: 特征值 λ
+                  - generic [ref=e138]:
+                    - generic [ref=e139]: ❌ 学生写的
+                    - generic [ref=e140]: λ = 2
+                  - generic [ref=e141]:
+                    - generic [ref=e142]: ✅ 正确答案
+                    - generic [ref=e143]: λ = -2
+                  - generic [ref=e144]:
+                    - generic [ref=e145]: 📚 知识点
+                    - generic [ref=e146]: 特征值求解
+                - generic [ref=e147]:
+                  - strong [ref=e148]: 📝
+                  - text: 展开行列式时符号判断错误，最终把特征值符号算反了。
+          - generic [ref=e149]:
+            - heading "🎯 错误分析" [level=4] [ref=e150]
+            - generic [ref=e151]:
+              - generic [ref=e152]: 💡 诊断说明
+              - paragraph [ref=e153]: 计算 det(A - λI) = 0 时，学生在展开行列式过程中遗漏了代数余子式的符号规则，导致结果从 -2 误写成了 2。
+            - generic [ref=e154]:
+              - generic [ref=e155]: 🎯
+              - generic [ref=e156]:
+                - text: 展开行列式时注意代数余子式的符号规则
+                - strong [ref=e157]: (-1)^(i+j)
+                - text: 。
+      - generic [ref=e158]:
+        - generic [ref=e159]:
+          - generic [ref=e160]: ⚠️ 李娜 · 初等行变换
+          - generic [ref=e161] [cursor=pointer]: 04-11 19:45
+        - generic [ref=e162]:
+          - generic [ref=e163]:
+            - heading "📐 错误步骤" [level=4] [ref=e164]
+            - generic [ref=e165]:
+              - generic [ref=e166] [cursor=pointer]:
+                - generic [ref=e167]:
+                  - generic [ref=e168]: "4"
+                  - generic [ref=e169]: R3 = R3 + 2R1
+                - generic [ref=e170]: ❌
+              - generic [ref=e171]:
+                - generic [ref=e172]:
+                  - generic [ref=e173]:
+                    - generic [ref=e174]: 📍 错误位置
+                    - generic [ref=e175]: R3 第1列、第4列
+                  - generic [ref=e176]:
+                    - generic [ref=e177]: ❌ 学生写的
+                    - generic [ref=e178]: "[0, 3, 2, 3]"
+                  - generic [ref=e179]:
+                    - generic [ref=e180]: ✅ 正确答案
+                    - generic [ref=e181]: "[8, 3, 2, 9]"
+                  - generic [ref=e182]:
+                    - generic [ref=e183]: 📚 知识点
+                    - generic [ref=e184]: 初等行变换
+                - generic [ref=e185]:
+                  - strong [ref=e186]: 📝
+                  - text: 学生只计算了部分列，没有把 2R1 的所有对应项完整加到 R3 上。
+          - generic [ref=e187]:
+            - heading "🎯 错误分析" [level=4] [ref=e188]
+            - generic [ref=e189]:
+              - generic [ref=e190]: 💡 诊断说明
+              - paragraph [ref=e191]: 执行 R3 = R3 + 2R1 时，学生只处理了中间两列，漏掉了第 1 列和第 4 列，因此结果没有保持整行同步更新。
+            - generic [ref=e192]:
+              - generic [ref=e193]: 🎯
+              - generic [ref=e194]: 行变换时每一列都要运算，建议列出完整计算过程并逐列核对。
