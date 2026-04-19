@@ -41,7 +41,7 @@ export class DiagnosisProgressPanel {
     this.container.innerHTML = `
       <div class="diagnosis-progress__empty">
         <p class="diagnosis-progress__empty-title">异步诊断流水线</p>
-        <p class="diagnosis-progress__empty-copy">启动 AI 诊断后，这里会先展示视觉识别进度，再逐步显示推理分析状态，减少老师等待完整结果的空窗时间。</p>
+        <p class="diagnosis-progress__empty-copy">启动 AI 批改后，这里会先展示视觉识别进度，再逐步显示推理分析状态，减少老师等待完整结果的空窗时间。</p>
       </div>
     `;
   }

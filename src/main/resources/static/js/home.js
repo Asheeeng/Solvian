@@ -1084,7 +1084,7 @@ if (currentSession) {
 
     triggerDiagnosisBtn.addEventListener('click', async () => {
       if (!problemViewer.hasImage()) {
-        diagnosisPanel?.setError('请先上传题目图片，再启动 AI 诊断。');
+        diagnosisPanel?.setError('请先上传题目图片，再启动 AI 批改。');
         problemFileMeta.textContent = '请先选择题目图片，然后再发起本次诊断。';
         return;
       }

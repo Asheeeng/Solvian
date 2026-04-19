@@ -161,7 +161,7 @@ const App = (() => {
       const userName = state.profile?.username || state.profile?.userId || '当前老师';
       eyebrow.textContent = 'Student Review';
       title.textContent = 'Solvian 学生作业诊断台';
-      desc.textContent = `当前登录：${roleToLabel(getRole())} ${userName}。按学生快速筛选最近提交的作业，查看图片、运行 AI 诊断，并把错题本与统计集中在同一个工作区中。`;
+      desc.textContent = `当前登录：${roleToLabel(getRole())} ${userName}。按学生快速筛选最近提交的作业，查看图片、执行 AI 批改，并把错题本与统计集中在同一个工作区中。`;
       sidebarEyebrow.textContent = 'Students';
       sidebarTitle.textContent = '学生列表';
       sidebarDesc.textContent = '按姓名或学号筛选，优先处理有待批作业的同学。';
@@ -501,12 +501,18 @@ const App = (() => {
       const status = getStatusMeta(work.status);
       return `
         <div class="img-card${work.id === state.selectedWorkId ? ' selected' : ''}" data-wid="${esc(work.id)}" onclick="App.pickImg(this.dataset.wid)">
-          <img src="${esc(work.url)}" alt="${esc(work.file)}" loading="lazy">
-          <div class="zoom-btn" data-src="${esc(work.url)}" onclick="event.stopPropagation();App.openLightbox(this.dataset.src)">🔍</div>
-          <span class="status-tag ${status.className}">${status.label}</span>
-          <div class="overlay">
+          <div class="img-card__media">
+            <img src="${esc(work.url)}" alt="${esc(work.file)}" loading="lazy">
+            <div class="zoom-btn" data-src="${esc(work.url)}" onclick="event.stopPropagation();App.openLightbox(this.dataset.src)">🔍</div>
+            <span class="status-tag ${status.className}">${status.label}</span>
+          </div>
+          <div class="img-card__meta">
             <div class="fn">${esc(work.file)}</div>
             <div class="tm">${esc(work.time)}</div>
+            <div class="img-card__statusline">
+              <span>${esc(work.studentName || '当前作业')}</span>
+              <span>状态：${status.label}</span>
+            </div>
           </div>
         </div>
       `;
@@ -554,9 +560,9 @@ const App = (() => {
     if (work.diagnosis.hasResult && work.diagnosis.result) {
       renderDiagnosisResult(work.diagnosis.result, {
         imageUrl: work.url,
-        tagText: '已从数据库载入诊断结果'
+        tagText: '已从数据库载入批改结果'
       });
-      setActionTip(`✅ 已载入 ${work.file} 的历史诊断，可再次运行 AI 诊断。`, 'ok');
+      setActionTip(`✅ 已载入 ${work.file} 的历史批改结果，可再次执行 AI 批改。`, 'ok');
     } else if (work.status === 'running') {
       showTaskWaiting(work);
       setActionTip(`这张作业正在诊断中：${work.file}`, 'ok');
@@ -594,7 +600,7 @@ const App = (() => {
     }
 
     if (!work) {
-      label.textContent = '启动 AI 诊断';
+      label.textContent = 'AI 批改';
       return;
     }
 
@@ -603,7 +609,7 @@ const App = (() => {
       return;
     }
 
-    label.textContent = work.diagnosis.hasResult ? '重新运行 AI 诊断' : '启动 AI 诊断';
+    label.textContent = work.diagnosis.hasResult ? '重新 AI 批改' : 'AI 批改';
   }
 
   function setActionTip(message, type = '') {
@@ -742,6 +748,7 @@ const App = (() => {
     $('explainBlock').classList.add('hidden');
     $('errorBoxes').innerHTML = '';
     $('previewImg').removeAttribute('src');
+    resetOcrToggle(false);
     resetPipeline();
   }
 
@@ -752,14 +759,15 @@ const App = (() => {
     $('ocrBlock').classList.add('hidden');
     $('traceBlock').classList.add('hidden');
     $('explainBlock').classList.add('hidden');
+    resetOcrToggle(false);
     resetPipeline();
-    tag('诊断进行中');
+    tag('批改进行中');
     setPipeState(1, 'active');
   }
 
   async function runDetection() {
     if (!isTeacherView()) {
-      setActionTip('当前账号不能发起 AI 诊断。', 'error');
+      setActionTip('当前账号不能发起 AI 批改。', 'error');
       return;
     }
 
@@ -770,7 +778,7 @@ const App = (() => {
     }
 
     const button = $('btnDetect');
-    setButtonBusy(button, true, '正在诊断');
+    setButtonBusy(button, true, '正在批改');
     setHeaderActionState('diagnosis');
     stopDiagnosisPolling();
     state.activeSubmissionId = work.id;
@@ -779,7 +787,7 @@ const App = (() => {
     $('previewImg').src = work.url;
     $('errorBoxes').innerHTML = '';
     resetPipeline();
-    tag('正在创建诊断任务');
+    tag('正在创建批改任务');
     $('resultArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     try {
@@ -798,7 +806,7 @@ const App = (() => {
 
       startDiagnosisPolling(task?.taskId, work);
     } catch (error) {
-      showTaskFailure(error.message || '诊断失败，请稍后重试。');
+      showTaskFailure(error.message || '批改失败，请稍后重试。');
       setButtonBusy(button, false);
       state.activeSubmissionId = '';
       await refreshSubmissionData({ preserveSelection: true });
@@ -807,7 +815,7 @@ const App = (() => {
 
   function startDiagnosisPolling(taskId, work) {
     if (!taskId) {
-      showTaskFailure('诊断任务创建失败。');
+      showTaskFailure('批改任务创建失败。');
       setButtonBusy($('btnDetect'), false);
       state.activeSubmissionId = '';
       return;
@@ -843,7 +851,7 @@ const App = (() => {
         return;
       }
       stopDiagnosisPolling();
-      showTaskFailure(error.message || '诊断进度获取失败，请稍后重试。');
+      showTaskFailure(error.message || '批改进度获取失败，请稍后重试。');
       setButtonBusy($('btnDetect'), false);
       state.activeSubmissionId = '';
       await refreshSubmissionData({ preserveSelection: true });
@@ -891,15 +899,15 @@ const App = (() => {
       if (shouldRenderPreview) {
         renderDiagnosisResult(result, {
           imageUrl: work?.url,
-          tagText: '诊断完成，结果已写入数据库'
+          tagText: '批改完成，结果已写入数据库'
         });
       }
-      setActionTip(`✅ ${work?.file || '当前作业'} 诊断完成。`, 'ok');
+      setActionTip(`✅ ${work?.file || '当前作业'} 批改完成。`, 'ok');
       return true;
     }
 
     if (task.status === 'failed') {
-      showTaskFailure(task.errorMessage || '诊断失败，请稍后重试。');
+      showTaskFailure(task.errorMessage || '批改失败，请稍后重试。');
       return true;
     }
 
@@ -975,18 +983,18 @@ const App = (() => {
       return 'AI 正在分析';
     }
     if (status === 'done') {
-      return '诊断完成';
+      return '批改完成';
     }
     if (status === 'failed') {
-      return '诊断失败';
+      return '批改失败';
     }
     return '处理中';
   }
 
   function showTaskFailure(message) {
     updatePipelineFromTask({ status: 'failed', progress: 100 });
-    tag(message || '诊断失败', false, true);
-    setActionTip(message || '诊断失败，请稍后重试。', 'error');
+    tag(message || '批改失败', false, true);
+    setActionTip(message || '批改失败，请稍后重试。', 'error');
   }
 
   function renderDiagnosisResult(result, { imageUrl = '', tagText = '' } = {}) {
@@ -996,9 +1004,9 @@ const App = (() => {
     }
 
     const fragments = buildOcrFragments(result);
-    showOCR(fragments);
-    showTrace(result.steps || []);
     showExplain(result);
+    showTrace(result.steps || []);
+    showOCR(fragments);
     showBoxes(result.imageHighlights || []);
     document.querySelectorAll('.pipe-step').forEach((item) => {
       item.classList.remove('active', 'fail');
@@ -1029,7 +1037,7 @@ const App = (() => {
     }
 
     if (result.feedback) {
-      fragments.push({ label: '诊断摘要', text: result.feedback });
+      fragments.push({ label: '批改摘要', text: result.feedback });
     }
 
     if (result.errorIndex) {
@@ -1051,7 +1059,7 @@ const App = (() => {
 
     if (!fragments.length) {
       fragments.push({
-        label: '诊断状态',
+        label: '批改状态',
         text: mapDiagnosisStatus(result.status)
       });
     }
@@ -1072,6 +1080,7 @@ const App = (() => {
       </div>
     `).join('');
 
+    resetOcrToggle(false);
     block.classList.remove('hidden');
   }
 
@@ -1092,36 +1101,76 @@ const App = (() => {
       const isWrong = Boolean(step.isWrong || diffLines.length);
       const open = isWrong ? ' open' : '';
       const cls = isWrong ? 'wrong' : 'correct';
-      const icon = isWrong ? '❌' : '✅';
       const noteText = step.explanation || step.errorMessage || '';
+      const stepNo = step.stepNo || index + 1;
+      const stepTitle = step.title || `步骤 ${index + 1}`;
+      const toggleIcon = isWrong ? '▼' : '▶';
 
       let body = '';
       if (step.highlightedLatex || step.latex) {
         body += latexBlockHtml(step.highlightedLatex || step.latex, isWrong);
-        if (step.content) {
-          body += `<div class="step-note">${renderText(step.content)}</div>`;
+        if (step.content && step.content !== step.latex) {
+          body += `<div class="step-note"><strong>步骤说明：</strong> ${renderText(step.content)}</div>`;
         }
       } else {
-        body += `<div class="formula-box">${esc(step.content || '暂无公式内容')}</div>`;
+        body += `<div class="formula-box">${renderText(step.content || '暂无公式内容')}</div>`;
       }
+
       if (noteText) {
-        body += `<div class="step-note"><strong>📝</strong> ${renderText(noteText)}</div>`;
+        body += `<div class="step-note"><strong>批改说明：</strong> ${renderText(noteText)}</div>`;
       }
-      if (diffLines.length) {
-        body += `<div class="correct-answer-box">
-          <div class="ca-label">✅ 正确结果提示</div>
-          <div class="formula-box">${diffLines.map((diff) => `${diff.row || '-'}行${diff.col || '-'}列：应为 ${diff.expected || '-'}，写成了 ${diff.actual || '-'}`).join('\n')}</div>
-        </div>`;
+
+      if (isWrong) {
+        body += `
+          <div class="trace-detail-box">
+            <div class="trace-detail-box__title">错误定位</div>
+            ${diffLines.length ? diffLines.map((diff) => `
+              <div class="trace-detail-item">
+                <div class="trace-detail-loc">${esc(formatDiffLocation(diff, stepNo))}</div>
+                <div class="trace-detail-grid">
+                  <div class="trace-detail-cell trace-detail-cell--wrong">
+                    <div class="trace-detail-label">学生写的</div>
+                    <div class="trace-detail-value">${renderText(diff.actual || step.content || '未识别')}</div>
+                  </div>
+                  <div class="trace-detail-cell trace-detail-cell--ok">
+                    <div class="trace-detail-label">正确答案</div>
+                    <div class="trace-detail-value">${renderText(diff.expected || step.latex || '请参考标准过程')}</div>
+                  </div>
+                </div>
+                ${diff.reason ? `<div class="trace-detail-note">${renderText(diff.reason)}</div>` : ''}
+              </div>
+            `).join('') : `
+              <div class="trace-detail-item">
+                <div class="trace-detail-loc">步骤 ${stepNo}</div>
+                <div class="trace-detail-grid">
+                  <div class="trace-detail-cell trace-detail-cell--wrong">
+                    <div class="trace-detail-label">当前写法</div>
+                    <div class="trace-detail-value">${renderText(step.content || step.highlightedLatex || step.latex || '未识别')}</div>
+                  </div>
+                  <div class="trace-detail-cell trace-detail-cell--ok">
+                    <div class="trace-detail-label">建议答案</div>
+                    <div class="trace-detail-value">${renderText(step.latex || noteText || '请参考标准过程')}</div>
+                  </div>
+                </div>
+              </div>
+            `}
+          </div>
+        `;
       }
 
       return `
         <div class="step-card ${cls}${open}">
-          <div class="step-top" onclick="this.parentElement.classList.toggle('open')">
+          <div class="step-top" onclick="const card=this.parentElement; card.classList.toggle('open'); const icon=this.querySelector('.step-icon'); if(icon){icon.textContent=card.classList.contains('open') ? '▼' : '▶';}">
             <div class="step-left">
-              <div class="step-num">${step.stepNo || index + 1}</div>
-              <div class="step-name">${esc(step.title || `步骤 ${index + 1}`)}</div>
+              <div class="step-num">${stepNo}</div>
+              <div class="step-head-copy">
+                <div class="step-name">${esc(stepTitle)}</div>
+                <div class="trace-step-status ${isWrong ? 'trace-step-status--wrong' : 'trace-step-status--ok'}">
+                  ${isWrong ? '❌ 错误' : '✅ 正确'}
+                </div>
+              </div>
             </div>
-            <div class="step-icon">${icon}</div>
+            <div class="step-icon">${toggleIcon}</div>
           </div>
           <div class="step-body">${body}</div>
         </div>
@@ -1138,20 +1187,64 @@ const App = (() => {
       return;
     }
 
+    const items = buildExplainItems(result);
+    const hasError = hasErrorInResult(result) || items.length > 0;
+    const score = resolveReviewScore(result, items);
+    const scoreTone = score >= 80 ? 'review-summary-score--ok' : score >= 60 ? 'review-summary-score--warn' : 'review-summary-score--err';
+    const summary = resolveReviewSummary(result, items, hasError);
+
+    $('explainCards').innerHTML = `
+      <div class="review-summary-card${hasError ? ' review-summary-card--error' : ' review-summary-card--ok'}">
+        <div class="review-summary-status ${hasError ? 'review-summary-status--error' : 'review-summary-status--ok'}">
+          ${hasError ? '❌ 错误' : '✅ 正确'}
+        </div>
+        <div class="review-summary-score ${scoreTone}">
+          <span class="review-summary-score__value">${score}</span>
+          <span class="review-summary-score__unit">/100</span>
+        </div>
+        <div class="review-summary-note">${renderText(summary)}</div>
+        ${items.length ? `
+          <div class="review-summary-errors">
+            ${items.map((item, index) => `
+              <div class="review-summary-error-item">
+                <div class="review-summary-error-item__title">错误 ${index + 1} · ${esc(item.position || item.title)}</div>
+                <div class="review-summary-error-item__row">
+                  <span class="review-summary-error-item__label">学生写的</span>
+                  <span class="review-summary-error-item__value review-summary-error-item__value--wrong">${renderText(item.wrote || '未识别')}</span>
+                </div>
+                <div class="review-summary-error-item__row">
+                  <span class="review-summary-error-item__label">正确答案</span>
+                  <span class="review-summary-error-item__value review-summary-error-item__value--ok">${renderText(item.correct || '请参考标准答案')}</span>
+                </div>
+                ${item.explain ? `<div class="review-summary-error-item__note">${renderText(item.explain)}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+
+    block.classList.remove('hidden');
+  }
+
+  function buildExplainItems(result = {}) {
     const items = [];
     const steps = Array.isArray(result.steps) ? result.steps : [];
 
     steps.forEach((step, index) => {
+      const stepNo = step.stepNo || index + 1;
+      const stepTitle = step.title || `步骤 ${stepNo}`;
       const diffs = Array.isArray(step.matrixCellDiffs) ? step.matrixCellDiffs : [];
+
       if (diffs.length) {
         diffs.forEach((diff) => {
           items.push({
-            title: `步骤 ${step.stepNo || index + 1} · ${step.title || '错误定位'}`,
-            loc: `第 ${diff.row || '-'} 行 · 第 ${diff.col || '-'} 列`,
-            wrote: diff.actual || '-',
-            correct: diff.expected || '-',
-            explain: diff.reason || step.explanation || step.errorMessage || result.feedback || '系统检测到该位置与标准答案不一致。',
-            suggest: '建议按列逐项核对，确认每一步行变换或代数运算只作用在目标对象上。'
+            stepNo,
+            title: stepTitle,
+            position: formatDiffLocation(diff, stepNo),
+            wrote: diff.actual || step.content || step.highlightedLatex || step.latex || '',
+            correct: diff.expected || step.latex || '请参考标准过程',
+            explain: diff.reason || step.explanation || step.errorMessage || result.feedback || '系统检测到该位置与标准答案不一致。'
           });
         });
         return;
@@ -1159,78 +1252,113 @@ const App = (() => {
 
       if (step.isWrong) {
         items.push({
-          title: `步骤 ${step.stepNo || index + 1} · ${step.title || '错误定位'}`,
-          loc: result.errorIndex ? `第 ${result.errorIndex} 步附近` : '当前步骤',
+          stepNo,
+          title: stepTitle,
+          position: `步骤 ${stepNo} · ${stepTitle}`,
           wrote: step.content || step.highlightedLatex || step.latex || '学生当前写法',
-          correct: result.feedback || '请参考系统诊断建议',
-          explain: step.errorMessage || step.explanation || result.feedback || '系统检测到该步骤存在风险。',
-          suggest: '建议对照上一步结果重新演算，并检查符号、行列位置和每一列的运算是否完整。'
+          correct: step.latex || result.feedback || '请参考标准过程',
+          explain: step.errorMessage || step.explanation || result.feedback || '系统检测到该步骤存在风险。'
         });
       }
     });
 
     if (!items.length && result.feedback && result.status !== 'correct') {
       items.push({
-        title: '系统诊断摘要',
-        loc: result.errorIndex ? `第 ${result.errorIndex} 步` : '待人工复核',
-        wrote: '请查看系统摘要',
-        correct: '请结合教师讲评进一步确认',
-        explain: result.feedback,
-        suggest: '建议结合原题和作答图片一起回看，必要时重新发起诊断。'
+        stepNo: result.errorIndex || 0,
+        title: '系统摘要',
+        position: result.errorIndex ? `第 ${result.errorIndex} 步附近` : '待人工复核',
+        wrote: '请结合原图复核',
+        correct: '请参考系统总结',
+        explain: result.feedback
       });
     }
 
-    if (!items.length) {
-      $('explainCards').innerHTML = `
-        <div class="all-correct">
-          <div class="big">🎉</div>
-          <div class="title">当前未发现明显错误</div>
-          <div class="sub">这张作业的可识别步骤没有被系统标记为错误。</div>
-        </div>
-      `;
-      block.classList.remove('hidden');
+    return items;
+  }
+
+  function resolveReviewScore(result = {}, items = []) {
+    const explicitScore = Number(result.score ?? result.totalScore ?? result.grade);
+    if (Number.isFinite(explicitScore)) {
+      return Math.max(0, Math.min(100, Math.round(explicitScore)));
+    }
+
+    if (result.status === 'correct') {
+      return 100;
+    }
+
+    if (result.status === 'unable_to_judge') {
+      return 60;
+    }
+
+    const steps = Array.isArray(result.steps) ? result.steps : [];
+    const totalSteps = Math.max(steps.length, items.length, 1);
+    const wrongSteps = new Set();
+
+    steps.forEach((step, index) => {
+      const diffs = Array.isArray(step.matrixCellDiffs) ? step.matrixCellDiffs : [];
+      if (step.isWrong || diffs.length) {
+        wrongSteps.add(step.stepNo || index + 1);
+      }
+    });
+
+    if (!wrongSteps.size && items.length) {
+      wrongSteps.add(items[0].stepNo || 1);
+    }
+
+    const wrongCount = Math.min(wrongSteps.size, totalSteps);
+    return Math.max(0, Math.round(((totalSteps - wrongCount) / totalSteps) * 100));
+  }
+
+  function resolveReviewSummary(result = {}, items = [], hasError = false) {
+    const summary = String(result.summary || result.feedback || '').trim();
+    if (summary) {
+      return summary;
+    }
+    if (hasError) {
+      return `共定位 ${items.length || 1} 处需要复核的问题，建议优先查看标红步骤和错误位置。`;
+    }
+    return '当前识别到的可见步骤未发现明显错误，建议结合原图再做一次人工复核。';
+  }
+
+  function formatDiffLocation(diff = {}, stepNo = '') {
+    if (diff.row != null && diff.col != null) {
+      return `步骤 ${stepNo} · 第 ${diff.row} 行 · 第 ${diff.col} 列`;
+    }
+    if (diff.row != null) {
+      return `步骤 ${stepNo} · 第 ${diff.row} 行`;
+    }
+    if (diff.col != null) {
+      return `步骤 ${stepNo} · 第 ${diff.col} 列`;
+    }
+    return `步骤 ${stepNo}`;
+  }
+
+  function resetOcrToggle(expanded = false) {
+    const body = $('ocrBody');
+    const icon = $('ocrToggleIcon');
+    const hint = $('ocrToggleHint');
+
+    if (body) {
+      body.classList.toggle('hidden', !expanded);
+    }
+    if (icon) {
+      icon.textContent = expanded ? '▼' : '▶';
+    }
+    if (hint) {
+      hint.textContent = expanded ? '点击收起' : '点击展开';
+    }
+  }
+
+  function toggleOcr(forceExpanded) {
+    const body = $('ocrBody');
+    if (!body) {
       return;
     }
 
-    $('explainCards').innerHTML = items.map((item) => `
-      <div class="err-card">
-        <div class="err-card-title">
-          <div class="err-icon-circle">⚠️</div>
-          ${esc(item.title)}
-        </div>
-
-        <div class="err-grid">
-          <div class="err-cell loc">
-            <div class="cell-label">错误位置</div>
-            <div class="cell-value">${esc(item.loc)}</div>
-          </div>
-          <div class="err-cell">
-            <div class="cell-label">所在步骤</div>
-            <div class="cell-value">${esc(item.title)}</div>
-          </div>
-          <div class="err-cell wrong">
-            <div class="cell-label">学生写的</div>
-            <div class="cell-value">${esc(item.wrote)}</div>
-          </div>
-          <div class="err-cell right">
-            <div class="cell-label">建议参考</div>
-            <div class="cell-value">${esc(item.correct)}</div>
-          </div>
-        </div>
-
-        <div class="err-explain">
-          <div class="ex-label">错误分析</div>
-          <p>${renderText(item.explain)}</p>
-        </div>
-
-        <div class="err-suggest">
-          <div class="sug-icon">🎯</div>
-          <div class="sug-text">${renderText(item.suggest)}</div>
-        </div>
-      </div>
-    `).join('');
-
-    block.classList.remove('hidden');
+    const shouldExpand = typeof forceExpanded === 'boolean'
+      ? forceExpanded
+      : body.classList.contains('hidden');
+    resetOcrToggle(shouldExpand);
   }
 
   function showBoxes(highlights = []) {
@@ -1293,7 +1421,7 @@ const App = (() => {
     if (status === 'unable_to_judge') {
       return '需要人工复核';
     }
-    return status ? String(status).replaceAll('_', ' ') : '诊断完成';
+    return status ? String(status).replaceAll('_', ' ') : '批改完成';
   }
 
   function setButtonBusy(button, busy, busyLabel = '') {
@@ -1466,6 +1594,7 @@ const App = (() => {
     goBack,
     runDetection,
     triggerUpload,
+    toggleOcr,
     focusDiagnosis,
     openNotebook,
     openStats,

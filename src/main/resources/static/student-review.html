@@ -32,7 +32,7 @@
         <div class="review-brand__copy">
           <p class="review-brand__eyebrow">Student Review</p>
           <h1 class="review-brand__title">Solvian 学生作业诊断台</h1>
-          <p class="review-brand__desc">按学生快速筛选最近提交的作业，查看图片、运行 AI 诊断，并把错误定位、步骤追踪和讲解建议集中在同一个工作区中。</p>
+          <p class="review-brand__desc">按学生快速筛选最近提交的作业，查看图片、执行 AI 批改，并把错误定位、步骤追踪和讲解建议集中在同一个工作区中。</p>
         </div>
       </div>
 
@@ -116,7 +116,7 @@
               <div class="action-group">
                 <button id="btnDetect" class="action-button action-button--primary action-button--large" type="button" onclick="App.runDetection()" disabled>
                   <span class="action-button__icon">▶</span>
-                  <span class="action-button__label">启动 AI 诊断</span>
+                  <span class="action-button__label">AI 批改</span>
                 </button>
               </div>
             </div>
@@ -138,8 +138,8 @@
               <div class="result-head">
                 <div class="result-head__copy">
                   <p class="eyebrow">Diagnosis Result</p>
-                  <h3 class="block-title">AI 诊断结果</h3>
-                  <p class="block-desc">诊断过程会依次展示预览图、流程状态、OCR 识别、步骤追踪和错误讲解。</p>
+                  <h3 class="block-title">AI 批改结果</h3>
+                  <p class="block-desc">结果区会依次展示原图、批改结论、步骤追踪，以及可展开查看的 OCR 识别内容。</p>
                 </div>
               </div>
 
@@ -150,54 +150,38 @@
                     <div id="errorBoxes" class="error-boxes"></div>
                   </div>
 
-                  <div class="pipeline-head">
-                    <div class="pipeline-head__title">诊断流水线</div>
+                  <div class="pipeline-inline">
+                    <span class="pipeline-inline__label">流程状态</span>
+                    <span class="pipeline-inline__copy">原图解析 → OCR 提取 → 步骤核验 → 结果生成</span>
                     <div id="pipeTag" class="pipe-tag">等待</div>
-                  </div>
-
-                  <div class="pipeline">
-                    <div class="pipe-step" data-n="1">
-                      <div class="pipe-step__num">1</div>
-                      <div class="pipe-step__title">载入题图</div>
-                      <div class="pipe-step__sub">准备图片与上下文</div>
-                    </div>
-                    <div class="pipe-step" data-n="2">
-                      <div class="pipe-step__num">2</div>
-                      <div class="pipe-step__title">OCR 提取</div>
-                      <div class="pipe-step__sub">抽取矩阵与关键文本</div>
-                    </div>
-                    <div class="pipe-step" data-n="3">
-                      <div class="pipe-step__num">3</div>
-                      <div class="pipe-step__title">步骤追踪</div>
-                      <div class="pipe-step__sub">校验每一步是否正确</div>
-                    </div>
-                    <div class="pipe-step" data-n="4">
-                      <div class="pipe-step__num">4</div>
-                      <div class="pipe-step__title">错误讲解</div>
-                      <div class="pipe-step__sub">生成可读反馈建议</div>
-                    </div>
                   </div>
                 </div>
 
-                <section id="ocrBlock" class="detail-block hidden">
-                  <p class="eyebrow">OCR Result</p>
-                  <h3 class="block-title">OCR 识别内容</h3>
-                  <p class="block-desc">按块展示题目与学生书写内容，便于快速对照。</p>
-                  <div id="ocrContent" class="ocr-content"></div>
+                <section id="explainBlock" class="detail-block hidden">
+                  <p class="eyebrow">Error Review</p>
+                  <h3 class="block-title">批改结果</h3>
+                  <p class="block-desc">先看整体结论，再看具体错误位置和参考答案。</p>
+                  <div id="explainCards" class="explain-cards"></div>
                 </section>
 
                 <section id="traceBlock" class="detail-block hidden">
                   <p class="eyebrow">Step Trace</p>
                   <h3 class="block-title">步骤追踪</h3>
-                  <p class="block-desc">错误步骤默认展开，便于直接定位问题。</p>
+                  <p class="block-desc">步骤中的数学内容会以 LaTeX 公式展示，错误步骤会重点标注。</p>
                   <div id="traceCards" class="trace-cards"></div>
                 </section>
 
-                <section id="explainBlock" class="detail-block hidden">
-                  <p class="eyebrow">Error Review</p>
-                  <h3 class="block-title">错误详解</h3>
-                  <p class="block-desc">聚焦错误位置、正确答案、原因和教学建议。</p>
-                  <div id="explainCards" class="explain-cards"></div>
+                <section id="ocrBlock" class="detail-block detail-block--toggle hidden">
+                  <button id="ocrToggleBtn" class="detail-toggle" type="button" onclick="App.toggleOcr()">
+                    <span class="detail-toggle__title">OCR 识别内容</span>
+                    <span id="ocrToggleHint" class="detail-toggle__hint">点击展开</span>
+                    <span id="ocrToggleIcon" class="detail-toggle__icon">▶</span>
+                  </button>
+                  <div id="ocrBody" class="detail-toggle__body hidden">
+                    <p class="eyebrow">OCR Result</p>
+                    <p class="block-desc">按块展示题目与学生书写内容，便于快速对照。</p>
+                    <div id="ocrContent" class="ocr-content"></div>
+                  </div>
                 </section>
               </div>
             </article>
