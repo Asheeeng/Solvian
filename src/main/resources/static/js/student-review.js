@@ -1277,7 +1277,33 @@ const App = (() => {
   }
 
   function resolveReviewScore(result = {}, items = []) {
+    const steps = Array.isArray(result.steps) ? result.steps : [];
+    const wrongSteps = new Set();
+
+    steps.forEach((step, index) => {
+      const diffs = Array.isArray(step.matrixCellDiffs) ? step.matrixCellDiffs : [];
+      if (step.isWrong || diffs.length) {
+        wrongSteps.add(step.stepNo || index + 1);
+      }
+    });
+
+    if (!wrongSteps.size && items.length) {
+      items.forEach((item, index) => {
+        wrongSteps.add(item.stepNo || index + 1);
+      });
+    }
+
     const explicitScore = Number(result.score ?? result.totalScore ?? result.grade);
+    const totalSteps = Math.max(steps.length, items.length, wrongSteps.size, 1);
+    const wrongCount = Math.min(wrongSteps.size, totalSteps);
+    if (wrongCount > 0) {
+      const heuristicScore = Math.max(0, Math.round(((totalSteps - wrongCount) / totalSteps) * 100));
+      if (Number.isFinite(explicitScore)) {
+        return Math.max(0, Math.min(95, Math.min(Math.round(explicitScore), heuristicScore)));
+      }
+      return heuristicScore;
+    }
+
     if (Number.isFinite(explicitScore)) {
       return Math.max(0, Math.min(100, Math.round(explicitScore)));
     }
@@ -1290,23 +1316,7 @@ const App = (() => {
       return 60;
     }
 
-    const steps = Array.isArray(result.steps) ? result.steps : [];
-    const totalSteps = Math.max(steps.length, items.length, 1);
-    const wrongSteps = new Set();
-
-    steps.forEach((step, index) => {
-      const diffs = Array.isArray(step.matrixCellDiffs) ? step.matrixCellDiffs : [];
-      if (step.isWrong || diffs.length) {
-        wrongSteps.add(step.stepNo || index + 1);
-      }
-    });
-
-    if (!wrongSteps.size && items.length) {
-      wrongSteps.add(items[0].stepNo || 1);
-    }
-
-    const wrongCount = Math.min(wrongSteps.size, totalSteps);
-    return Math.max(0, Math.round(((totalSteps - wrongCount) / totalSteps) * 100));
+    return 85;
   }
 
   function resolveReviewSummary(result = {}, items = [], hasError = false) {
